@@ -64,4 +64,7 @@ function initThemeToggle() {
             applyTheme(systemTheme);
         }
     });
+
+    // Expose applyTheme globally so chatbot can use it
+    window.applyTheme = applyTheme;
 }

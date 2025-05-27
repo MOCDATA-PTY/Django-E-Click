@@ -36,9 +36,6 @@ function initChatbot() {
             "You can reach us through the contact form on our website, by email at contact@eclick.com, or by phone at (555) 123-4567.",
             "Our team is available Monday to Friday, 9am-5pm. Feel free to use the contact section on this website!"
         ],
-        theme: [
-            "You can toggle between light and dark mode using the theme button in the chat header. We offer a seamless visual experience regardless of your preference."
-        ],
         default: [
             "I don't have that information right now. Would you like to speak with a member of our team?",
             "Great question! For more detailed information, I recommend reaching out to our team through the contact form.",
@@ -46,13 +43,12 @@ function initChatbot() {
         ]
     };
     
-    // Keywords for matching user queries
+    // Keywords for matching user queries (removed theme keywords)
     const keywords = {
         service: ['service', 'offer', 'provide'],
         automation: ['automat', 'workflow', 'process'],
         price: ['price', 'cost', 'much'],
-        contact: ['contact', 'reach', 'talk'],
-        theme: ['theme', 'dark', 'light', 'mode']
+        contact: ['contact', 'reach', 'talk']
     };
     
     // Initialize timestamp
@@ -119,8 +115,52 @@ function initChatbot() {
         chatbotMessages.appendChild(messageDiv);
     }
     
+    // Handle theme switching
+    function handleThemeInput(input) {
+        const normalizedInput = input.toLowerCase().trim();
+
+        if (normalizedInput.includes('dark') ||
+            normalizedInput.includes('night') ||
+            normalizedInput.includes('dark mode') ||
+            normalizedInput.includes('i want dark') ||
+            normalizedInput.includes('switch to dark') ||
+            normalizedInput.includes('make it dark')) {
+          
+          // Properly set theme with localStorage
+          localStorage.setItem('theme', 'dark');
+          if (window.applyTheme) {
+              window.applyTheme('dark');
+          }
+          return 'Switching to dark mode! 🌙 Enjoy the darker interface.';
+        }
+
+        if (normalizedInput.includes('light') ||
+            normalizedInput.includes('day') ||
+            normalizedInput.includes('light mode') ||
+            normalizedInput.includes('i want light') ||
+            normalizedInput.includes('switch to light') ||
+            normalizedInput.includes('make it light')) {
+          
+          // Properly set theme with localStorage  
+          localStorage.setItem('theme', 'light');
+          if (window.applyTheme) {
+              window.applyTheme('light');
+          }
+          return 'Switching to light mode! ☀️ Enjoy the brighter interface.';
+        }
+
+        return null; // No theme change requested
+    }
+    
     // Generate bot response
     function generateBotResponse(query) {
+        // First check if it's a theme request
+        const themeResponse = handleThemeInput(query);
+        if (themeResponse) {
+            return themeResponse;
+        }
+        
+        // Otherwise, use regular keyword matching
         const lowercaseQuery = query.toLowerCase();
         let responseType = 'default';
         

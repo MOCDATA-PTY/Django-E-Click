@@ -1,31 +1,55 @@
+{% load static %}
+
 <!-- Chatbot Component -->
-<div id="chatbot-container">
+<div id="chatbot-container" class="relative">
     <!-- Chat button -->
     <button
         id="chatbot-button"
-        class="fixed bottom-5 right-5 bg-red-600 hover:bg-red-700 dark:bg-accent hover:dark:bg-accent-dark text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all z-50 scale-100 opacity-100"
+        class="fixed bottom-20 sm:bottom-24 md:bottom-28 right-20 sm:right-24 md:right-28 z-50 animate-float"
         aria-label="Open chat"
     >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-        </svg>
+        <div class="p-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg flex items-center justify-center">
+            <img src="{% static 'images/GIU AMA 255-07.jpg' %}" alt="Robot Icon" class="w-[96px] h-[96px] sm:w-[115px] sm:h-[115px]"/>
+        </div>
     </button>
-    
+
+    <!-- Speech Bubble -->
+    <div
+        id="chatbot-bubble"
+        class="fixed z-40 p-2 sm:p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md text-slate-700 dark:text-slate-200 text-xs sm:text-sm pointer-events-none opacity-100 transition-opacity duration-300"
+        style="bottom: calc(var(--button-bottom, 112px) + 80px); left: calc(var(--button-left, 112px) + 80px);"
+    >
+        How can I help you?
+    </div>
+
     <!-- Chat window -->
-    <div 
+    <div
         id="chatbot-window"
-        class="fixed bottom-5 right-5 w-80 sm:w-96 h-[500px] max-h-[80vh] bg-white dark:bg-gray-900 rounded-lg shadow-xl flex flex-col overflow-hidden z-50 transition-all duration-300 opacity-0 scale-95 pointer-events-none"
+        class="fixed bottom-5 right-5 w-80 sm:w-96 h-[500px] max-h-[80vh] bg-white dark:bg-gray-900 rounded-lg shadow-xl flex flex-col z-50 transition-all duration-300 opacity-0 scale-95 pointer-events-none"
     >
         <!-- Header -->
-        <div class="bg-red-600 dark:bg-accent text-white p-4 flex justify-between items-center">
+        <div class="bg-red-600 dark:bg-accent text-white p-4 flex justify-between items-center flex-shrink-0">
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center">
-                    <span class="text-red-600 dark:text-accent font-bold text-xl">E</span>
+                    <!-- Small robot icon for header -->
+                    <svg class="w-5 h-5 text-red-600 dark:text-accent" fill="currentColor" viewBox="0 0 20 20">
+                        <rect x="6" y="4" width="8" height="6" rx="1"/>
+                        <circle cx="8.5" cy="6.5" r="0.8" fill="white"/>
+                        <circle cx="11.5" cy="6.5" r="0.8" fill="white"/>
+                        <rect x="8.5" y="8.5" width="3" height="0.8" rx="0.4" fill="white"/>
+                        <rect x="9.7" y="2" width="0.6" height="2" rx="0.3"/>
+                        <circle cx="10" cy="1.5" r="0.8"/>
+                        <rect x="7" y="10" width="6" height="6" rx="0.5"/>
+                        <rect x="4" y="11" width="3" height="1.5" rx="0.5"/>
+                        <rect x="13" y="11" width="3" height="1.5" rx="0.5"/>
+                        <rect x="8" y="16" width="1.5" height="2.5" rx="0.3"/>
+                        <rect x="10.5" y="16" width="1.5" height="2.5" rx="0.3"/>
+                    </svg>
                 </div>
                 <h3 class="font-semibold">E-click Support</h3>
             </div>
             <div class="flex items-center gap-2">
-                <button 
+                <button
                     id="chatbot-close"
                     class="text-white hover:text-red-200"
                     aria-label="Close chat"
@@ -36,26 +60,26 @@
                 </button>
             </div>
         </div>
-        
+
         <!-- Messages -->
-        <div id="chatbot-messages" class="flex-1 overflow-y-auto p-3 bg-gray-50 dark:bg-gray-800">
+        <div id="chatbot-messages" class="flex-1 overflow-y-auto p-3 bg-gray-50 dark:bg-gray-800 flex-grow">
             <div class="mb-2 flex justify-start">
                 <div class="max-w-[80%] rounded-lg p-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100">
-                    <p class="text-sm leading-snug">👋 Hello! I'm E-click's virtual assistant. How can I help you today?</p>
+                    <p class="text-sm leading-snug">Hello! I'm your E-click assistant. Would you like to use light mode or dark mode?</p>
                     <p class="text-xs mt-0.5 opacity-70" id="initial-timestamp"></p>
                 </div>
             </div>
         </div>
-        
+
         <!-- Input area -->
-        <form id="chatbot-form" class="border-t border-gray-200 dark:border-gray-700 p-3 flex">
+        <form id="chatbot-form" class="border-t border-gray-200 dark:border-gray-700 p-3 flex-shrink-0 flex">
             <input
                 id="chatbot-input"
                 type="text"
                 placeholder="Type your message..."
                 class="flex-1 bg-white dark:bg-gray-700 border border-red-200 dark:border-gray-600 text-gray-800 dark:text-white placeholder-gray-400 rounded-l-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-red-500 dark:focus:ring-accent"
             />
-            <button 
+            <button
                 type="submit"
                 class="bg-red-600 hover:bg-red-700 dark:bg-accent hover:dark:bg-accent-dark text-white px-4 py-2 rounded-r-md transition-colors"
                 disabled
@@ -67,3 +91,291 @@
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatbotButton = document.getElementById('chatbot-button');
+    const chatbotWindow = document.getElementById('chatbot-window');
+    const chatbotCloseButton = document.getElementById('chatbot-close');
+    const chatbotForm = document.getElementById('chatbot-form');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotMessages = document.getElementById('chatbot-messages');
+    const sendButton = chatbotForm.querySelector('button[type="submit"]');
+    const initialTimestamp = document.getElementById('initial-timestamp');
+    const chatbotBubble = document.getElementById('chatbot-bubble');
+
+    // Function to format timestamp
+    function formatTimestamp(date) {
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedHours = hours % 12 || 12;
+        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+        return `${formattedHours}:${formattedMinutes} ${ampm}`;
+    }
+
+    // Set initial message timestamp
+    if (initialTimestamp) {
+        initialTimestamp.textContent = formatTimestamp(new Date());
+    }
+
+    // Function to update bubble position based on button position
+    function updateBubblePosition() {
+        const chatbotContainerRect = document.getElementById('chatbot-container').getBoundingClientRect();
+        const buttonRect = chatbotButton.getBoundingClientRect();
+        const bubbleRect = chatbotBubble.getBoundingClientRect();
+        
+        // Adjust these offsets as needed to fine-tune bubble position relative to the robot
+        const offsetX = -bubbleRect.width + 20; // Increased distance from left edge of robot (20px gap)
+        const verticalOffsetFromButtonTop = 0; // Align bottom of bubble with top of robot
+        
+        // Calculate bubble position relative to the viewport
+        // Position bubble's right edge relative to the button's left edge
+        const bubbleLeft = buttonRect.left + offsetX;
+        // Position bubble's bottom edge relative to the button's top edge
+        const bubbleBottom = window.innerHeight - (buttonRect.top + verticalOffsetFromButtonTop);
+
+        // Apply position using style properties
+         chatbotBubble.style.left = `${bubbleLeft}px`;
+         chatbotBubble.style.bottom = `${bubbleBottom}px`;
+
+        // Also adjust visibility/opacity if needed based on button visibility
+        if (chatbotButton.style.display === 'none' || chatbotButton.classList.contains('opacity-0')) {
+             chatbotBubble.classList.add('opacity-0', 'pointer-events-none');
+        } else {
+             chatbotBubble.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+    }
+
+    // Initial bubble positioning and update on window resize/scroll
+    updateBubblePosition();
+    window.addEventListener('resize', updateBubblePosition);
+    // May need more event listeners if the button's position changes without resize/scroll
+
+
+    // Function to open the chatbot window
+    function openChat() {
+        chatbotWindow.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+        chatbotWindow.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
+        // Hide the chatbot button by making it invisible and not interactable
+        chatbotButton.classList.add('opacity-0', 'pointer-events-none');
+        chatbotBubble.classList.add('opacity-0', 'pointer-events-none'); // Hide bubble when chat opens
+    }
+
+    // Function to close the chatbot window
+    function closeChat() {
+        chatbotWindow.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
+        chatbotWindow.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+        // Show the chatbot button by making it visible and interactable
+        chatbotButton.classList.remove('opacity-0', 'pointer-events-none');
+        chatbotBubble.classList.remove('opacity-0', 'pointer-events-none'); // Show bubble when chat closes
+        updateBubblePosition(); // Update bubble position when showing again
+    }
+
+    // Event listeners
+    chatbotButton.addEventListener('click', openChat);
+    chatbotCloseButton.addEventListener('click', closeChat);
+
+    // Enable send button when input is not empty
+    chatbotInput.addEventListener('input', function() {
+        sendButton.disabled = chatbotInput.value.trim() === '';
+    });
+
+    // Function to add a message to the chat window
+    function addChatMessage(message, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `mb-2 flex ${isUser ? 'justify-end' : 'justify-start'}`;
+        const timestamp = formatTimestamp(new Date());
+        messageDiv.innerHTML = `
+            <div class="max-w-[80%] rounded-lg p-2.5 ${isUser ? 'bg-red-500 text-white' : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100'}">
+                <p class="text-sm leading-snug">${message}</p>
+                <p class="text-xs mt-0.5 opacity-70 ${isUser ? 'text-red-100' : 'text-gray-600 dark:text-gray-300'}">${timestamp}</p>
+            </div>
+        `;
+        chatbotMessages.appendChild(messageDiv);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    // Function to handle user input for theme switching
+    function handleThemeInput(input) {
+        const normalizedInput = input.toLowerCase().trim();
+
+        if (normalizedInput.includes('dark') ||
+            normalizedInput.includes('night') ||
+            normalizedInput.includes('dark mode') ||
+            normalizedInput.includes('i want dark') ||
+            normalizedInput.includes('switch to dark') ||
+            normalizedInput.includes('make it dark')) {
+          
+          // Properly set theme with localStorage
+          localStorage.setItem('theme', 'dark');
+          window.applyTheme('dark');
+          addChatMessage('Switching to dark mode! 🌙 Enjoy the darker interface.');
+          return;
+        }
+
+        if (normalizedInput.includes('light') ||
+            normalizedInput.includes('day') ||
+            normalizedInput.includes('light mode') ||
+            normalizedInput.includes('i want light') ||
+            normalizedInput.includes('switch to light') ||
+            normalizedInput.includes('make it light')) {
+          
+          // Properly set theme with localStorage  
+          localStorage.setItem('theme', 'light');
+          window.applyTheme('light');
+          addChatMessage('Switching to light mode! ☀️ Enjoy the brighter interface.');
+          return;
+        }
+
+        addChatMessage('I\'m not sure what theme you want. Please try saying something like "I want dark mode" or "Switch to light mode".');
+    }
+
+    // Handle form submission
+    chatbotForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const userMessage = chatbotInput.value.trim();
+        if (userMessage) {
+            addChatMessage(userMessage, true);
+            handleThemeInput(userMessage);
+            chatbotInput.value = '';
+            sendButton.disabled = true;
+        }
+    });
+
+    // Add an event listener to reposition the bubble when the button's animation frame updates
+    // This is a bit hacky, but needed because the button's position changes due to the animation
+    let animationFrameId;
+    function animateBubblePosition() {
+        updateBubblePosition();
+        animationFrameId = requestAnimationFrame(animateBubblePosition);
+    }
+    
+    // Start observing the button's animation
+    // We need a way to observe the transform change due to animation. MutationObserver isn't ideal for transforms.
+    // requestAnimationFrame is the most reliable way to track the animated position.
+    animateBubblePosition();
+
+    // Stop the animation frame loop when the window is closed or navigated away
+    window.addEventListener('beforeunload', function() {
+        cancelAnimationFrame(animationFrameId);
+    });
+
+});
+
+// Theme Toggle JavaScript - Final Fixed Version  
+document.addEventListener('DOMContentLoaded', function () {     
+    initThemeToggle(); 
+});  
+
+function initThemeToggle() {     
+    const themeToggle = document.getElementById('theme-toggle');     
+    const mobileThemeToggle = document.getElementById('mobile-theme-toggle');      
+
+    // Use localStorage or system preference     
+    let currentTheme = localStorage.getItem('theme') ||         
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');      
+
+    applyTheme(currentTheme);      
+
+    function applyTheme(theme) {         
+        if (theme === 'dark') {             
+            document.documentElement.classList.add('dark');         
+        } else {             
+            document.documentElement.classList.remove('dark');         
+        }          
+
+        // Desktop icons         
+        const sunIcon = document.getElementById('sun-icon');         
+        const moonIcon = document.getElementById('moon-icon');          
+
+        if (sunIcon && moonIcon) {             
+            sunIcon.classList.toggle('opacity-100', theme === 'dark');             
+            sunIcon.classList.toggle('opacity-0', theme !== 'dark');             
+            moonIcon.classList.toggle('opacity-0', theme === 'dark');             
+            moonIcon.classList.toggle('opacity-100', theme !== 'dark');         
+        }          
+
+        // Mobile icons         
+        if (mobileThemeToggle) {             
+            const mobileSunIcon = mobileThemeToggle.querySelector('svg:first-child');             
+            const mobileMoonIcon = mobileThemeToggle.querySelector('svg:last-child');              
+
+            if (mobileSunIcon && mobileMoonIcon) {                 
+                mobileSunIcon.classList.toggle('hidden', theme !== 'dark');                 
+                mobileSunIcon.classList.toggle('block', theme === 'dark');                 
+                mobileMoonIcon.classList.toggle('hidden', theme === 'dark');                 
+                mobileMoonIcon.classList.toggle('block', theme !== 'dark');             
+            }         
+        }     
+    }      
+
+    function toggleTheme() {         
+        currentTheme = currentTheme === 'dark' ? 'light' : 'dark';         
+        localStorage.setItem('theme', currentTheme);         
+        applyTheme(currentTheme);     
+    }      
+
+    if (themeToggle) themeToggle.addEventListener('click', toggleTheme);     
+    if (mobileThemeToggle) mobileThemeToggle.addEventListener('click', toggleTheme);      
+
+    // Listen for system preference change if no saved theme     
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');     
+    mediaQuery.addEventListener('change', (e) => {         
+        if (!localStorage.getItem('theme')) {             
+            const systemTheme = e.matches ? 'dark' : 'light';             
+            currentTheme = systemTheme;             
+            applyTheme(systemTheme);         
+        }     
+    });      
+
+    // Expose applyTheme globally so chatbot can use it     
+    window.applyTheme = applyTheme; 
+}
+</script>
+
+<style>
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Remove all transitions from the button except the float animation */
+#chatbot-button {
+    transition-property: opacity, transform; /* Allow opacity and transform transitions */
+    transition-duration: 300ms; /* Match chat window transition */
+    transition-timing-function: ease-in-out; /* Smooth timing */
+}
+
+#chatbot-button:hover {
+    transform: none !important; /* Still prevent hover transform */
+}
+
+/* Simple tail for the speech bubble */
+#chatbot-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; /* Position at the bottom edge of the bubble */
+    right: 15px; /* Adjust horizontally to point towards the robot */
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 7px solid #fff; /* Tail color matches bubble background, points down */
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1)); /* Optional shadow for the tail */
+}
+
+/* Dark mode tail color */
+.dark #chatbot-bubble::after {
+     border-top-color: #374151; /* Dark mode tail color */
+}
+</style>

@@ -1,9 +1,36 @@
 <button
-    id="scroll-to-top"
-    class="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-eclick-600 hover:bg-eclick-700 text-white shadow-lg z-50 flex items-center justify-center transition-all duration-300 opacity-0 translate-y-10 pointer-events-none"
+    id="scroll-to-top-btn"
+    class="fixed bottom-5 right-24 bg-red-600 hover:bg-red-700 text-white w-12 h-12 p-3 rounded-full shadow-md transition-opacity duration-300 z-40 opacity-0 pointer-events-none flex items-center justify-center"
     aria-label="Scroll to top"
 >
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-    </svg>
+    &uarr;
 </button>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const scrollToTopButton = document.getElementById('scroll-to-top-btn');
+    const bottomThreshold = 100; // Show button after scrolling 100 pixels from bottom
+
+    // Show/hide button on scroll
+    window.addEventListener('scroll', function() {
+        // Check if the user is near the bottom of the page
+        const isAtBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - bottomThreshold;
+
+        if (isAtBottom) {
+            scrollToTopButton.classList.add('opacity-100');
+            scrollToTopButton.classList.remove('opacity-0', 'pointer-events-none');
+        } else {
+            scrollToTopButton.classList.add('opacity-0', 'pointer-events-none');
+            scrollToTopButton.classList.remove('opacity-100');
+        }
+    });
+
+    // Scroll to top on button click
+    scrollToTopButton.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Smooth scroll animation
+        });
+    });
+});
+</script> 

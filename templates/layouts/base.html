@@ -1,11 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en" class="{% if request.session.theme == 'dark' %}dark{% endif %}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}E-click Technologies - Revolutionary Software Solutions{% endblock %}</title>
-    
-    {% load static %}
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -76,18 +75,5 @@
     <script src="{% static 'js/theme.js' %}"></script>
     <script src="{% static 'js/chatbot.js' %}"></script>
     {% block extra_js %}{% endblock %}
-    
-    <!-- Theme initialization script -->
-    <script>
-        // Initialize theme on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const theme = '{{ request.session.theme|default:"light" }}';
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        });
-    </script>
 </body>
 </html>
