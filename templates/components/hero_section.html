@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Click Technologies</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          animation: {
+            float: 'float 6s ease-in-out infinite',
+            pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="antialiased">
+
+<!-- Navigation -->
+<nav class="fixed w-full z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg" id="navbar">
+ <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+   <div class="flex justify-between items-center h-16 lg:h-20">
+     <!-- Logo -->
+     <a href="#home" class="flex items-center gap-2 lg:gap-3 group">
+       <div class="w-8 h-8 lg:w-10 lg:h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+         <span class="text-white font-bold text-sm lg:text-base">EC</span>
+       </div>
+       <div class="flex flex-col">
+         <span class="text-lg lg:text-xl font-bold text-slate-900 dark:text-white">E-click</span>
+         <span class="text-xs text-slate-500 dark:text-slate-400 -mt-1 tracking-wider hidden sm:block">TECHNOLOGIES</span>
+       </div>
+     </a>
+     
+     <!-- Desktop Navigation -->
+     <div class="hidden lg:flex items-center gap-8">
+       <a href="#home" class="nav-link text-red-600 dark:text-red-400 font-medium transition-all duration-300 relative">
+         Home
+         <span class="absolute -bottom-2 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 rounded-full"></span>
+       </a>
+       <a href="#services" class="nav-link text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 font-medium transition-all duration-300 relative group">
+         Services
+         <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+       </a>
+       <a href="#solutions" class="nav-link text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 font-medium transition-all duration-300 relative group">
+         Solutions
+         <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+       </a>
+       <a href="#clients" class="nav-link text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 font-medium transition-all duration-300 relative group">
+         Clients
+         <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+       </a>
+       <a href="#contact" class="nav-link text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 font-medium transition-all duration-300 relative group">
+         Contact
+         <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+       </a>
+     </div>
+     
+     <!-- Theme Toggle & CTA - Desktop -->
+     <div class="hidden lg:flex items-center gap-4">
+       <button id="theme-toggle" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-300 hover:scale-105">
+         <svg id="sun-icon" class="w-5 h-5 text-yellow-500 transition-all duration-300" fill="currentColor" viewBox="0 0 24 24">
+           <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"/>
+         </svg>
+         <svg id="moon-icon" class="w-5 h-5 text-slate-400 transition-all duration-300 absolute opacity-0" fill="currentColor" viewBox="0 0 24 24">
+           <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd"/>
+         </svg>
+       </button>
+       
+       {% if user.is_authenticated %}
+         <div class="flex items-center gap-4">
+           <span class="text-slate-600 dark:text-slate-300">Welcome, {{ user.username }}</span>
+           <a href="{% url 'main:logout' %}" class="px-4 py-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition-all duration-300 hover:scale-105">
+             Log out
+           </a>
+         </div>
+       {% else %}
+         <a href="{% url 'main:login' %}" class="px-4 py-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition-all duration-300 hover:scale-105">
+           Log in
+         </a>
+         <a href="{% url 'main:signup' %}" class="px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+           Sign up
+         </a>
+       {% endif %}
+     </div>
+     
+     <!-- Mobile Menu Toggle -->
+     <div class="flex items-center gap-3 lg:hidden">
+       <button id="theme-toggle-mobile" class="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-300">
+         <svg id="sun-icon-mobile" class="w-4 h-4 text-yellow-500 transition-all duration-300" fill="currentColor" viewBox="0 0 24 24">
+           <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"/>
+         </svg>
+         <svg id="moon-icon-mobile" class="w-4 h-4 text-slate-400 transition-all duration-300 absolute opacity-0" fill="currentColor" viewBox="0 0 24 24">
+           <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd"/>
+         </svg>
+       </button>
+       
+       <button id="mobile-toggle" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300">
+         <div class="w-6 h-0.5 bg-slate-800 dark:bg-slate-200 mb-1.5 transition-all duration-300 origin-center" id="line1"></div>
+         <div class="w-6 h-0.5 bg-slate-800 dark:bg-slate-200 mb-1.5 transition-all duration-300" id="line2"></div>
+         <div class="w-6 h-0.5 bg-slate-800 dark:bg-slate-200 transition-all duration-300 origin-center" id="line3"></div>
+       </button>
+     </div>
+   </div>
+   
+   <!-- Mobile Menu -->
+   <div id="mobile-menu" class="lg:hidden fixed top-16 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 transform -translate-y-full opacity-0 transition-all duration-300 ease-in-out">
+     <div class="px-4 py-6 space-y-4">
+       <a href="#home" class="block py-3 px-4 text-red-600 dark:text-red-400 font-medium bg-red-50 dark:bg-red-900/20 rounded-lg">Home</a>
+       <a href="#services" class="block py-3 px-4 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all duration-300">Services</a>
+       <a href="#solutions" class="block py-3 px-4 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all duration-300">Solutions</a>
+       <a href="#clients" class="block py-3 px-4 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all duration-300">Clients</a>
+       <a href="#contact" class="block py-3 px-4 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-all duration-300">Contact</a>
+       
+       <div class="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
+         {% if user.is_authenticated %}
+           <div class="px-4 py-2 text-slate-600 dark:text-slate-300">
+             Welcome, {{ user.username }}
+           </div>
+           <a href="{% url 'main:logout' %}" class="block w-full py-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition-all duration-300">
+             Log out
+           </a>
+         {% else %}
+           <a href="{% url 'main:login' %}" class="block w-full py-3 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition-all duration-300">
+             Log in
+           </a>
+           <a href="{% url 'main:signup' %}" class="block w-full py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-xl font-medium shadow-lg transition-all duration-300">
+             Sign up
+           </a>
+         {% endif %}
+       </div>
+     </div>
+   </div>
+ </div>
+</nav>
+
+<!-- Hero Section -->
+<section id="home" class="relative pt-20 lg:pt-32 px-4 sm:px-6 lg:px-8 bg-white dark:bg-slate-900 overflow-hidden transition-colors min-h-screen">
+  <!-- Animated Background -->
+  <div class="absolute inset-0 opacity-5 dark:opacity-10 pointer-events-none">
+    <div class="absolute inset-0 bg-gradient-to-br from-red-500/20 via-blue-500/10 to-purple-500/20 animate-pulse"></div>
+  </div>
+
+  <!-- Floating Code Elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-20 left-4 sm:left-10 text-red-500/20 dark:text-red-400/20 font-mono text-xs sm:text-sm animate-pulse">
+      &lt;div className="innovation"&gt;
+    </div>
+    <div class="absolute top-40 right-4 sm:right-20 text-blue-500/20 dark:text-blue-400/20 font-mono text-xs sm:text-sm animate-pulse" style="animation-delay: 1s;">
+      const success = () =&gt; { return true; }
+    </div>
+    <div class="absolute bottom-40 left-4 sm:left-20 text-purple-500/20 dark:text-purple-400/20 font-mono text-xs sm:text-sm animate-pulse" style="animation-delay: 2s;">
+      &lt;/software&gt;
+    </div>
+    <div class="absolute bottom-20 right-4 sm:right-10 text-green-500/20 dark:text-green-400/20 font-mono text-xs sm:text-sm animate-pulse" style="animation-delay: 1.5s;">
+      npm install future
+    </div>
+  </div>
+
+  <div class="container mx-auto relative z-10">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[calc(100vh-5rem)] lg:min-h-[85vh]">
+        
+        <!-- Left Content -->
+        <div class="space-y-6 lg:space-y-8 max-w-2xl order-2 lg:order-1">
+          <!-- Company Logo -->
+          <div class="flex items-center justify-center lg:justify-start reveal-element opacity-0 translate-y-10 transition-all duration-700">
+            <div class="relative">
+              <div class="h-12 sm:h-16 w-24 sm:w-32 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center text-white font-bold text-lg sm:text-xl">
+                E-CLICK
+              </div>
+              <div class="absolute -inset-2 bg-gradient-to-r from-red-500/20 to-blue-500/20 rounded-xl blur-lg"></div>
+            </div>
+          </div>
+          
+          <!-- Innovation Badge -->
+          <div class="flex justify-center lg:justify-start reveal-element opacity-0 translate-y-10 transition-all duration-700" style="transition-delay: 200ms">
+            <span class="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-semibold bg-gradient-to-r from-red-50 to-blue-50 dark:from-red-900/20 dark:to-blue-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20">
+              <div class="relative">
+                <div class="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full"></div>
+                <div class="absolute inset-0 w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full animate-ping"></div>
+              </div>
+              <span class="hidden sm:inline">Next-Generation Software Solutions</span>
+              <span class="sm:hidden">Next-Gen Solutions</span>
+              <svg class="w-3 h-3 sm:w-4 sm:h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </span>
+          </div>
+          
+          <!-- Main Headline -->
+          <h1 class="reveal-element opacity-0 translate-y-10 transition-all duration-700 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-slate-900 dark:text-white text-center lg:text-left" style="transition-delay: 300ms">
+            Build the 
+            <span class="relative">
+              <span class="bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+                Future
+              </span>
+              <div class="absolute -bottom-1 sm:-bottom-2 left-0 right-0 h-0.5 sm:h-1 bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 rounded-full"></div>
+            </span>
+            <br>of Software
+          </h1>
+          
+          <!-- Value Proposition -->
+          <p class="reveal-element opacity-0 translate-y-10 transition-all duration-700 text-base sm:text-lg lg:text-xl leading-relaxed text-slate-600 dark:text-slate-300 text-center lg:text-left" style="transition-delay: 400ms">
+            Transform your business with cutting-edge software solutions. From AI-powered applications to cloud-native platforms, we deliver enterprise-grade technology that scales with your ambitions.
+          </p>
+          
+          <!-- Key Features -->
+          <div class="reveal-element opacity-0 translate-y-10 transition-all duration-700 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4" style="transition-delay: 500ms">
+            <div class="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-500/20">
+              <div class="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <span class="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">99.9% Uptime</span>
+            </div>
+            
+            <div class="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-500/20">
+              <div class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+              </div>
+              <span class="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">Lightning Fast</span>
+            </div>
+            
+            <div class="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-500/20">
+              <div class="w-6 h-6 sm:w-8 sm:h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <span class="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">Enterprise Security</span>
+            </div>
+            
+            <div class="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-200 dark:border-orange-500/20">
+              <div class="w-6 h-6 sm:w-8 sm:h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+              </div>
+              <span class="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">24/7 Support</span>
+            </div>
+          </div>
+          
+          <!-- CTA Buttons -->
+          <div class="reveal-element opacity-0 translate-y-10 transition-all duration-700 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start" style="transition-delay: 600ms">
+            {% if user.is_authenticated %}
+              <a href="#contact" class="group bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:transform hover:scale-105 flex items-center justify-center gap-3">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Get Started
+              </a>
+            {% else %}
+              <a href="{% url 'main:signup' %}" class="group bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:transform hover:scale-105 flex items-center justify-center gap-3">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Start Building Now
+              </a>
+              
+              <a href="{% url 'main:login' %}" class="group bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-300 hover:transform hover:scale-105 flex items-center justify-center gap-3 hover:border-red-300 dark:hover:border-red-500">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Sign In
+              </a>
+            {% endif %}
+          </div>
+          
+          <!-- Social Proof -->
+          <div class="reveal-element opacity-0 translate-y-10 transition-all duration-700 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-8 pt-6 sm:pt-8" style="transition-delay: 700ms">
+            <div class="flex -space-x-3">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-red-400 to-red-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold border-3 border-white dark:border-slate-900 shadow-lg">CTO</div>
+              <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-400 to-blue-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold border-3 border-white dark:border-slate-900 shadow-lg">CEO</div>
+              <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-400 to-purple-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold border-3 border-white dark:border-slate-900 shadow-lg">VP</div>
+              <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-400 to-green-600 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-bold border-3 border-white dark:border-slate-900 shadow-lg">+10</div>
+            </div>
+            <div class="text-center lg:text-left">
+              <p class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+                <span class="bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent counter" data-target="1000">1000</span>+
+              </p>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300">Software projects delivered</p>
+            </div>
+          </div>
+          
+          <!-- Tech Stack -->
+          <div class="reveal-element opacity-0 translate-y-10 transition-all duration-700 pt-6 sm:pt-8" style="transition-delay: 800ms">
+            <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 sm:mb-4 font-semibold text-center lg:text-left">Powered by industry-leading technology</p>
+            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-6">
+              <div class="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-300 group">
+                <div class="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-br from-red-500 to-red-600 rounded flex items-center justify-center">
+                  <span class="text-white text-xs font-bold">R</span>
+                </div>
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-red-600 dark:group-hover:text-red-400">React</span>
+              </div>
+              
+              <div class="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors duration-300 group">
+                <div class="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-br from-green-500 to-green-600 rounded flex items-center justify-center">
+                  <span class="text-white text-xs font-bold">N</span>
+                </div>
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-green-600 dark:group-hover:text-green-400">Node.js</span>
+              </div>
+              
+              <div class="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-300 group">
+                <div class="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center">
+                  <span class="text-white text-xs font-bold">K</span>
+                </div>
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">Kubernetes</span>
+              </div>
+              
+              <div class="flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors duration-300 group">
+                <div class="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded flex items-center justify-center">
+                  <span class="text-white text-xs font-bold">AI</span>
+                </div>
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300 group-hover:text-purple-600 dark:group-hover:text-purple-400">AI/ML</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Side - Interactive Dashboard -->
+        <div class="reveal-element opacity-0 translate-y-10 transition-all duration-700 relative order-1 lg:order-2" style="transition-delay: 400ms">
+          <!-- Main Interface -->
+          <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden max-w-lg mx-auto lg:max-w-none">
+            
+            <!-- Terminal Header -->
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+              <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-1 sm:gap-2">
+                  <div class="w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full"></div>
+                  <div class="w-2 h-2 sm:w-3 sm:h-3 bg-yellow-500 rounded-full"></div>
+                  <div class="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full"></div>
+                </div>
+                <span class="text-white/80 text-xs sm:text-sm font-mono">E-Click DevStudio</span>
+              </div>
+              <div class="px-2 sm:px-3 py-1 bg-green-500 text-white text-xs rounded-full flex items-center gap-1">
+                <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-pulse"></div>
+                Live
+              </div>
+            </div>
+            
+            <!-- Code Editor -->
+            <div class="bg-slate-900 p-3 sm:p-6 font-mono text-xs sm:text-sm">
+              <div class="space-y-1 sm:space-y-2">
+                <div class="flex">
+                  <span class="text-slate-500 w-6 sm:w-8">1</span>
+                  <span class="text-blue-400">import</span>
+                  <span class="text-white ml-1 sm:ml-2">{ </span>
+                  <span class="text-green-400">Innovation</span>
+                  <span class="text-white"> } from </span>
+                  <span class="text-yellow-400">'@eclick/core'</span>
+                </div>
+                <div class="flex">
+                  <span class="text-slate-500 w-6 sm:w-8">2</span>
+                </div>
+                <div class="flex">
+                  <span class="text-slate-500 w-6 sm:w-8">3</span>
+                  <span class="text-purple-400">const</span>
+                  <span class="text-blue-300 ml-1 sm:ml-2">buildFuture</span>
+                  <span class="text-white"> = async () => {</span>
+                </div>
+                <div class="flex">
+                  <span class="text-slate-500 w-6 sm:w-8">4</span>
+                  <span class="text-white ml-2 sm:ml-4">return await </span>
+                  <span class="text-green-400">Innovation</span>
+                  <span class="text-white">.</span>
+                  <span class="text-yellow-400">create</span>
+                  <span class="text-white">({</span>
+                </div>
+                <div class="flex">
+                  <span class="text-slate-500 w-6 sm:w-8">5</span>
+                  <span class="text-white ml-4 sm:ml-8">speed: </span>
+                  <span class="text-orange-400">'lightning'</span>
+                  <span class="text-white">,</span>
+                </div>
+                <div class="flex">
+                  <span class="text-slate-500 w-6 sm:w-8">6</span>
+                  <span class="text-white ml-4 sm:ml-8">scale: </span>
+                  <span class="text-orange-400">'unlimited'</span>
+                  <span class="text-white">,</span>
+                </div>
+                <div class="flex">
+                  <span class="text-slate-500 w-6 sm:w-8">7</span>
+                  <span class="text-white ml-4 sm:ml-8">security: </span>
+                  <span class="text-orange-400">'enterprise'</span>
+                </div>
+                <div class="flex">
+                  <span class="text-slate-500 w-6 sm:w-8">8</span>
+                  <span class="text-white ml-2 sm:ml-4">})</span>
+                </div>
+                <div class="flex">
+                  <span class="text-slate-500 w-6 sm:w-8">9</span>
+                  <span class="text-white">}</span>
+                </div>
+                <div class="flex items-center mt-3 sm:mt-4 pt-2 border-t border-slate-700">
+                  <span class="text-green-400">➜</span>
+                  <span class="text-white ml-1 sm:ml-2 text-xs sm:text-sm">Building the future</span>
+                  <div class="ml-1 sm:ml-2 flex space-x-1">
+                    <div class="w-1 h-1 bg-white rounded-full animate-pulse"></div>
+                    <div class="w-1 h-1 bg-white rounded-full animate-pulse" style="animation-delay: 0.2s"></div>
+                    <div class="w-1 h-1 bg-white rounded-full animate-pulse" style="animation-delay: 0.4s"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Metrics Dashboard -->
+            <div class="bg-white dark:bg-slate-800 p-3 sm:p-6 border-t border-slate-200 dark:border-slate-700">
+              <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6">
+                <div class="text-center p-2 sm:p-4 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl border border-red-200 dark:border-red-500/20">
+                  <div class="text-lg sm:text-2xl font-bold text-red-600 dark:text-red-400">99.9</div>
+                  <div class="text-xs text-red-600/80 dark:text-red-400/80">Uptime %</div>
+                </div>
+                <div class="text-center p-2 sm:p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl border border-blue-200 dark:border-blue-500/20">
+                  <div class="text-lg sm:text-2xl font-bold text-blue-600 dark:text-blue-400">2.3</div>
+                  <div class="text-xs text-blue-600/80 dark:text-blue-400/80">Load Time (s)</div>
+                </div>
+                <div class="text-center p-2 sm:p-4 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl border border-green-200 dark:border-green-500/20">
+                  <div class="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400">1000</div>
+                  <div class="text-xs text-green-600/80 dark:text-green-400/80">Requests/sec</div>
+                </div>
+              </div>
+              
+              <!-- Performance Chart -->
+              <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 sm:p-4">
+                <div class="flex justify-between items-center mb-2 sm:mb-3">
+                  <span class="text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300">System Performance</span>
+                  <span class="text-xs text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">Optimal</span>
+                </div>
+                <div class="flex items-end gap-1 h-12 sm:h-16">
+                  <div class="flex-1 bg-gradient-to-t from-red-500 to-red-400 rounded-sm performance-bar" style="height: 60%;"></div>
+                  <div class="flex-1 bg-gradient-to-t from-red-500 to-red-400 rounded-sm performance-bar" style="height: 75%;"></div>
+                  <div class="flex-1 bg-gradient-to-t from-red-500 to-red-400 rounded-sm performance-bar" style="height: 45%;"></div>
+                  <div class="flex-1 bg-gradient-to-t from-red-500 to-red-400 rounded-sm performance-bar" style="height: 80%;"></div>
+                  <div class="flex-1 bg-gradient-to-t from-red-500 to-red-400 rounded-sm performance-bar" style="height: 65%;"></div>
+                  <div class="flex-1 bg-gradient-to-t from-red-500 to-red-400 rounded-sm performance-bar" style="height: 90%;"></div>
+                  <div class="flex-1 bg-gradient-to-t from-red-500 to-red-400 rounded-sm performance-bar" style="height: 70%;"></div>
+                  <div class="flex-1 bg-gradient-to-t from-red-500 to-red-400 rounded-sm performance-bar" style="height: 85%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+  }
+
+  .performance-bar {
+    animation: barGrow 1s ease-out forwards;
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+
+  @keyframes barGrow {
+    to { transform: scaleY(1); }
+  }
+
+  .reveal-element {
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), 
+                opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  button:hover {
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .performance-bar:hover {
+    transform: scaleY(1.1);
+    filter: brightness(1.1);
+  }
+
+  * {
+    transition-property: color, background-color, border-color, transform, opacity;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+
+  /* Enhanced Responsive Styles */
+  @media (max-width: 640px) {
+    .hero-section {
+      padding-top: 1rem;
+      padding-bottom: 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    .container {
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    .performance-bar {
+      min-height: 0.5rem;
+    }
+
+    /* Mobile Navigation Improvements */
+    #mobile-menu {
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+    }
+
+    #mobile-menu a {
+      padding: 1rem;
+      font-size: 1.1rem;
+    }
+
+    /* Mobile Button Adjustments */
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+    }
+
+    /* Mobile Metrics Dashboard */
+    .metrics-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    /* Mobile Tech Stack */
+    .tech-stack {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .tech-item {
+      width: calc(50% - 0.5rem);
+      margin: 0;
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 1023px) {
+    h1 {
+      font-size: 3.5rem;
+      line-height: 1.2;
+    }
+
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+
+    /* Tablet Navigation */
+    #mobile-menu {
+      max-height: calc(100vh - 5rem);
+    }
+
+    /* Tablet Button Adjustments */
+    button {
+      padding: 0.875rem 1.5rem;
+    }
+
+    /* Tablet Metrics Dashboard */
+    .metrics-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1280px;
+    }
+
+    /* Desktop Navigation */
+    .nav-link {
+      font-size: 1.1rem;
+      padding: 0.5rem 1rem;
+    }
+
+    /* Desktop Button Adjustments */
+    button {
+      padding: 1rem 2rem;
+    }
+
+    /* Desktop Metrics Dashboard */
+    .metrics-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  /* Improved Mobile Menu */
+  #mobile-menu.show {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  #mobile-menu {
+    visibility: hidden;
+  }
+
+  /* Better Touch Targets for Mobile */
+  @media (max-width: 1023px) {
+    button, 
+    a, 
+    .nav-link {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /* Improved Text Readability */
+  @media (max-width: 640px) {
+    p {
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .text-sm {
+      font-size: 0.875rem;
+    }
+
+    .text-xs {
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Better Image Handling */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Improved Form Elements */
+  input, 
+  textarea, 
+  select {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Theme Management
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+  const sunIcon = document.getElementById('sun-icon');
+  const moonIcon = document.getElementById('moon-icon');
+  const sunIconMobile = document.getElementById('sun-icon-mobile');
+  const moonIconMobile = document.getElementById('moon-icon-mobile');
+  
+  function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = savedTheme === 'system' ? (prefersDark ? 'dark' : 'light') : savedTheme;
+    
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
+    updateThemeIcons();
+  }
+  
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.contains('dark');
+    if (isDark) {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    }
+    updateThemeIcons();
+  }
+  
+  function updateThemeIcons() {
+    const isDark = document.documentElement.classList.contains('dark');
+    
+    // Desktop icons
+    if (sunIcon && moonIcon) {
+      if (isDark) {
+        sunIcon.style.opacity = '0';
+        moonIcon.style.opacity = '1';
+      } else {
+        sunIcon.style.opacity = '1';
+        moonIcon.style.opacity = '0';
+      }
+    }
+    
+    // Mobile icons
+    if (sunIconMobile && moonIconMobile) {
+      if (isDark) {
+        sunIconMobile.style.opacity = '0';
+        moonIconMobile.style.opacity = '1';
+      } else {
+        sunIconMobile.style.opacity = '1';
+        moonIconMobile.style.opacity = '0';
+      }
+    }
+  }
+  
+  // Counter Animation
+  function animateCounters() {
+    document.querySelectorAll('.counter').forEach(counter => {
+      const target = parseInt(counter.dataset.target);
+      const duration = 2000;
+      const step = target / (duration / 16);
+      let current = 0;
+      
+      const timer = setInterval(() => {
+        current += step;
+        if (current >= target) {
+          current = target;
+          clearInterval(timer);
+        }
+        
+        if (target < 10) {
+          counter.textContent = current.toFixed(1);
+        } else {
+          counter.textContent = Math.floor(current);
+        }
+      }, 16);
+    });
+  }
+  
+  // Reveal Animations
+  function initRevealAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('opacity-0', 'translate-y-10');
+          entry.target.classList.add('opacity-100', 'translate-y-0');
+        }
+      });
+    }, { 
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+    
+    document.querySelectorAll('.reveal-element').forEach(el => {
+      observer.observe(el);
+    });
+  }
+  
+  // Performance Bar Animation
+  function animatePerformanceBars() {
+    const bars = document.querySelectorAll('.performance-bar');
+    bars.forEach((bar, index) => {
+      setTimeout(() => {
+        bar.style.transform = 'scaleY(1)';
+      }, index * 100);
+    });
+  }
+  
+  // Mobile Menu Toggle
+  const mobileToggle = document.getElementById('mobile-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  let isMobileMenuOpen = false;
+  
+  function toggleMobileMenu() {
+    isMobileMenuOpen = !isMobileMenuOpen;
+    const lines = mobileToggle.querySelectorAll('div');
+    
+    if (isMobileMenuOpen) {
+      lines[0].style.transform = 'rotate(45deg) translateY(6px)';
+      lines[1].style.opacity = '0';
+      lines[2].style.transform = 'rotate(-45deg) translateY(-6px)';
+      mobileMenu.classList.add('show');
+    } else {
+      lines[0].style.transform = 'none';
+      lines[1].style.opacity = '1';
+      lines[2].style.transform = 'none';
+      mobileMenu.classList.remove('show');
+    }
+  }
+  
+  // Close mobile menu when clicking on links
+  function closeMobileMenu() {
+    if (isMobileMenuOpen) {
+      toggleMobileMenu();
+    }
+  }
+  
+  // Event Listeners
+  themeToggle?.addEventListener('click', toggleTheme);
+  themeToggleMobile?.addEventListener('click', toggleTheme);
+  mobileToggle?.addEventListener('click', toggleMobileMenu);
+  
+  // Close mobile menu when clicking on nav links
+  document.querySelectorAll('#mobile-menu a').forEach(link => {
+    link.addEventListener('click', closeMobileMenu);
+  });
+  
+  // Close mobile menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (isMobileMenuOpen && !mobileToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+      toggleMobileMenu();
+    }
+  });
+  
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 1024 && isMobileMenuOpen) {
+      toggleMobileMenu();
+    }
+  });
+  
+  // Initialize everything
+  initTheme();
+  initRevealAnimations();
+  
+  // Animate counters and bars when hero section is visible
+  const heroObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          animateCounters();
+          animatePerformanceBars();
+        }, 500);
+        heroObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  
+  const heroSection = document.querySelector('#home');
+  if (heroSection) {
+    heroObserver.observe(heroSection);
+  }
+});
+</script>
+
+</body>
+</html>

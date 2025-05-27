@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white dark:bg-slate-800 shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex items-center mb-6">
+          <a href="{% if project %}{% url 'main:project_detail' project.id %}{% else %}{% url 'main:project_list' %}{% endif %}" class="text-slate-500 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-300">
+            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+            </svg>
+          </a>
+          <h1 class="ml-4 text-2xl font-bold text-slate-900 dark:text-white">
+            {% if project %}Edit Project{% else %}New Project{% endif %}
+          </h1>
+        </div>
+
+        <form method="post" class="space-y-6">
+          {% csrf_token %}
+          
+          <div>
+            <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Project Name</label>
+            <div class="mt-1">
+              {{ form.name }}
+            </div>
+            {% if form.name.errors %}
+            <p class="mt-2 text-sm text-red-600">{{ form.name.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
+            <div class="mt-1">
+              {{ form.description }}
+            </div>
+            {% if form.description.errors %}
+            <p class="mt-2 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Status</label>
+              <div class="mt-1">
+                {{ form.status }}
+              </div>
+              {% if form.status.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ form.status.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div>
+              <label for="{{ form.priority.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Priority</label>
+              <div class="mt-1">
+                {{ form.priority }}
+              </div>
+              {% if form.priority.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ form.priority.errors.0 }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <label for="{{ form.start_date.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Start Date</label>
+              <div class="mt-1">
+                {{ form.start_date }}
+              </div>
+              {% if form.start_date.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ form.start_date.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div>
+              <label for="{{ form.end_date.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">End Date</label>
+              <div class="mt-1">
+                {{ form.end_date }}
+              </div>
+              {% if form.end_date.errors %}
+              <p class="mt-2 text-sm text-red-600">{{ form.end_date.errors.0 }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <div>
+            <label for="{{ form.client.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Client</label>
+            <div class="mt-1">
+              {{ form.client }}
+            </div>
+            {% if form.client.errors %}
+            <p class="mt-2 text-sm text-red-600">{{ form.client.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div>
+            <label for="{{ form.team.id_for_label }}" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Team Members</label>
+            <div class="mt-1">
+              {{ form.team }}
+            </div>
+            {% if form.team.errors %}
+            <p class="mt-2 text-sm text-red-600">{{ form.team.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="flex justify-end space-x-3">
+            <a href="{% if project %}{% url 'main:project_detail' project.id %}{% else %}{% url 'main:project_list' %}{% endif %}" class="inline-flex items-center px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Cancel
+            </a>
+            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              {% if project %}Update Project{% else %}Create Project{% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900">
+  <!-- Header -->
+  <div class="bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center">
+            <a href="{% url 'main:project_list' %}" class="text-slate-500 hover:text-slate-600 dark:text-slate-400 dark:hover:text-slate-300">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+              </svg>
+            </a>
+            <h1 class="ml-4 text-2xl font-bold text-slate-900 dark:text-white">{{ project.name }}</h1>
+          </div>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ project.description }}</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="{% url 'main:update_project' project.id %}" class="inline-flex items-center px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="-ml-1 mr-2 h-5 w-5 text-slate-500 dark:text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            </svg>
+            Edit Project
+          </a>
+          <a href="{% url 'main:create_activity' project.id %}" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Add Activity
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Info -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <!-- Project Details -->
+      <div class="lg:col-span-2">
+        <div class="bg-white dark:bg-slate-800 shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg font-medium text-slate-900 dark:text-white">Project Details</h3>
+            <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div>
+                <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Status</dt>
+                <dd class="mt-1 text-sm text-slate-900 dark:text-white">
+                  <span class="px-2 py-1 text-xs font-medium rounded-full
+                    {% if project.status == 'completed' %}bg-green-100 text-green-800
+                    {% elif project.status == 'in-progress' %}bg-blue-100 text-blue-800
+                    {% elif project.status == 'planning' %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {{ project.get_status_display }}
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Priority</dt>
+                <dd class="mt-1 text-sm text-slate-900 dark:text-white">
+                  <span class="px-2 py-1 text-xs font-medium rounded-full
+                    {% if project.priority == 'high' %}bg-red-100 text-red-800
+                    {% elif project.priority == 'medium' %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-green-100 text-green-800{% endif %}">
+                    {{ project.get_priority_display }}
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Start Date</dt>
+                <dd class="mt-1 text-sm text-slate-900 dark:text-white">{{ project.start_date|date:"M d, Y" }}</dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">End Date</dt>
+                <dd class="mt-1 text-sm text-slate-900 dark:text-white">{{ project.end_date|date:"M d, Y" }}</dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Client</dt>
+                <dd class="mt-1 text-sm text-slate-900 dark:text-white">{{ project.client }}</dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Team Members</dt>
+                <dd class="mt-1">
+                  <div class="flex -space-x-2">
+                    {% for member in project.team.all %}
+                    <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-sm font-medium text-slate-600 dark:text-slate-300 border-2 border-white dark:border-slate-800" title="{{ member.username }}">
+                      {{ member.username|first|upper }}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </dd>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gantt Chart -->
+        <div class="mt-6 bg-white dark:bg-slate-800 shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg font-medium text-slate-900 dark:text-white">Project Timeline</h3>
+            <div class="mt-6">
+              <div class="overflow-x-auto">
+                <div class="min-w-full">
+                  <!-- Timeline Header -->
+                  <div class="flex border-b border-slate-200 dark:border-slate-700">
+                    <div class="w-64 flex-shrink-0 px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400">Activity</div>
+                    <div class="flex-1 grid grid-cols-12 gap-1 px-4 py-3 text-sm font-medium text-slate-500 dark:text-slate-400">
+                      {% for week in weeks %}
+                      <div class="text-center">Week {{ forloop.counter }}</div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  
+                  <!-- Timeline Rows -->
+                  {% for activity in project.activities.all %}
+                  <div class="flex border-b border-slate-200 dark:border-slate-700">
+                    <div class="w-64 flex-shrink-0 px-4 py-3">
+                      <div class="flex items-center">
+                        <div class="flex-1">
+                          <div class="text-sm font-medium text-slate-900 dark:text-white">{{ activity.title }}</div>
+                          <div class="text-sm text-slate-500 dark:text-slate-400">{{ activity.description|truncatewords:10 }}</div>
+                        </div>
+                        <a href="{% url 'main:update_activity' project.id activity.id %}" class="ml-4 text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                    <div class="flex-1 grid grid-cols-12 gap-1 px-4 py-3">
+                      {% for week in weeks %}
+                      <div class="relative">
+                        {% if week >= activity.start_date and week <= activity.end_date %}
+                        <div class="absolute inset-0 bg-blue-100 dark:bg-blue-900 rounded-md"></div>
+                        {% endif %}
+                      </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity List -->
+      <div class="lg:col-span-1">
+        <div class="bg-white dark:bg-slate-800 shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg font-medium text-slate-900 dark:text-white">Activities</h3>
+            <div class="mt-6 space-y-4">
+              {% for activity in project.activities.all %}
+              <div class="bg-slate-50 dark:bg-slate-700 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-sm font-medium text-slate-900 dark:text-white">{{ activity.title }}</h4>
+                  <span class="px-2 py-1 text-xs font-medium rounded-full
+                    {% if activity.progress == 100 %}bg-green-100 text-green-800
+                    {% elif activity.progress > 0 %}bg-blue-100 text-blue-800
+                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {{ activity.progress }}%
+                  </span>
+                </div>
+                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ activity.description|truncatewords:15 }}</p>
+                <div class="mt-2">
+                  <div class="flex items-center justify-between text-sm">
+                    <span class="text-slate-500 dark:text-slate-400">{{ activity.start_date|date:"M d" }} - {{ activity.end_date|date:"M d" }}</span>
+                    <a href="{% url 'main:update_activity' project.id activity.id %}" class="text-blue-600 hover:text-blue-500">Edit</a>
+                  </div>
+                </div>
+                {% if activity.tasks.exists %}
+                <div class="mt-3 space-y-2">
+                  {% for task in activity.tasks.all %}
+                  <div class="flex items-center">
+                    <input type="checkbox" 
+                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                           {% if task.completed %}checked{% endif %}
+                           onchange="toggleTask({{ project.id }}, {{ activity.id }}, {{ task.id }})">
+                    <label class="ml-2 text-sm text-slate-700 dark:text-slate-300">{{ task.title }}</label>
+                  </div>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              {% empty %}
+              <div class="text-center py-6">
+                <svg class="mx-auto h-12 w-12 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-white">No activities</h3>
+                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Get started by creating a new activity.</p>
+                <div class="mt-6">
+                  <a href="{% url 'main:create_activity' project.id %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                    Add Activity
+                  </a>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+<script>
+function toggleTask(projectId, activityId, taskId) {
+  fetch(`/projects/${projectId}/activities/${activityId}/tasks/${taskId}/toggle/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': getCookie('csrftoken'),
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Reload the page to update progress
+      window.location.reload();
+    }
+  })
+  .catch(error => console.error('Error:', error));
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+</script>
+{% endblock %}
+{% endblock %} 
