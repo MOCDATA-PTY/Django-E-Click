@@ -1,0 +1,4362 @@
+{% extends 'home/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Admin Control Panel{% endblock %}
+
+{% block content %}
+<div class="admin-controls">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <h1>Admin Control Panel</h1>
+        <p>Manage users, monitor system statistics, and oversee project operations.</p>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}message-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Permission Warning Banner for Non-Admin Users -->
+    {% if not user.is_staff or not user.profile.can_access_admin %}
+    <div class="permission-warning">
+        <div class="warning-content">
+            <svg class="warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <div class="warning-text">
+                <h3>Limited Access Warning</h3>
+                <p>You are viewing the admin panel with limited access. Some features require admin privileges. Contact your system administrator if you need full access.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- System Statistics Section -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ active_users }}</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_clients }}</div>
+            <div class="stat-label">Total Clients</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_projects }}</div>
+            <div class="stat-label">Total Projects</div>
+        </div>
+    </div>
+
+    <!-- User Management Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>User Management</h2>
+        </div>
+        <div class="section-content">
+            <div class="form-actions">
+                {% if user.is_staff and user.profile.can_access_admin %}
+                <button class="btn btn-primary add-user-btn" onclick="openAddUserModal()">
+                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add New User
+                </button>
+                {% else %}
+                <button class="btn btn-secondary add-user-btn" disabled>
+                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add New User (Admin Only)
+                </button>
+                {% endif %}
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="userSearch" placeholder="Search users..." class="search-input">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+
+            <div class="users-table">
+                <div class="table-header">
+                    <div class="table-cell">Username</div>
+                    <div class="table-cell">Full Name</div>
+                    <div class="table-cell">Email</div>
+                    <div class="table-cell">Status</div>
+                    <div class="table-cell">Role</div>
+                    <div class="table-cell">Actions</div>
+                </div>
+                
+                {% for user in users %}
+                <div class="table-row" data-username="{{ user.username|lower }}" data-name="{{ user.get_full_name|lower }}" data-email="{{ user.email|lower }}">
+                    <div class="table-cell">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                {% if user.profile.profile_picture %}
+                                    <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}" class="avatar-img">
+                                {% else %}
+                                    <div class="avatar-placeholder">{{ user.username|first|upper }}</div>
+                                {% endif %}
+                            </div>
+                            <span class="username">{{ user.username }}</span>
+                        </div>
+                    </div>
+                    <div class="table-cell">
+                        {% if user.get_full_name %}
+                            {{ user.get_full_name }}
+                        {% else %}
+                            <span class="empty-field">—</span>
+                        {% endif %}
+                    </div>
+                    <div class="table-cell">{{ user.email }}</div>
+                    <div class="table-cell">
+                        <span class="status-badge {% if user.is_active %}active{% else %}inactive{% endif %}">
+                            {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                    <div class="table-cell">
+                        <span class="role-badge {% if user.is_staff %}admin{% else %}user{% endif %}">
+                            {% if user.is_staff %}Admin{% else %}User{% endif %}
+                        </span>
+                    </div>
+                    <div class="table-cell">
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="editUser('{{ user.id }}')" title="Edit User">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                            {% if request.user.is_staff and request.user.profile.can_access_admin %}
+                            <button class="action-btn" onclick="toggleUserAccess('{{ user.id }}')" title="Toggle Access">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                            <button class="action-btn danger" onclick="deleteUser('{{ user.id }}')" title="Delete User">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                            {% else %}
+                            <button class="action-btn disabled" disabled title="Admin Access Required">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                            <button class="action-btn disabled" disabled title="Admin Access Required">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Statistics Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Project Statistics</h2>
+        </div>
+        <div class="section-content">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">{{ projects_in_progress }}</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ projects_completed }}</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ projects_planned }}</div>
+                    <div class="stat-label">Planned</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ total_tasks }}</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Recent Activity</h2>
+        </div>
+        <div class="section-content">
+            <div class="activity-grid">
+                <div class="activity-list">
+                    <h3>Recent Users</h3>
+                    {% for user in recent_users %}
+                    <div class="activity-item">
+                        <div class="activity-avatar">
+                            {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.username }}" class="avatar-img small">
+                            {% else %}
+                                <div class="avatar-placeholder small">{{ user.username|first|upper }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">{{ user.get_full_name }}</div>
+                            <div class="activity-subtitle">Joined {{ user.date_joined|date:"M d, Y" }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="activity-list">
+                    <h3>Recent Projects</h3>
+                    {% for project in recent_projects %}
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">{{ project.name }}</div>
+                            <div class="activity-subtitle">{{ project.client }} • {{ project.status|title }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Management Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Client Management</h2>
+        </div>
+        <div class="section-content">
+            <div class="form-actions">
+                {% if user.is_staff and user.profile.can_access_admin %}
+                <button class="btn btn-primary add-client-btn" onclick="openAddClientModal()">
+                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add New Client
+                </button>
+                {% else %}
+                <button class="btn btn-secondary add-client-btn" disabled>
+                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add New Client (Admin Only)
+                </button>
+                {% endif %}
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="clientSearch" placeholder="Search clients..." class="search-input">
+                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+
+            <div class="clients-table">
+                <div class="table-header">
+                    <div class="table-cell">Username</div>
+                    <div class="table-cell">Email</div>
+                    <div class="table-cell">Status</div>
+                    <div class="table-cell">Password Changed</div>
+                    <div class="table-cell">Created</div>
+                    <div class="table-cell">Actions</div>
+                </div>
+                
+                {% for client in clients %}
+                <div class="table-row" data-username="{{ client.username|lower }}" data-email="{{ client.email|lower }}">
+                    <div class="table-cell">
+                        <div class="client-info">
+                            <span class="username">{{ client.username }}</span>
+                        </div>
+                    </div>
+                    <div class="table-cell">{{ client.email }}</div>
+                    <div class="table-cell">
+                        <span class="status-badge {% if client.is_active %}active{% else %}inactive{% endif %}">
+                            {% if client.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                    <div class="table-cell">
+                        <span class="status-badge {% if client.has_changed_password %}success{% else %}warning{% endif %}">
+                            {% if client.has_changed_password %}Yes{% else %}No{% endif %}
+                        </span>
+                    </div>
+                    <div class="table-cell">{{ client.created_at|date:"M d, Y" }}</div>
+                    <div class="table-cell">
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="editClient('{{ client.id }}')" title="Edit Client">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                            </button>
+                            {% if request.user.is_staff and request.user.profile.can_access_admin %}
+                            <button class="action-btn" onclick="toggleClientAccess('{{ client.id }}')" title="Toggle Access">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                            <button class="action-btn danger" onclick="deleteClient('{{ client.id }}')" title="Delete Client">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                            {% else %}
+                            <button class="action-btn disabled" disabled title="Admin Access Required">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                                </svg>
+                            </button>
+                            <button class="action-btn disabled" disabled title="Admin Access Required">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- System Monitoring Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>System Monitoring</h2>
+        </div>
+        <div class="section-content">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">{{ suspended_users_count }}</div>
+                    <div class="stat-label">Suspended Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ locked_accounts_count }}</div>
+                    <div class="stat-label">Locked Accounts</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ db_size }} MB</div>
+                    <div class="stat-label">Database Size</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ total_tasks }}</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal - Completely Redone -->
+<div id="editUserModal" class="modal">
+    <div class="modal-content wide-modal">
+        <div class="modal-header">
+            <h2>Edit User Profile</h2>
+            <button class="close-btn" onclick="closeEditUserModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Tabs -->
+            <div class="edit-project-tabs">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="user-info" onclick="switchTab('user-info')">
+                        <svg class="tab-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        User Information
+                    </button>
+                    <button class="tab-btn" data-tab="user-permissions" onclick="switchTab('user-permissions')">
+                        <svg class="tab-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                        </svg>
+                        Permissions
+                    </button>
+                </div>
+            </div>
+
+            <!-- User Information Tab -->
+            <div class="tab-content active" id="user-info">
+                <form id="editUserForm" method="POST" action="{% url 'admin_control' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="edit_user">
+                    <input type="hidden" name="user_id" id="edit_user_id">
+                    
+                    <div class="form-group">
+                        <label for="edit_username">Username *</label>
+                        <input type="text" id="edit_username" name="username" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_first_name">First Name</label>
+                            <input type="text" id="edit_first_name" name="first_name">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_last_name">Last Name</label>
+                            <input type="text" id="edit_last_name" name="last_name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_email">Email *</label>
+                            <input type="email" id="edit_email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_phone">Phone</label>
+                            <input type="tel" id="edit_phone" name="phone">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="edit_role">Role *</label>
+                            <select id="edit_role" name="role" required>
+                                <option value="">Select role</option>
+                                <option value="admin">Admin</option>
+                                <option value="user">User</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_is_active">Account Status *</label>
+                            <select id="edit_is_active" name="is_active" required>
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Update User Profile</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Permissions Tab -->
+            <div class="tab-content" id="user-permissions">
+                <div class="form-section">
+                    <h3>Access Permissions</h3>
+                    <p class="section-description">Control which features and pages this user can access</p>
+                    
+                    <div class="permissions-grid">
+                        <div class="permission-item">
+                            <label class="permission-label">
+                                <input type="checkbox" id="edit_can_access_dashboard" name="can_access_dashboard" class="permission-checkbox">
+                                <div class="permission-info">
+                                    <span class="permission-name">Dashboard</span>
+                                    <span class="permission-description">Access to main dashboard and overview</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <label class="permission-label">
+                                <input type="checkbox" id="edit_can_access_projects" name="can_access_projects" class="permission-checkbox">
+                                <div class="permission-info">
+                                    <span class="permission-name">Projects</span>
+                                    <span class="permission-description">View and manage projects</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <label class="permission-label">
+                                <input type="checkbox" id="edit_can_access_reports" name="can_access_reports" class="permission-checkbox">
+                                <div class="permission-info">
+                                    <span class="permission-name">Reports</span>
+                                    <span class="permission-description">Generate and view reports</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <label class="permission-label">
+                                <input type="checkbox" id="edit_can_access_analytics" name="can_access_analytics" class="permission-checkbox">
+                                <div class="permission-info">
+                                    <span class="permission-name">Analytics</span>
+                                    <span class="permission-description">View analytics and insights</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <label class="permission-label">
+                                <input type="checkbox" id="edit_can_access_admin" name="can_access_admin" class="permission-checkbox">
+                                <div class="permission-info">
+                                    <span class="permission-name">Admin Panel</span>
+                                    <span class="permission-description">Access to admin control panel</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <label class="permission-label">
+                                <input type="checkbox" id="edit_can_manage_users" name="can_manage_users" class="permission-checkbox">
+                                <div class="permission-info">
+                                    <span class="permission-name">User Management</span>
+                                    <span class="permission-description">Create, edit, and manage users</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <label class="permission-label">
+                                <input type="checkbox" id="edit_can_manage_clients" name="can_manage_clients" class="permission-checkbox">
+                                <div class="permission-info">
+                                    <span class="permission-name">Client Management</span>
+                                    <span class="permission-description">Manage client accounts and access</span>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="permission-item">
+                            <label class="permission-label">
+                                <input type="checkbox" id="edit_can_access_system_logs" name="can_access_system_logs" class="permission-checkbox">
+                                <div class="permission-info">
+                                    <span class="permission-name">System Logs</span>
+                                    <span class="permission-description">View system activity logs</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditUserModal()">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="saveUserPermissions()">Save Permissions</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal - Completely Redone -->
+<div id="addUserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New User</h2>
+            <button class="close-btn" onclick="closeAddUserModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <form method="POST" action="{% url 'admin_control' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_user">
+                
+                <div class="form-group">
+                    <label for="username">Username *</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">First Name *</label>
+                        <input type="text" id="first_name" name="first_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">Last Name *</label>
+                        <input type="text" id="last_name" name="last_name" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="role">Role *</label>
+                    <select id="role" name="role" required>
+                        <option value="">Select role</option>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Client Modal -->
+<div id="addClientModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Client</h2>
+            <button class="close-btn" onclick="closeAddClientModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <form method="POST" action="{% url 'admin_control' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_client">
+                
+                <div class="form-group">
+                    <label for="client_username">Username *</label>
+                    <input type="text" id="client_username" name="client_username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client_email">Email *</label>
+                    <input type="email" id="client_email" name="client_email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="client_full_name">Full Name</label>
+                    <input type="text" id="client_full_name" name="client_full_name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="client_phone">Phone</label>
+                    <input type="tel" id="client_phone" name="client_phone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="client_company">Company</label>
+                    <input type="text" id="client_company" name="client_company">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddClientModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Client</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Client Modal -->
+<div id="editClientModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Client Profile</h2>
+            <button class="close-btn" onclick="closeEditClientModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="modal-body">
+            <form id="editClientForm" method="POST" action="{% url 'admin_control' %}">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit_client">
+                <input type="hidden" name="client_id" id="edit_client_id">
+                
+                <div class="form-group">
+                    <label for="edit_client_username">Username *</label>
+                    <input type="text" id="edit_client_username" name="client_username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_client_email">Email *</label>
+                    <input type="email" id="edit_client_email" name="client_email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_client_full_name">Full Name</label>
+                    <input type="text" id="edit_client_full_name" name="client_full_name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_client_phone">Phone</label>
+                    <input type="tel" id="edit_client_phone" name="client_phone">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_client_company">Company</label>
+                    <input type="text" id="edit_client_company" name="client_company">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_client_is_active">Account Status *</label>
+                    <select id="edit_client_is_active" name="client_is_active" required>
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditClientModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Client Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* CSS Variables for consistent theming */
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --text-muted: #9ca3af;
+        --text-white: #ffffff;
+        --background-primary: #ffffff;
+        --background-secondary: #f9fafb;
+        --background-tertiary: #f1f5f9;
+        --info: #3b82f6;
+        --border-light: #e5e7eb;
+        --border-medium: #d1d5db;
+        --border-dark: #94a3b8;
+        --radius-small: 0.375rem;
+        --radius-medium: 0.5rem;
+        --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    /* EXACTLY matching add projects form styles for ALL admin controls */
+    .admin-controls {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Dashboard Header - EXACTLY matching form style */
+    .dashboard-header {
+        background: var(--background-primary);
+        border: none;
+        border-radius: 0;
+        padding: 2rem 0;
+        margin-bottom: 3rem;
+        text-align: center;
+        position: relative;
+        width: 100%;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .dashboard-header h1 {
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .dashboard-header p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        font-weight: 300;
+    }
+
+    /* Statistics Grid - EXACTLY matching form style */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: var(--background-primary);
+        border: none;
+        border-radius: 0;
+        padding: 1.5rem 0;
+        text-align: center;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .stat-card:hover {
+        border-bottom: 2px solid var(--primary);
+        transform: translateY(-1px);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.75rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        font-weight: 400;
+    }
+
+    /* Section Styling - EXACTLY matching form style */
+    .section {
+        background: var(--background-primary);
+        border: none;
+        border-radius: 0;
+        margin-bottom: 3rem;
+        overflow: visible;
+        padding: 0;
+    }
+
+    .section-header {
+        background: var(--background-primary);
+        padding: 0 0 1rem 0;
+        border-bottom: 1px solid var(--border-light);
+        margin-bottom: 2rem;
+    }
+
+    .section-header h2 {
+        color: var(--text-secondary);
+        margin: 0;
+        font-size: 0.8rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .section-content {
+        padding: 0;
+    }
+
+    /* Form Actions - EXACTLY matching form style */
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 2rem;
+        gap: 1rem;
+        padding: 0;
+    }
+
+    /* Button Styles - EXACTLY matching form style */
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-small);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
+        min-width: 100px;
+        white-space: nowrap;
+        line-height: 1.4;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: var(--text-white);
+        border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .btn-secondary {
+        background: var(--background-primary);
+        color: var(--text-secondary);
+        border-color: var(--border-medium);
+    }
+
+    .btn-secondary:hover {
+        background: var(--background-secondary);
+        color: var(--text-primary);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .btn-icon {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    /* Search Container - EXACTLY matching form style */
+    .search-container {
+        position: relative;
+        margin-bottom: 2rem;
+        max-width: 300px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 0;
+        border: none;
+        border-bottom: 1px solid var(--border-light);
+        border-radius: 0;
+        font-size: 1rem;
+        background: transparent;
+        color: var(--text-primary);
+        transition: all 0.3s ease;
+        font-family: inherit;
+        padding-left: 2rem;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-bottom: 2px solid var(--primary);
+        background: transparent;
+        box-shadow: none;
+        transform: translateY(-1px);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1rem;
+        height: 1rem;
+        color: var(--text-muted);
+    }
+
+    /* Users Table - EXACTLY matching form style */
+    .users-table {
+        border: none;
+        border-radius: 0;
+        overflow: visible;
+        background: transparent;
+    }
+
+    .table-header {
+        display: grid;
+        grid-template-columns: 2fr 2fr 2fr 1fr 1fr 1.5fr;
+        gap: 2rem;
+        padding: 1rem 0;
+        background: transparent;
+        border-bottom: 1px solid var(--border-light);
+        font-weight: 400;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .table-row {
+        display: grid;
+        grid-template-columns: 2fr 2fr 2fr 1fr 1fr 1.5fr;
+        gap: 2rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+        align-items: center;
+    }
+
+    .table-row:hover {
+        background: transparent;
+        border-bottom: 2px solid var(--primary);
+    }
+
+    .table-row:last-child {
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .table-cell {
+        display: flex;
+        align-items: center;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .user-avatar {
+        flex-shrink: 0;
+    }
+
+    .avatar-img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .avatar-placeholder {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--text-muted);
+        color: var(--background-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .avatar-placeholder.small {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+
+    .username {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .empty-field {
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 0.875rem;
+    }
+
+    /* Status and Role Badges - EXACTLY matching form style */
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        border: 1px solid;
+    }
+
+    .status-badge.active {
+        background: transparent;
+        color: var(--success);
+        border-color: var(--success);
+    }
+
+    .status-badge.inactive {
+        background: transparent;
+        color: var(--danger);
+        border-color: var(--danger);
+    }
+
+    .status-badge.success {
+        background: transparent;
+        color: var(--success);
+        border-color: var(--success);
+    }
+
+    .status-badge.warning {
+        background: transparent;
+        color: var(--warning);
+        border-color: var(--warning);
+    }
+
+    .role-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        border: 1px solid;
+    }
+
+    .role-badge.admin {
+        background: transparent;
+        color: var(--warning);
+        border-color: var(--warning);
+    }
+
+    .role-badge.user {
+        background: transparent;
+        color: var(--text-muted);
+        border-color: var(--border-light);
+    }
+
+    /* Action Buttons - EXACTLY matching form style */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--border-medium);
+        border-radius: 50px;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .action-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        transform: translateY(-1px);
+    }
+
+    .action-btn svg {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .action-btn.danger:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .action-btn.disabled {
+        background-color: transparent;
+        border-color: var(--border-light);
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .action-btn.disabled:hover {
+        background-color: transparent;
+        border-color: var(--border-light);
+        transform: none;
+    }
+
+    /* Project Statistics - EXACTLY matching form style */
+    .stat-item {
+        text-align: center;
+        padding: 1.5rem 0;
+        border: none;
+        border-radius: 0;
+        transition: all 0.3s ease;
+        background: transparent;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .stat-item:hover {
+        border-bottom: 2px solid var(--primary);
+        transform: translateY(-1px);
+    }
+
+    /* Activity Grid - EXACTLY matching form style */
+    .activity-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+
+    .activity-list {
+        margin-bottom: 2rem;
+    }
+
+    .activity-list h3 {
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+
+    .activity-item:last-child {
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .activity-item:hover {
+        border-bottom: 2px solid var(--primary);
+    }
+
+    .activity-avatar, .activity-icon {
+        flex-shrink: 0;
+    }
+
+    .activity-icon svg {
+        width: 24px;
+        height: 24px;
+        color: var(--text-muted);
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-title {
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .activity-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 300;
+    }
+
+    /* Client Management Styles */
+    .clients-table {
+        width: 100%;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+
+    .clients-table .table-header {
+        background: var(--background-secondary);
+        font-weight: 600;
+        color: var(--text-primary);
+        border-bottom: 2px solid var(--border-light);
+    }
+
+    .clients-table .table-row {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1.5fr;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        align-items: center;
+        border-bottom: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+
+    .clients-table .table-row:hover {
+        background: var(--background-secondary);
+        border-bottom: 2px solid var(--primary);
+    }
+
+    .clients-table .table-row:last-child {
+        border-bottom: none;
+    }
+
+    .clients-table .table-cell {
+        padding: 0.5rem 0;
+        border-bottom: none;
+    }
+
+    .client-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .client-info .username {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    /* No Results Message */
+    .no-results {
+        padding: 3rem 1.5rem;
+        text-align: center;
+        color: var(--text-muted);
+    }
+
+    .no-results-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .no-results svg {
+        color: var(--text-muted);
+    }
+
+    .no-results p {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+
+    .modal.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background-color: var(--background-primary);
+        margin: auto;
+        padding: 0;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow-medium);
+        position: relative;
+        display: block;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-light);
+        background: var(--background-secondary);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-muted);
+        padding: 0.25rem;
+        border-radius: var(--radius-small);
+        transition: all 0.2s ease;
+    }
+
+    .close-btn:hover {
+        color: var(--text-primary);
+        background: var(--background-primary);
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: block;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem 0.75rem;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-small);
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        background: var(--background-primary);
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        display: block;
+        line-height: 1.4;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: var(--text-muted);
+        font-weight: 300;
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        font-style: italic;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+
+    .form-row .form-group {
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-light);
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-small);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
+        min-width: 100px;
+        white-space: nowrap;
+        line-height: 1.4;
+    }
+
+    /* Ensure proper form display in all cases */
+    form {
+        display: block;
+        width: 100%;
+    }
+
+    /* Fix for any potential form layout issues */
+    .modal-body form {
+        display: block;
+        width: 100%;
+    }
+
+    .modal-body .form-group {
+        display: block;
+        width: 100%;
+    }
+
+    /* Ensure proper spacing and alignment */
+    .modal-body {
+        padding: 1.5rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-light);
+        background: var(--background-secondary);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Fix for tab content display */
+    .tab-content {
+        display: none;
+        width: 100%;
+    }
+
+    .tab-content.active {
+        display: block;
+        width: 100%;
+    }
+
+    /* Ensure permissions grid displays properly */
+    .permissions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .permission-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        background: transparent;
+        transition: all 0.3s ease;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Fix for any potential overflow issues */
+    .modal-content {
+        overflow: visible;
+    }
+
+    .modal-body {
+        overflow: visible;
+    }
+
+    /* Ensure proper form validation display */
+    .form-group input:invalid,
+    .form-group select:invalid,
+    .form-group textarea:invalid {
+        border-color: var(--danger);
+    }
+
+    .form-group input:valid,
+    .form-group select:valid,
+    .form-group textarea:valid {
+        border-color: var(--success);
+    }
+
+    /* Fix for required field indicators */
+    .form-group label[for*="required"]::after,
+    .form-group label:contains("*")::after {
+        content: " *";
+        color: var(--danger);
+        font-weight: 600;
+    }
+
+    /* Ensure proper button states */
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn:disabled:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Fix for any potential z-index issues */
+    .modal {
+        z-index: 9999;
+    }
+
+    .modal-content {
+        z-index: 10000;
+    }
+
+    /* Ensure proper form layout on all screen sizes */
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            max-width: 98%;
+            width: 100%;
+            margin: 0.5rem;
+        }
+        
+        .modal-body {
+            padding: 1rem;
+        }
+        
+        .modal-header {
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.875rem 0.75rem;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+        }
+    }
+
+    /* Additional Form Fixes to ensure proper display */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+
+    .modal.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background-color: var(--background-primary);
+        margin: auto;
+        padding: 0;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow-medium);
+        position: relative;
+        display: block;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: block;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem 0.75rem;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-small);
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        background: var(--background-primary);
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        display: block;
+        line-height: 1.4;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: var(--text-muted);
+        font-weight: 300;
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        font-style: italic;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+
+    .form-row .form-group {
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-light);
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-small);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
+        min-width: 100px;
+        white-space: nowrap;
+        line-height: 1.4;
+    }
+
+    /* Ensure proper form display in all cases */
+    form {
+        display: block;
+        width: 100%;
+    }
+
+    /* Fix for any potential form layout issues */
+    .modal-body form {
+        display: block;
+        width: 100%;
+    }
+
+    .modal-body .form-group {
+        display: block;
+        width: 100%;
+    }
+
+    /* Ensure proper spacing and alignment */
+    .modal-body {
+        padding: 1.5rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-light);
+        background: var(--background-secondary);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Fix for tab content display */
+    .tab-content {
+        display: none;
+        width: 100%;
+    }
+
+    .tab-content.active {
+        display: block;
+        width: 100%;
+    }
+
+    /* Ensure permissions grid displays properly */
+    .permissions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .permission-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        background: transparent;
+        transition: all 0.3s ease;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Fix for any potential overflow issues */
+    .modal-content {
+        overflow: visible;
+    }
+
+    .modal-body {
+        overflow: visible;
+    }
+
+    /* Ensure proper form validation display */
+    .form-group input:invalid,
+    .form-group select:invalid,
+    .form-group textarea:invalid {
+        border-color: var(--danger);
+    }
+
+    .form-group input:valid,
+    .form-group select:valid,
+    .form-group textarea:valid {
+        border-color: var(--success);
+    }
+
+    /* Fix for required field indicators */
+    .form-group label[for*="required"]::after,
+    .form-group label:contains("*")::after {
+        content: " *";
+        color: var(--danger);
+        font-weight: 600;
+    }
+
+    /* Ensure proper button states */
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn:disabled:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* Fix for any potential z-index issues */
+    .modal {
+        z-index: 9999;
+    }
+
+    .modal-content {
+        z-index: 10000;
+    }
+
+    /* Ensure proper form layout on all screen sizes */
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            max-width: 98%;
+            width: 100%;
+            margin: 0.5rem;
+        }
+        
+        .modal-body {
+            padding: 1rem;
+        }
+        
+        .modal-header {
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.875rem 0.75rem;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+        }
+    }
+
+    /* Permission Warning - EXACTLY matching form style */
+    .permission-warning {
+        background-color: transparent;
+        border: none;
+        border-radius: 0;
+        padding: 1.5rem 0;
+        margin-bottom: 3rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-bottom: 1px solid var(--warning);
+    }
+
+    .warning-content {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .warning-icon {
+        width: 24px;
+        height: 24px;
+        color: var(--warning);
+    }
+
+    .warning-text h3 {
+        color: var(--warning);
+        margin-bottom: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .warning-text p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        line-height: 1.5;
+        font-weight: 300;
+    }
+
+    /* Messages - EXACTLY matching form style */
+    .messages {
+        margin-bottom: 3rem;
+    }
+
+    .message {
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+        border-radius: 0;
+        border: none;
+        border-bottom: 1px solid;
+        background: transparent;
+    }
+
+    .message-success {
+        border-bottom-color: var(--success);
+        color: var(--success);
+    }
+
+    .message-error {
+        border-bottom-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .message-warning {
+        border-bottom-color: var(--warning);
+        color: var(--warning);
+    }
+
+    .message-info {
+        border-bottom-color: var(--info);
+        color: var(--info);
+    }
+
+    /* EXACTLY matching add projects form styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal.show {
+        display: flex;
+    }
+
+    .modal-content {
+        background: var(--background-primary);
+        border: none;
+        border-radius: 0;
+        padding: 0;
+        max-width: 600px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow-medium);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0;
+        padding: 2rem 2rem 0 2rem;
+        border-bottom: none;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .close-btn:hover {
+        color: var(--text-secondary);
+    }
+
+    .modal-body {
+        padding: 0 2rem 2rem 2rem;
+    }
+
+    /* EXACTLY matching add projects form styles */
+    .form-group {
+        margin-bottom: 2rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 400;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 1rem 0;
+        border: none;
+        border-bottom: 1px solid var(--border-light);
+        border-radius: 0;
+        font-size: 1rem;
+        background: transparent;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        color: var(--text-primary);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-bottom: 2px solid var(--primary);
+        background: transparent;
+        box-shadow: none;
+        transform: translateY(-1px);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: var(--text-muted);
+        font-weight: 300;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-light);
+    }
+
+    /* EXACTLY matching add projects form buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        border: 1px solid transparent;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 400;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        letter-spacing: 0.025em;
+        min-width: 120px;
+        justify-content: center;
+    }
+
+    /* Button styles removed - using main button styles above */
+
+    /* Tab styles EXACTLY matching add projects form */
+    .edit-project-tabs {
+        margin-bottom: 2rem;
+    }
+
+    .tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 1rem 1.5rem;
+        border: none;
+        background: none;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        border-bottom: 2px solid transparent;
+    }
+
+    .tab-btn:hover {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+    }
+
+    .tab-btn.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+        font-weight: 600;
+    }
+
+    .tab-icon {
+        width: 1.1rem;
+        height: 1.1rem;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section h3 {
+        color: var(--text-secondary);
+        margin-bottom: 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .section-description {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        margin-bottom: 1.5rem;
+        font-weight: 300;
+        font-style: italic;
+    }
+
+    /* Permissions grid EXACTLY matching add projects form style */
+    .permissions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+    }
+
+    .permission-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        background: transparent;
+        transition: all 0.3s ease;
+    }
+
+    .permission-item:hover {
+        border-color: var(--primary);
+        background: var(--background-secondary);
+        transform: translateY(-1px);
+    }
+
+    .permission-label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1;
+        cursor: pointer;
+    }
+
+    .permission-checkbox {
+        width: 1.1rem;
+        height: 1.1rem;
+        accent-color: var(--primary);
+        flex-shrink: 0;
+    }
+
+    .permission-info {
+        flex: 1;
+    }
+
+    .permission-name {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .permission-description {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        line-height: 1.4;
+    }
+
+    /* CSS Variables EXACTLY matching add projects form */
+    :root {
+        --primary: #3B82F6;
+        --primary-dark: #1E40AF;
+        --background-gray: #F3F4F6;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --danger: #EF4444;
+        --info: #3B82F6;
+        --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+        --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-heavy: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    [data-theme="dark"] {
+        --primary: #60A5FA;
+        --primary-dark: #3B82F6;
+        --background-gray: #4A5568;
+    }
+
+    /* Wide modal for Edit User */
+    .wide-modal {
+        max-width: 800px;
+        width: 90%;
+    }
+
+    /* Ensure proper form display in all cases */
+    form {
+        display: block;
+        width: 100%;
+    }
+
+    /* Fix for any potential form layout issues */
+    .modal-body form {
+        display: block;
+        width: 100%;
+    }
+
+    .modal-body .form-group {
+        display: block;
+        width: 100%;
+    }
+
+    /* Ensure proper spacing and alignment */
+    .modal-body {
+        padding: 1.5rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-light);
+        background: var(--background-secondary);
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Fix for tab content display */
+    .tab-content {
+        display: none;
+        width: 100%;
+    }
+
+    .tab-content.active {
+        display: block;
+        width: 100%;
+    }
+
+    /* Ensure permissions grid displays properly */
+    .permissions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .permission-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        background: transparent;
+        transition: all 0.3s ease;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Fix for any potential overflow issues */
+    .modal-content {
+        overflow: visible;
+    }
+
+    .modal-body {
+        overflow: visible;
+    }
+
+    /* Responsive Design - Enhanced for all devices */
+    
+    /* Large Tablets and Small Laptops */
+    @media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .activity-grid {
+            gap: 2rem;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            width: 95%;
+        }
+        
+        .form-row {
+            gap: 1.5rem;
+        }
+        
+        .permissions-grid {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+    }
+    
+    /* Tablets */
+    @media (max-width: 768px) {
+        .admin-controls {
+            padding: 0 1rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        .table-header,
+        .table-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+        
+        .table-cell {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        .table-cell:last-child {
+            border-bottom: none;
+        }
+        
+        .action-buttons {
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .permissions-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .btn {
+            padding: 0.875rem 1.5rem;
+            font-size: 0.8rem;
+            min-width: 100px;
+        }
+        
+        .modal-content {
+            max-width: 95%;
+            width: 98%;
+            margin: 1rem;
+        }
+        
+        .modal-header,
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .tabs {
+            flex-direction: column;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border-light);
+            border-radius: 0;
+        }
+        
+        .tab-btn.active {
+            border-bottom: 2px solid var(--primary);
+        }
+    }
+    
+    /* Mobile Phones - Portrait */
+    @media (max-width: 480px) {
+        .admin-controls {
+            padding: 0 0.5rem;
+        }
+        
+        .dashboard-header {
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 1.25rem;
+        }
+        
+        .dashboard-header p {
+            font-size: 0.8rem;
+        }
+        
+        .stats-grid {
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            padding: 1rem 0;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .search-container {
+            max-width: 100%;
+        }
+        
+        .search-input {
+            font-size: 0.9rem;
+            padding: 0.875rem 0 0.875rem 1.75rem;
+        }
+        
+        .search-icon {
+            width: 0.875rem;
+            height: 0.875rem;
+        }
+        
+        .modal-content {
+            max-width: 98%;
+            width: 100%;
+            margin: 0.5rem;
+            max-height: 95vh;
+        }
+        
+        .modal-header,
+        .modal-body {
+            padding: 1rem;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.25rem;
+        }
+        
+        .close-btn {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.875rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .permissions-grid {
+            gap: 0.75rem;
+        }
+        
+        .permission-item {
+            padding: 0.75rem;
+        }
+        
+        .permission-name {
+            font-size: 0.85rem;
+        }
+        
+        .permission-description {
+            font-size: 0.7rem;
+        }
+    }
+    
+    /* Mobile Phones - Landscape */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .modal-content {
+            max-height: 85vh;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    
+    /* High DPI Displays */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        .btn,
+        .action-btn,
+        .permission-checkbox {
+            border-width: 0.5px;
+        }
+    }
+    
+    /* Print Styles */
+    @media print {
+        .admin-controls {
+            padding: 0;
+        }
+        
+        .dashboard-header,
+        .section-header {
+            border-bottom: 1px solid #000;
+        }
+        
+        .btn,
+        .action-btn,
+        .search-container {
+            display: none;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        
+        .table-header,
+        .table-row {
+            display: table-row;
+        }
+        
+        .table-cell {
+            display: table-cell;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+        }
+    }
+    
+    /* Accessibility Improvements */
+    @media (prefers-reduced-motion: reduce) {
+        .btn,
+        .action-btn,
+        .stat-card,
+        .table-row,
+        .permission-item {
+            transition: none;
+        }
+        
+        .btn:hover,
+        .action-btn:hover,
+        .stat-card:hover,
+        .table-row:hover,
+        .permission-item:hover {
+            transform: none;
+        }
+    }
+    
+    /* High Contrast Mode */
+    @media (prefers-contrast: high) {
+        .border-light {
+            border-color: #000;
+        }
+        
+        .text-muted {
+            color: #000;
+        }
+        
+        .btn-secondary {
+            border-color: #000;
+        }
+    }
+    
+    /* Focus Visible for Keyboard Navigation */
+    .btn:focus-visible,
+    .action-btn:focus-visible,
+    .search-input:focus-visible,
+    .permission-checkbox:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+    
+    /* Skip Link for Accessibility */
+    .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: var(--primary);
+        color: var(--text-white);
+        padding: 8px;
+        text-decoration: none;
+        border-radius: 4px;
+        z-index: 1001;
+    }
+    
+    .skip-link:focus {
+        top: 6px;
+    }
+
+    /* Tab Styles */
+    .edit-project-tabs {
+        margin-bottom: 2rem;
+    }
+
+    .tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border-light);
+        margin-bottom: 2rem;
+    }
+
+    .tab-btn {
+        padding: 1rem 1.5rem;
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        color: var(--text-secondary);
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .tab-btn:hover {
+        color: var(--text-primary);
+        background: var(--background-secondary);
+    }
+
+    .tab-btn.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+        background: var(--background-secondary);
+    }
+
+    .tab-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    /* Permissions Styles */
+    .form-section {
+        margin-bottom: 2rem;
+    }
+
+    .form-section h3 {
+        color: var(--text-primary);
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .section-description {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .permissions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
+    }
+
+    .permission-item {
+        padding: 1rem;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-small);
+        background: var(--background-primary);
+        transition: all 0.2s ease;
+    }
+
+    .permission-item:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .permission-label {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        cursor: pointer;
+    }
+
+    .permission-checkbox {
+        margin: 0;
+        margin-top: 0.125rem;
+        width: 1rem;
+        height: 1rem;
+        accent-color: var(--primary);
+    }
+
+    .permission-info {
+        flex: 1;
+    }
+
+    .permission-name {
+        display: block;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .permission-description {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+    }
+
+    /* Users Table Styles */
+    .users-table {
+        width: 100%;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        overflow: hidden;
+        margin-top: 1rem;
+    }
+
+    .users-table .table-header {
+        background: var(--background-secondary);
+        font-weight: 600;
+        color: var(--text-primary);
+        border-bottom: 2px solid var(--border-light);
+        display: grid;
+        grid-template-columns: 1fr 1.5fr 2fr 1fr 1fr 1.5fr;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        align-items: center;
+    }
+
+    .users-table .table-row {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr 2fr 1fr 1fr 1.5fr;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        align-items: center;
+        border-bottom: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+
+    .users-table .table-row:hover {
+        background: var(--background-secondary);
+        border-bottom: 2px solid var(--primary);
+    }
+
+    .users-table .table-row:last-child {
+        border-bottom: none;
+    }
+
+    .users-table .table-cell {
+        padding: 0.5rem 0;
+        border-bottom: none;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .user-avatar {
+        flex-shrink: 0;
+    }
+
+    .avatar-img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .avatar-placeholder {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: var(--text-white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .avatar-placeholder.small {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+
+    .username {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .empty-field {
+        color: var(--text-muted);
+        font-style: italic;
+    }
+
+    /* Section Styles */
+    .section {
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .section-header {
+        background: var(--background-secondary);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .section-header h2 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .section-content {
+        padding: 1.5rem;
+    }
+
+    /* Search Container */
+    .search-container {
+        position: relative;
+        max-width: 400px;
+        margin-bottom: 1rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 0 0.75rem 2.5rem;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-small);
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        background: var(--background-primary);
+        transition: border-color 0.2s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1rem;
+        height: 1rem;
+        color: var(--text-muted);
+        pointer-events: none;
+    }
+
+    /* Table Styles */
+    .table-header {
+        background: var(--background-secondary);
+        font-weight: 600;
+        color: var(--text-primary);
+        border-bottom: 2px solid var(--border-light);
+        display: grid;
+        grid-template-columns: 1fr 1.5fr 2fr 1fr 1fr 1.5fr;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        align-items: center;
+    }
+
+    .table-row {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr 2fr 1fr 1fr 1.5fr;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        align-items: center;
+        border-bottom: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+
+    .table-row:hover {
+        background: var(--background-secondary);
+        border-bottom: 2px solid var(--primary);
+    }
+
+    .table-row:last-child {
+        border-bottom: none;
+    }
+
+    .table-cell {
+        padding: 0.5rem 0;
+        border-bottom: none;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: var(--background-primary);
+        border: none;
+        border-radius: 0;
+        padding: 1.5rem 0;
+        text-align: center;
+        transition: all 0.3s ease;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .stat-card:hover {
+        border-bottom: 2px solid var(--primary);
+        transform: translateY(-1px);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 1.5rem 0;
+        border: none;
+        border-radius: 0;
+        transition: all 0.3s ease;
+        background: transparent;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .stat-item:hover {
+        border-bottom: 2px solid var(--primary);
+        transform: translateY(-1px);
+    }
+
+    /* Activity Grid */
+    .activity-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+
+    .activity-list {
+        margin-bottom: 2rem;
+    }
+
+    .activity-list h3 {
+        font-size: 0.8rem;
+        font-weight: 400;
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+
+    .activity-item:last-child {
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .activity-item:hover {
+        border-bottom: 2px solid var(--primary);
+    }
+
+    .activity-avatar, .activity-icon {
+        flex-shrink: 0;
+    }
+
+    .activity-icon svg {
+        width: 24px;
+        height: 24px;
+        color: var(--text-muted);
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-title {
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .activity-subtitle {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 300;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .activity-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .clients-table .table-row,
+        .users-table .table-row {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+
+        .clients-table .table-header,
+        .users-table .table-header {
+            display: none;
+        }
+
+        .table-cell {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .table-cell:last-child {
+            border-bottom: none;
+        }
+
+        .action-buttons {
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .permissions-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            font-size: 0.8rem;
+            min-width: 100px;
+        }
+
+        .modal-content {
+            max-width: 95%;
+            width: 98%;
+            margin: 1rem;
+        }
+
+        .modal-header,
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .tabs {
+            flex-direction: column;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
+            border-bottom: 1px solid var(--border-light);
+            border-radius: 0;
+        }
+
+        .tab-btn.active {
+            border-bottom: 2px solid var(--primary);
+        }
+    }
+
+    /* Mobile Phones - Portrait */
+    @media (max-width: 480px) {
+        .admin-controls {
+            padding: 0 0.5rem;
+        }
+
+        .dashboard-header {
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.25rem;
+        }
+
+        .dashboard-header p {
+            font-size: 0.8rem;
+        }
+
+        .stats-grid {
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            padding: 1rem 0;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .search-container {
+            max-width: 100%;
+        }
+
+        .search-input {
+            font-size: 0.9rem;
+            padding: 0.875rem 0 0.875rem 1.75rem;
+        }
+
+        .search-icon {
+            width: 0.875rem;
+            height: 0.875rem;
+        }
+
+        .modal-content {
+            max-width: 98%;
+            width: 100%;
+            margin: 0.5rem;
+            max-height: 95vh;
+        }
+
+        .modal-header,
+        .modal-body {
+            padding: 1rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.25rem;
+        }
+
+        .close-btn {
+            width: 20px;
+            height: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.875rem 0;
+            font-size: 0.9rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .permissions-grid {
+            gap: 0.75rem;
+        }
+
+        .permission-item {
+            padding: 0.75rem;
+        }
+
+        .permission-name {
+            font-size: 0.85rem;
+        }
+
+        .permission-description {
+            font-size: 0.7rem;
+        }
+    }
+
+    /* Mobile Phones - Landscape */
+    @media (max-width: 768px) and (orientation: landscape) {
+        .modal-content {
+            max-height: 85vh;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .form-row {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    /* High DPI Displays */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        .btn,
+        .action-btn,
+        .permission-checkbox {
+            border-width: 0.5px;
+        }
+    }
+
+    /* Print Styles */
+    @media print {
+        .admin-controls {
+            padding: 0;
+        }
+
+        .dashboard-header,
+        .section-header {
+            border-bottom: 1px solid #000;
+        }
+
+        .btn,
+        .action-btn,
+        .search-container {
+            display: none;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .table-header,
+        .table-row {
+            display: table-row;
+        }
+
+        .table-cell {
+            display: table-cell;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+        }
+    }
+
+    /* Accessibility Improvements */
+    @media (prefers-reduced-motion: reduce) {
+        .btn,
+        .action-btn,
+        .stat-card,
+        .table-row,
+        .permission-item {
+            transition: none;
+        }
+
+        .btn:hover,
+        .action-btn:hover,
+        .stat-card:hover,
+        .table-row:hover,
+        .permission-item:hover {
+            transform: none;
+        }
+    }
+
+    /* High Contrast Mode */
+    @media (prefers-contrast: high) {
+        .border-light {
+            border-color: #000;
+        }
+
+        .text-muted {
+            color: #000;
+        }
+
+        .btn-secondary {
+            border-color: #000;
+        }
+    }
+
+    /* Focus Visible for Keyboard Navigation */
+    .btn:focus-visible,
+    .action-btn:focus-visible,
+    .search-input:focus-visible,
+    .permission-checkbox:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    /* Skip Link for Accessibility */
+    .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: var(--primary);
+        color: var(--text-white);
+        padding: 8px;
+        text-decoration: none;
+        border-radius: 4px;
+        z-index: 1001;
+    }
+
+    .skip-link:focus {
+        top: 6px;
+    }
+
+    /* Messages */
+    .messages {
+        margin-bottom: 3rem;
+    }
+
+    .message {
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+        border-radius: 0;
+        border: none;
+        border-bottom: 1px solid;
+        background: transparent;
+    }
+
+    .message-success {
+        border-bottom-color: var(--success);
+        color: var(--success);
+    }
+
+    .message-error {
+        border-bottom-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .message-warning {
+        border-bottom-color: var(--warning);
+        color: var(--warning);
+    }
+
+    .message-info {
+        border-bottom-color: var(--primary);
+        color: var(--primary);
+    }
+
+    /* Form Enhancements */
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-bottom: 2px solid var(--primary);
+        background: transparent;
+        box-shadow: none;
+        transform: translateY(-1px);
+    }
+
+    .form-group input:focus::placeholder,
+    .form-group textarea:focus::placeholder {
+        color: var(--primary);
+        opacity: 0.7;
+    }
+
+    .form-group input:valid,
+    .form-group select:valid,
+    .form-group textarea:valid {
+        border-bottom-color: var(--success);
+    }
+
+    .form-group input:invalid:not(:placeholder-shown),
+    .form-group select:invalid:not(:placeholder-shown),
+    .form-group textarea:invalid:not(:placeholder-shown) {
+        border-bottom-color: var(--danger);
+    }
+
+    /* Required field indicator */
+    .form-group label[for*="required"]::after,
+    .form-group label:has(+ input[required])::after,
+    .form-group label:has(+ select[required])::after {
+        content: " *";
+        color: var(--danger);
+        font-weight: 600;
+    }
+
+    /* Form field animations */
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Button hover effects */
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Modal improvements */
+    .modal-content {
+        animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* Tab improvements */
+    .tab-btn {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .tab-btn::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: var(--primary);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+
+    .tab-btn.active::after {
+        width: 100%;
+    }
+
+    .tab-btn:hover::after {
+        width: 100%;
+    }
+
+    /* Form section improvements */
+    .form-section {
+        background: var(--background-secondary);
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-light);
+        margin-bottom: 2rem;
+    }
+
+    .form-section h3 {
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    /* Permission item improvements */
+    .permission-item {
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .permission-item:hover {
+        background: var(--background-secondary);
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .permission-checkbox:checked + .permission-info .permission-name {
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    /* Responsive form improvements */
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            margin: 1rem;
+            max-height: 90vh;
+        }
+        
+        .modal-header,
+        .modal-body {
+            padding: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.875rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .modal-header,
+        .modal-body {
+            padding: 1rem;
+        }
+        
+        .tabs {
+            flex-direction: column;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* Fix for any potential overflow issues */
+    .modal-content {
+        overflow: visible;
+    }
+
+    .modal-body {
+        overflow: visible;
+    }
+
+    /* Dropdown Styling for Light and Dark Modes */
+    .form-group select {
+        background-color: var(--background-primary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-small);
+        padding: 0.75rem 0.75rem;
+        font-size: 0.875rem;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+        padding-right: 2.5rem;
+        transition: all 0.2s ease;
+        background-clip: padding-box;
+    }
+
+    .form-group select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        background-color: var(--background-primary);
+    }
+
+    .form-group select:hover {
+        border-color: var(--primary);
+        background-color: var(--background-primary);
+    }
+
+    .form-group select option {
+        background-color: var(--background-primary);
+        color: var(--text-primary);
+        padding: 0.5rem;
+        border: none;
+    }
+
+    .form-group select option:hover {
+        background-color: var(--background-secondary);
+    }
+
+    .form-group select option:checked {
+        background-color: var(--primary);
+        color: var(--text-white);
+    }
+
+    /* Dark Mode Specific Dropdown Styling */
+    [data-theme="dark"] .form-group select {
+        background-color: #1f2937;
+        color: #f9fafb;
+        border-color: #4b5563;
+    }
+
+    [data-theme="dark"] .form-group select:focus {
+        border-color: var(--primary);
+        background-color: #1f2937;
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    }
+
+    [data-theme="dark"] .form-group select:hover {
+        border-color: var(--primary);
+        background-color: #1f2937;
+    }
+
+    [data-theme="dark"] .form-group select option {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+
+    [data-theme="dark"] .form-group select option:hover {
+        background-color: #374151;
+    }
+
+    [data-theme="dark"] .form-group select option:checked {
+        background-color: var(--primary);
+        color: #ffffff;
+    }
+
+    /* Light Mode Specific Dropdown Styling */
+    [data-theme="light"] .form-group select {
+        background-color: #ffffff;
+        color: #1f2937;
+        border-color: #d1d5db;
+    }
+
+    [data-theme="light"] .form-group select:focus {
+        border-color: var(--primary);
+        background-color: #ffffff;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    [data-theme="light"] .form-group select:hover {
+        border-color: var(--primary);
+        background-color: #ffffff;
+    }
+
+    [data-theme="light"] .form-group select option {
+        background-color: #ffffff;
+        color: #1f2937;
+    }
+
+    [data-theme="light"] .form-group select option:hover {
+        background-color: #f3f4f6;
+    }
+
+    [data-theme="light"] .form-group select option:checked {
+        background-color: var(--primary);
+        color: #ffffff;
+    }
+
+
+
+    [data-theme="dark"] .form-group select {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f9fafb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    }
+
+    /* Hover state for dropdown arrow */
+    .form-group select:hover {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    }
+
+    /* Focus state for dropdown arrow */
+    .form-group select:focus {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    }
+
+    /* Ensure proper contrast for disabled state */
+    .form-group select:disabled {
+        background-color: var(--background-tertiary);
+        color: var(--text-muted);
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .form-group select:disabled option {
+        background-color: var(--background-tertiary);
+        color: var(--text-muted);
+    }
+
+    /* Override any conflicting select styles with more specific rules */
+    .modal .form-group select,
+    .modal-content .form-group select,
+    #editUserModal .form-group select,
+    #addUserModal .form-group select {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+        background-repeat: no-repeat !important;
+        background-position: right 0.75rem center !important;
+        background-size: 1rem !important;
+        padding-right: 2.5rem !important;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+    }
+
+    /* Dark mode override */
+    [data-theme="dark"] .modal .form-group select,
+    [data-theme="dark"] .modal-content .form-group select,
+    [data-theme="dark"] #editUserModal .form-group select,
+    [data-theme="dark"] #addUserModal .form-group select {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f9fafb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    }
+
+    /* Hover state override */
+    .modal .form-group select:hover,
+    .modal-content .form-group select:hover,
+    #editUserModal .form-group select:hover,
+    #addUserModal .form-group select:hover {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    }
+
+    /* Focus state override */
+    .modal .form-group select:focus,
+    .modal-content .form-group select:focus,
+    #editUserModal .form-group select:focus,
+    #addUserModal .form-group select:focus {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    }
+</style>
+
+<script>
+    // Search functionality for users
+    document.getElementById('userSearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('.table-row');
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            const username = row.dataset.username;
+            const name = row.dataset.name;
+            const email = row.dataset.email;
+            
+            if (username.includes(searchTerm) || name.includes(searchTerm) || email.includes(searchTerm)) {
+                row.style.display = 'grid';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Show/hide no results message
+        const noResults = document.getElementById('noResults');
+        if (visibleCount === 0 && searchTerm.length > 0) {
+            if (!noResults) {
+                const noResultsDiv = document.createElement('div');
+                noResultsDiv.id = 'noResults';
+                noResultsDiv.className = 'no-results';
+                noResultsDiv.innerHTML = `
+                    <div class="no-results-content">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <p>No users found matching "${searchTerm}"</p>
+                    </div>
+                `;
+                document.querySelector('.users-table').appendChild(noResultsDiv);
+            }
+        } else if (noResults) {
+            noResults.remove();
+        }
+    });
+
+    // Client search functionality
+    document.getElementById('clientSearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('.clients-table .table-row');
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            const username = row.dataset.username;
+            const email = row.dataset.email;
+            
+            if (username.includes(searchTerm) || email.includes(searchTerm)) {
+                row.style.display = 'grid';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Show/hide no results message for clients
+        const noClientResults = document.getElementById('noClientResults');
+        if (visibleCount === 0 && searchTerm.length > 0) {
+            if (!noClientResults) {
+                const noResultsDiv = document.createElement('div');
+                noResultsDiv.id = 'noClientResults';
+                noResultsDiv.className = 'no-results';
+                noResultsDiv.innerHTML = `
+                    <div class="no-results-content">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <p>No clients found matching "${searchTerm}"</p>
+                    </div>
+                `;
+                document.querySelector('.clients-table').appendChild(noResultsDiv);
+            }
+        } else if (noClientResults) {
+            noClientResults.remove();
+        }
+    });
+
+    // Modal functions
+    function openAddUserModal() {
+        document.getElementById('addUserModal').style.display = 'flex';
+    }
+
+    function closeAddUserModal() {
+        document.getElementById('addUserModal').style.display = 'none';
+    }
+
+    // Client modal functions
+    function openAddClientModal() {
+        document.getElementById('addClientModal').style.display = 'flex';
+    }
+
+    function closeAddClientModal() {
+        document.getElementById('addClientModal').style.display = 'none';
+    }
+
+    function editClient(clientId) {
+        console.log('DEBUG: editClient called with clientId:', clientId);
+        // For now, just show the modal - you can implement client data fetching later
+        document.getElementById('edit_client_id').value = clientId;
+        document.getElementById('editClientModal').style.display = 'flex';
+    }
+
+    function closeEditClientModal() {
+        document.getElementById('editClientModal').style.display = 'none';
+        document.getElementById('editClientForm').reset();
+    }
+
+    function editUser(userId) {
+        console.log('DEBUG: editUser called with userId:', userId);
+        
+        // Fetch user data and populate the form
+        const url = `/admin-api/user/${userId}/details/`;
+        console.log('DEBUG: Fetching from URL:', url);
+        
+        fetch(url)
+            .then(response => {
+                console.log('DEBUG: Response status:', response.status);
+                console.log('DEBUG: Response ok:', response.ok);
+                return response.json();
+            })
+            .then(data => {
+                console.log('DEBUG: Received data:', data);
+                
+                if (data.error) {
+                    console.error('DEBUG: Data contains error:', data.error);
+                    alert('Error loading user data: ' + data.error);
+                    return;
+                }
+                
+                // Populate the edit form
+                document.getElementById('edit_user_id').value = data.id;
+                document.getElementById('edit_username').value = data.username;
+                document.getElementById('edit_first_name').value = data.first_name || '';
+                document.getElementById('edit_last_name').value = data.last_name || '';
+                document.getElementById('edit_email').value = data.email;
+                document.getElementById('edit_phone').value = data.phone || '';
+                document.getElementById('edit_role').value = data.is_staff ? 'admin' : 'user';
+                document.getElementById('edit_is_active').value = data.is_active.toString();
+                
+                // Populate permission checkboxes
+                if (data.profile) {
+                    document.getElementById('edit_can_access_dashboard').checked = data.profile.can_access_dashboard || false;
+                    document.getElementById('edit_can_access_projects').checked = data.profile.can_access_projects || false;
+                    document.getElementById('edit_can_access_reports').checked = data.profile.can_access_reports || false;
+                    document.getElementById('edit_can_access_analytics').checked = data.profile.can_access_analytics || false;
+                    document.getElementById('edit_can_access_admin').checked = data.profile.can_access_admin || false;
+                    document.getElementById('edit_can_manage_users').checked = data.profile.can_manage_users || false;
+                    document.getElementById('edit_can_manage_clients').checked = data.profile.can_manage_clients || false;
+                    document.getElementById('edit_can_access_system_logs').checked = data.profile.can_access_system_logs || false;
+                }
+                
+                // Show the modal
+                document.getElementById('editUserModal').style.display = 'flex';
+                
+                // Reset to first tab
+                switchTab('user-info');
+            })
+            .catch(error => {
+                console.error('DEBUG: Error fetching user data:', error);
+                alert('Error loading user data. Please try again.');
+            });
+    }
+
+    function closeEditUserModal() {
+        document.getElementById('editUserModal').style.display = 'none';
+        document.getElementById('editUserForm').reset();
+    }
+
+    function toggleUserAccess(userId) {
+        if (confirm('Are you sure you want to toggle this user\'s access?')) {
+            // Implement toggle access functionality
+            console.log('Toggle access for user:', userId);
+        }
+    }
+
+    // Helper function to get CSRF token
+    function getCSRFToken() {
+        // Try multiple methods to get the CSRF token
+        let csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+        
+        if (!csrfToken) {
+            // Fallback: try to get from meta tag
+            csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        }
+        
+        if (!csrfToken) {
+            // Fallback: try to get from cookie
+            const name = 'csrftoken';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            csrfToken = cookieValue;
+        }
+        
+        if (!csrfToken) {
+            console.error('CSRF token not found');
+            alert('Security token not found. Please refresh the page and try again.');
+            return null;
+        }
+        
+        return csrfToken;
+    }
+
+    function deleteUser(userId) {
+        console.log('deleteUser called with userId:', userId);
+        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            // Get the CSRF token from the form
+            const csrfToken = getCSRFToken();
+            if (!csrfToken) return;
+            
+            console.log('CSRF token obtained, submitting delete request...');
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('action', 'delete_user');
+            formData.append('user_id', userId);
+            formData.append('csrfmiddlewaretoken', csrfToken);
+            
+            // Submit the delete request
+            fetch('{% url "admin_control" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => {
+                console.log('Delete response status:', response.status);
+                if (response.ok) {
+                    console.log('User deleted successfully, reloading page...');
+                    // Reload the page to show updated data
+                    window.location.reload();
+                } else {
+                    console.error('Delete failed with status:', response.status);
+                    alert('Error deleting user. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting user. Please try again.');
+            });
+        }
+    }
+
+    // Client action functions
+    function toggleClientAccess(clientId) {
+        console.log('toggleClientAccess called with clientId:', clientId);
+        if (confirm('Are you sure you want to toggle this client\'s access?')) {
+            // Get the CSRF token from the form
+            const csrfToken = getCSRFToken();
+            if (!csrfToken) return;
+            
+            console.log('CSRF token obtained, submitting toggle request...');
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('action', 'toggle_client_access');
+            formData.append('client_id', clientId);
+            formData.append('csrfmiddlewaretoken', csrfToken);
+            
+            // Submit the request
+            fetch('{% url "admin_control" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => {
+                console.log('Toggle response status:', response.status);
+                if (response.ok) {
+                    console.log('Client access toggled successfully, reloading page...');
+                    // Reload the page to show updated data
+                    window.location.reload();
+                } else {
+                    console.error('Toggle failed with status:', response.status);
+                    alert('Error toggling client access. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error toggling client access. Please try again.');
+            });
+        }
+    }
+
+    function deleteClient(clientId) {
+        console.log('deleteClient called with clientId:', clientId);
+        if (confirm('Are you sure you want to delete this client? This action cannot be undone.')) {
+            // Get the CSRF token from the form
+            const csrfToken = getCSRFToken();
+            if (!csrfToken) return;
+            
+            console.log('CSRF token obtained, submitting delete request...');
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('action', 'delete_client');
+            formData.append('client_id', clientId);
+            formData.append('csrfmiddlewaretoken', csrfToken);
+            
+            // Submit the delete request
+            fetch('{% url "admin_control" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => {
+                console.log('Delete response status:', response.status);
+                if (response.ok) {
+                    console.log('Client deleted successfully, reloading page...');
+                    // Reload the page to show updated data
+                    window.location.reload();
+                } else {
+                    console.error('Delete failed with status:', response.status);
+                    alert('Error deleting client. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting client. Please try again.');
+            });
+        }
+    }
+
+    // Close modals when clicking outside
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
+        }
+    }
+
+    // Tab functionality for Edit User Modal
+    function switchTab(tabId) {
+        console.log('DEBUG: switchTab called with tabId:', tabId);
+        
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+        
+        console.log('DEBUG: Found tabs:', tabs.length);
+        console.log('DEBUG: Found contents:', contents.length);
+
+        // Remove active class from all tabs and contents
+        tabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+        contents.forEach(content => {
+            content.classList.remove('active');
+        });
+
+        // Add active class to selected tab and content
+        const selectedTab = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+        const selectedContent = document.getElementById(tabId);
+        
+        if (selectedTab) {
+            selectedTab.classList.add('active');
+            console.log('DEBUG: Activated tab:', tabId);
+        } else {
+            console.error('DEBUG: Tab not found:', tabId);
+        }
+        
+        if (selectedContent) {
+            selectedContent.classList.add('active');
+            console.log('DEBUG: Activated content:', tabId);
+        } else {
+            console.error('DEBUG: Content not found:', tabId);
+        }
+    }
+
+    // Save user permissions function
+    function saveUserPermissions() {
+        const userId = document.getElementById('edit_user_id').value;
+        if (!userId) {
+            alert('No user selected. Please select a user first.');
+            return;
+        }
+
+        // Collect all permission values
+        const permissions = {
+            can_access_dashboard: document.getElementById('edit_can_access_dashboard').checked,
+            can_access_projects: document.getElementById('edit_can_access_projects').checked,
+            can_access_reports: document.getElementById('edit_can_access_reports').checked,
+            can_access_analytics: document.getElementById('edit_can_access_analytics').checked,
+            can_access_admin: document.getElementById('edit_can_access_admin').checked,
+            can_manage_users: document.getElementById('edit_can_manage_users').checked,
+            can_manage_clients: document.getElementById('edit_can_manage_clients').checked,
+            can_access_system_logs: document.getElementById('edit_can_access_system_logs').checked
+        };
+
+        // Create form data
+        const formData = new FormData();
+        formData.append('action', 'update_user_permissions');
+        formData.append('user_id', userId);
+        formData.append('permissions', JSON.stringify(permissions));
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+        // Submit permissions update
+        fetch('{% url "admin_control" %}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Permissions updated successfully!');
+                closeEditUserModal();
+            } else {
+                alert('Error updating permissions: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error saving permissions:', error);
+            alert('Error saving permissions. Please try again.');
+        });
+    }
+
+    // Initialize active tab on modal open
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DEBUG: DOM loaded, initializing tabs');
+        // Don't auto-switch tabs on page load, let the default active state work
+    });
+</script>
+
+{% endblock %}

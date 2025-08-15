@@ -1,0 +1,4032 @@
+[
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$F0p85gaQnWfIO5FzLTlRrf$Fj/9Xu58gzOMYNn6YS9qRLRHtGKAejv5dEIwOR881oo=",
+    "last_login": "2025-08-13T10:18:07.231Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "Ethan",
+    "last_name": "Sevenster",
+    "email": "admin@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-05T19:07:59.208Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$720000$2CtiiJvA2goKyiqgf99G7W$C4b6sGBZYo/7A5LkgHT1badEEKjwvKeBjLNw253wb88=",
+    "last_login": "2025-08-06T22:03:21.593Z",
+    "is_superuser": false,
+    "username": "Anthony",
+    "first_name": "",
+    "last_name": "",
+    "email": "anthony@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-06T22:02:16.578Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$3nZYaoGARPKFBDrnrXiSFf$0YfjdeLh7IbfXr554TuZig6jxFLNZumxWhf9oid9b3w=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "team_member",
+    "first_name": "Team",
+    "last_name": "Member",
+    "email": "team@example.com",
+    "is_staff": false,
+    "is_active": false,
+    "date_joined": "2025-08-07T05:00:33.189Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$oWEmj6x3NJCLaLa5cnCjd6$/gYC9/8Qzwbdn8otnZZbWJ/sCq3QuXhkJNWidx1m1FQ=",
+    "last_login": "2025-08-12T07:49:59.874Z",
+    "is_superuser": true,
+    "username": "User 2",
+    "first_name": "User 2",
+    "last_name": "User 2 Lastname",
+    "email": "ethansevenster621@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-10T12:11:22.257Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$kgy0WgrcFjlRX2DxoAal4H$qy8BFis9rFwWK+wqB6f39qucwFzm2GQS6vWZD4rt/pE=",
+    "last_login": "2025-08-13T10:15:25.412Z",
+    "is_superuser": false,
+    "username": "User",
+    "first_name": "User",
+    "last_name": "User",
+    "email": "ethansevenster9999@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-08-10T13:24:56.075Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 8,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$KpVukA1ELnKkd8B28FmbQN$YzhUNWkIXHpA0lxcrdqA+VJBbaYO29gFEO97gCoNWBI=",
+    "last_login": "2025-08-11T11:31:53.224Z",
+    "is_superuser": true,
+    "username": "Ethan",
+    "first_name": "Ethan",
+    "last_name": "Ethan",
+    "email": "ethansevenster5@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-10T17:39:40.101Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "home.project",
+  "pk": 23,
+  "fields": {
+    "name": "Building a Car",
+    "client": "Magnus Opus Consultants",
+    "client_email": "ethansevenster5@gmail.com",
+    "status": "planned",
+    "client_username": "Magnus Opus Consultants",
+    "created_at": "2025-08-13T02:10:44.358Z",
+    "updated_at": "2025-08-13T10:18:25.558Z",
+    "assigned_users": [
+      3
+    ]
+  }
+},
+{
+  "model": "home.task",
+  "pk": 12,
+  "fields": {
+    "title": "Laying Foundation",
+    "description": "Buying the cemenet and laying the cement",
+    "priority": "low",
+    "status": "in_progress",
+    "start_date": "2025-08-01",
+    "end_date": "2025-08-27",
+    "estimated_hours": null,
+    "project": 23,
+    "created_at": "2025-08-13T02:10:44.366Z",
+    "updated_at": "2025-08-13T05:34:49.895Z",
+    "assigned_users": []
+  }
+},
+{
+  "model": "home.subtask",
+  "pk": 10,
+  "fields": {
+    "title": "Go to get cement",
+    "description": "",
+    "is_completed": false,
+    "status": "in_progress",
+    "priority": "high",
+    "start_date": "2025-08-07",
+    "end_date": "2025-08-20",
+    "task": 12,
+    "created_at": "2025-08-13T02:10:44.371Z",
+    "updated_at": "2025-08-13T05:28:32.388Z"
+  }
+},
+{
+  "model": "home.userprofile",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "profile_picture": "profile_pictures/gantt-chart-template.webp",
+    "bio": "",
+    "phone": "+27713588818",
+    "address": "",
+    "department": "",
+    "can_access_dashboard": true,
+    "can_access_projects": true,
+    "can_access_reports": true,
+    "can_access_analytics": true,
+    "can_access_admin": true,
+    "can_manage_users": true,
+    "can_manage_clients": true,
+    "can_access_system_logs": false,
+    "can_create_projects": true,
+    "can_edit_projects": true,
+    "can_delete_projects": true,
+    "can_create_tasks": true,
+    "can_edit_tasks": true,
+    "can_delete_tasks": true,
+    "can_view_system_logs": true,
+    "can_access_backup_management": true,
+    "can_access_system_monitoring": true,
+    "is_suspended": false,
+    "suspension_reason": null,
+    "suspension_until": null,
+    "max_login_attempts": 5,
+    "current_login_attempts": 0,
+    "last_failed_login": "2025-08-12T07:53:13.994Z",
+    "account_locked_until": null,
+    "created_at": "2025-08-06T00:21:19.508Z",
+    "updated_at": "2025-08-13T10:18:07.212Z"
+  }
+},
+{
+  "model": "home.userprofile",
+  "pk": 3,
+  "fields": {
+    "user": 3,
+    "profile_picture": "",
+    "bio": "",
+    "phone": "",
+    "address": "",
+    "department": "",
+    "can_access_dashboard": true,
+    "can_access_projects": true,
+    "can_access_reports": true,
+    "can_access_analytics": true,
+    "can_access_admin": true,
+    "can_manage_users": true,
+    "can_manage_clients": true,
+    "can_access_system_logs": false,
+    "can_create_projects": true,
+    "can_edit_projects": true,
+    "can_delete_projects": true,
+    "can_create_tasks": true,
+    "can_edit_tasks": true,
+    "can_delete_tasks": true,
+    "can_view_system_logs": true,
+    "can_access_backup_management": true,
+    "can_access_system_monitoring": true,
+    "is_suspended": false,
+    "suspension_reason": null,
+    "suspension_until": null,
+    "max_login_attempts": 5,
+    "current_login_attempts": 0,
+    "last_failed_login": null,
+    "account_locked_until": null,
+    "created_at": "2025-08-06T22:02:17.150Z",
+    "updated_at": "2025-08-10T16:59:35.971Z"
+  }
+},
+{
+  "model": "home.userprofile",
+  "pk": 4,
+  "fields": {
+    "user": 4,
+    "profile_picture": "",
+    "bio": "",
+    "phone": "",
+    "address": "",
+    "department": "",
+    "can_access_dashboard": true,
+    "can_access_projects": true,
+    "can_access_reports": true,
+    "can_access_analytics": true,
+    "can_access_admin": false,
+    "can_manage_users": false,
+    "can_manage_clients": false,
+    "can_access_system_logs": false,
+    "can_create_projects": false,
+    "can_edit_projects": false,
+    "can_delete_projects": false,
+    "can_create_tasks": false,
+    "can_edit_tasks": false,
+    "can_delete_tasks": false,
+    "can_view_system_logs": false,
+    "can_access_backup_management": false,
+    "can_access_system_monitoring": false,
+    "is_suspended": false,
+    "suspension_reason": null,
+    "suspension_until": null,
+    "max_login_attempts": 5,
+    "current_login_attempts": 0,
+    "last_failed_login": null,
+    "account_locked_until": null,
+    "created_at": "2025-08-07T11:45:57.315Z",
+    "updated_at": "2025-08-07T11:45:57.315Z"
+  }
+},
+{
+  "model": "home.userprofile",
+  "pk": 5,
+  "fields": {
+    "user": 5,
+    "profile_picture": "",
+    "bio": "",
+    "phone": "0761235651",
+    "address": "",
+    "department": "",
+    "can_access_dashboard": true,
+    "can_access_projects": true,
+    "can_access_reports": true,
+    "can_access_analytics": true,
+    "can_access_admin": true,
+    "can_manage_users": true,
+    "can_manage_clients": true,
+    "can_access_system_logs": false,
+    "can_create_projects": false,
+    "can_edit_projects": false,
+    "can_delete_projects": false,
+    "can_create_tasks": false,
+    "can_edit_tasks": false,
+    "can_delete_tasks": false,
+    "can_view_system_logs": false,
+    "can_access_backup_management": false,
+    "can_access_system_monitoring": false,
+    "is_suspended": false,
+    "suspension_reason": null,
+    "suspension_until": null,
+    "max_login_attempts": 5,
+    "current_login_attempts": 0,
+    "last_failed_login": null,
+    "account_locked_until": null,
+    "created_at": "2025-08-10T12:11:22.828Z",
+    "updated_at": "2025-08-12T07:49:59.846Z"
+  }
+},
+{
+  "model": "home.userprofile",
+  "pk": 6,
+  "fields": {
+    "user": 6,
+    "profile_picture": "",
+    "bio": "",
+    "phone": "0761235651",
+    "address": "",
+    "department": "",
+    "can_access_dashboard": true,
+    "can_access_projects": true,
+    "can_access_reports": true,
+    "can_access_analytics": true,
+    "can_access_admin": false,
+    "can_manage_users": false,
+    "can_manage_clients": false,
+    "can_access_system_logs": false,
+    "can_create_projects": false,
+    "can_edit_projects": false,
+    "can_delete_projects": false,
+    "can_create_tasks": false,
+    "can_edit_tasks": false,
+    "can_delete_tasks": false,
+    "can_view_system_logs": false,
+    "can_access_backup_management": false,
+    "can_access_system_monitoring": false,
+    "is_suspended": false,
+    "suspension_reason": null,
+    "suspension_until": null,
+    "max_login_attempts": 5,
+    "current_login_attempts": 0,
+    "last_failed_login": null,
+    "account_locked_until": null,
+    "created_at": "2025-08-10T13:24:56.630Z",
+    "updated_at": "2025-08-13T10:15:25.395Z"
+  }
+},
+{
+  "model": "home.userprofile",
+  "pk": 8,
+  "fields": {
+    "user": 8,
+    "profile_picture": "",
+    "bio": "",
+    "phone": "0761235651",
+    "address": "",
+    "department": "",
+    "can_access_dashboard": true,
+    "can_access_projects": true,
+    "can_access_reports": true,
+    "can_access_analytics": true,
+    "can_access_admin": true,
+    "can_manage_users": true,
+    "can_manage_clients": true,
+    "can_access_system_logs": true,
+    "can_create_projects": false,
+    "can_edit_projects": false,
+    "can_delete_projects": false,
+    "can_create_tasks": false,
+    "can_edit_tasks": false,
+    "can_delete_tasks": false,
+    "can_view_system_logs": false,
+    "can_access_backup_management": false,
+    "can_access_system_monitoring": false,
+    "is_suspended": false,
+    "suspension_reason": null,
+    "suspension_until": null,
+    "max_login_attempts": 5,
+    "current_login_attempts": 0,
+    "last_failed_login": "2025-08-10T21:49:34.128Z",
+    "account_locked_until": null,
+    "created_at": "2025-08-10T17:39:40.687Z",
+    "updated_at": "2025-08-12T17:02:44.897Z"
+  }
+},
+{
+  "model": "home.client",
+  "pk": 3,
+  "fields": {
+    "username": "Magnus Opus Consultants",
+    "email": "ethansevenster5@gmail.com",
+    "password": "2a19003826cbf82ed199bf977cae54d31586914144eecb95a722e3825e47190c",
+    "profile_picture": "",
+    "is_active": true,
+    "has_changed_password": true,
+    "created_at": "2025-08-06T10:53:13.586Z",
+    "updated_at": "2025-08-06T12:19:00.237Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 3,
+  "fields": {
+    "client": 3,
+    "otp": "246604",
+    "is_used": true,
+    "expires_at": "2025-08-06T11:03:13.593Z",
+    "created_at": "2025-08-06T10:53:13.593Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 4,
+  "fields": {
+    "client": 3,
+    "otp": "234744",
+    "is_used": true,
+    "expires_at": "2025-08-06T11:07:45.546Z",
+    "created_at": "2025-08-06T10:57:45.546Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 5,
+  "fields": {
+    "client": 3,
+    "otp": "940292",
+    "is_used": true,
+    "expires_at": "2025-08-06T11:12:10.358Z",
+    "created_at": "2025-08-06T11:02:10.359Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 6,
+  "fields": {
+    "client": 3,
+    "otp": "858290",
+    "is_used": true,
+    "expires_at": "2025-08-06T11:15:43.426Z",
+    "created_at": "2025-08-06T11:05:43.427Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 7,
+  "fields": {
+    "client": 3,
+    "otp": "961374",
+    "is_used": true,
+    "expires_at": "2025-08-06T11:17:19.583Z",
+    "created_at": "2025-08-06T11:07:19.583Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 8,
+  "fields": {
+    "client": 3,
+    "otp": "672566",
+    "is_used": true,
+    "expires_at": "2025-08-06T11:21:29.096Z",
+    "created_at": "2025-08-06T11:11:29.096Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 9,
+  "fields": {
+    "client": 3,
+    "otp": "752432",
+    "is_used": true,
+    "expires_at": "2025-08-06T11:55:46.875Z",
+    "created_at": "2025-08-06T11:45:46.875Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 10,
+  "fields": {
+    "client": 3,
+    "otp": "825157",
+    "is_used": true,
+    "expires_at": "2025-08-06T12:23:25.966Z",
+    "created_at": "2025-08-06T12:13:25.966Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 11,
+  "fields": {
+    "client": 3,
+    "otp": "757200",
+    "is_used": true,
+    "expires_at": "2025-08-06T12:23:54.517Z",
+    "created_at": "2025-08-06T12:13:54.517Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 12,
+  "fields": {
+    "client": 3,
+    "otp": "613472",
+    "is_used": true,
+    "expires_at": "2025-08-06T12:28:38.449Z",
+    "created_at": "2025-08-06T12:18:38.449Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 13,
+  "fields": {
+    "client": 3,
+    "otp": "814757",
+    "is_used": true,
+    "expires_at": "2025-08-06T12:57:22.020Z",
+    "created_at": "2025-08-06T12:47:22.021Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 14,
+  "fields": {
+    "client": 3,
+    "otp": "308589",
+    "is_used": true,
+    "expires_at": "2025-08-06T15:08:35.917Z",
+    "created_at": "2025-08-06T14:58:35.917Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 15,
+  "fields": {
+    "client": 3,
+    "otp": "961329",
+    "is_used": true,
+    "expires_at": "2025-08-10T22:56:19.540Z",
+    "created_at": "2025-08-10T22:46:19.546Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 16,
+  "fields": {
+    "client": 3,
+    "otp": "044200",
+    "is_used": true,
+    "expires_at": "2025-08-11T11:47:02.610Z",
+    "created_at": "2025-08-11T11:37:02.635Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 17,
+  "fields": {
+    "client": 3,
+    "otp": "201380",
+    "is_used": true,
+    "expires_at": "2025-08-11T11:48:58.763Z",
+    "created_at": "2025-08-11T11:38:58.774Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 18,
+  "fields": {
+    "client": 3,
+    "otp": "640335",
+    "is_used": true,
+    "expires_at": "2025-08-12T20:51:57.287Z",
+    "created_at": "2025-08-12T20:41:57.291Z"
+  }
+},
+{
+  "model": "home.clientotp",
+  "pk": 19,
+  "fields": {
+    "client": 3,
+    "otp": "892642",
+    "is_used": false,
+    "expires_at": "2025-08-12T23:28:15.460Z",
+    "created_at": "2025-08-12T23:18:15.465Z"
+  }
+},
+{
+  "model": "home.userotp",
+  "pk": 2,
+  "fields": {
+    "user": 8,
+    "otp": "984839",
+    "is_used": true,
+    "expires_at": "2025-08-10T20:16:46.152Z",
+    "created_at": "2025-08-10T20:06:46.152Z"
+  }
+},
+{
+  "model": "home.userotp",
+  "pk": 3,
+  "fields": {
+    "user": 1,
+    "otp": "194777",
+    "is_used": true,
+    "expires_at": "2025-08-10T19:38:25.503Z",
+    "created_at": "2025-08-10T19:28:25.504Z"
+  }
+},
+{
+  "model": "home.userotp",
+  "pk": 4,
+  "fields": {
+    "user": 1,
+    "otp": "787500",
+    "is_used": false,
+    "expires_at": "2025-08-10T22:56:19.555Z",
+    "created_at": "2025-08-10T22:46:19.559Z"
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-07T09:13:02.432Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 2,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-07T11:37:21.133Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 3,
+  "fields": {
+    "user": 3,
+    "action": "logout",
+    "timestamp": "2025-08-10T10:35:28.591Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 4,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-10T11:16:58.817Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 5,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-10T12:36:58.638Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 6,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-10T12:37:07.857Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 7,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-10T12:37:19.182Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 8,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-10T12:37:38.416Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 9,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-10T12:52:12.435Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 10,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-10T13:16:06.425Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 11,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-10T13:16:52.703Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 12,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-10T13:17:06.367Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 13,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-10T13:17:32.315Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 14,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-10T13:23:13.651Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 15,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-10T13:25:05.841Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 16,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-10T13:25:12.202Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 17,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-10T13:25:27.026Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 18,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-10T13:25:31.651Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 19,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-10T13:25:45.727Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 20,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-10T13:25:49.002Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 21,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-10T13:26:05.662Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 22,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-10T13:26:10.801Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 23,
+  "fields": {
+    "user": 8,
+    "action": "login",
+    "timestamp": "2025-08-10T20:07:27.449Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 24,
+  "fields": {
+    "user": 8,
+    "action": "logout",
+    "timestamp": "2025-08-10T20:11:50.530Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 25,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-10T20:11:56.210Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 26,
+  "fields": {
+    "user": 5,
+    "action": "login",
+    "timestamp": "2025-08-10T20:28:44.121Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 27,
+  "fields": {
+    "user": 5,
+    "action": "logout",
+    "timestamp": "2025-08-10T21:49:29.885Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 28,
+  "fields": {
+    "user": 8,
+    "action": "login",
+    "timestamp": "2025-08-10T21:49:40.936Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 29,
+  "fields": {
+    "user": 8,
+    "action": "logout",
+    "timestamp": "2025-08-10T21:50:04.210Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 30,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-10T21:50:07.633Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 31,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-11T08:16:37.076Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 32,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-11T09:08:46.358Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 33,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-11T09:08:53.412Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 34,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-11T11:27:51.512Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 35,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-11T11:27:57.815Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 36,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-11T11:29:43.896Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 37,
+  "fields": {
+    "user": 8,
+    "action": "login",
+    "timestamp": "2025-08-11T11:30:08.533Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 38,
+  "fields": {
+    "user": 8,
+    "action": "login",
+    "timestamp": "2025-08-11T11:31:53.231Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 39,
+  "fields": {
+    "user": 8,
+    "action": "logout",
+    "timestamp": "2025-08-11T11:32:33.652Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 40,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-11T11:32:43.981Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 41,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-11T11:33:49.315Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 42,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-11T11:34:14.409Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 43,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T07:49:45.372Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 44,
+  "fields": {
+    "user": 5,
+    "action": "login",
+    "timestamp": "2025-08-12T07:49:59.883Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 45,
+  "fields": {
+    "user": 5,
+    "action": "logout",
+    "timestamp": "2025-08-12T07:51:10.310Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 46,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T07:51:18.001Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 47,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T07:53:03.813Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 48,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T07:53:22.190Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 49,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T09:38:48.062Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 50,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T09:39:01.211Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 51,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T10:01:12.618Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 52,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T10:01:30.704Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 53,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T11:27:00.924Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 54,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T11:27:09.832Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 55,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T11:27:37.252Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 56,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T11:28:15.098Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 57,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T12:52:45.964Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 58,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T12:54:10.815Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 59,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T13:24:30.063Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 60,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T16:52:56.289Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 61,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:03:17.899Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 62,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T22:03:25.529Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 63,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:18:46.635Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 64,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T22:18:51.045Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 65,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:19:15.258Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 66,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T22:19:20.330Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 67,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:19:43.480Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 68,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T22:19:47.471Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 69,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:20:11.563Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 70,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T22:20:16.064Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 71,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:20:27.405Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 72,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T22:20:31.183Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 73,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:21:58.031Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 74,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T22:22:03.656Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 75,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:29:49.443Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 76,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T22:29:53.592Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 77,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:30:07.002Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 78,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T22:30:11.976Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 79,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:31:21.949Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 80,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T22:31:26.217Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 81,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:35:17.338Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 82,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T22:35:21.601Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 83,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:35:30.849Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 84,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T22:35:35.344Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 85,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:40:40.997Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 86,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T22:40:45.095Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 87,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:40:52.477Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 88,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T22:40:57.340Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 89,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:57:51.453Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 90,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T22:57:56.150Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 91,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T22:58:04.524Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 92,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T22:58:08.053Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 93,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T23:01:37.368Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 94,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T23:01:42.116Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 95,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T23:01:49.873Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 96,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T23:01:55.877Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 97,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-12T23:02:30.084Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 98,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-12T23:02:35.657Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 99,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-12T23:14:43.825Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 100,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-12T23:14:47.239Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 101,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-13T01:03:40.665Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 102,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-13T01:05:44.628Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 103,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-13T04:44:28.642Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 104,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:16:11.282Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:16:11.281497+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 105,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:16:23.537Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:16:23.537604+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 106,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:16:31.462Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:16:31.461818+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 107,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:18:48.257Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 06:18:48.257664+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 108,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:18:57.847Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 06:18:57.847013+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 109,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:19:03.666Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 06:19:03.665778+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 110,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:19:22.025Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 06:19:22.024578+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 111,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:19:24.202Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:19:24.201825+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 112,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:19:32.567Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:19:32.567081+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 113,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:19:38.367Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 06:19:38.367417+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 114,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:19:40.758Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:19:40.758036+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 115,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:20:50.417Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:20:50.417578+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 116,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:20:58.538Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 06:20:58.538650+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 117,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:21:04.410Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 06:21:04.410647+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 118,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:21:07.127Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:21:07.127292+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 119,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-13T06:24:49.894Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 120,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-13T06:24:57.012Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 121,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:24:57.033Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 06:24:57.033587+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 122,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:25:01.041Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 06:25:01.041674+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 123,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:25:05.871Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 06:25:05.870816+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 124,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:26:28.744Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:26:28.743674+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 125,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:27:53.641Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:27:53.641258+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 126,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:28:00.491Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:28:00.491380+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 127,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:28:11.371Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:28:11.371530+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 128,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:28:14.753Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:28:14.753079+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 129,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:28:18.746Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:28:18.745814+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 130,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:29:47.982Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:29:47.981930+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 131,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:29:54.878Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:29:54.877989+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 132,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:30:02.199Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:30:02.199210+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 133,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:30:30.361Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:30:30.360963+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 134,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:31:48.874Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "System Logs",
+      "page_url": "/system-logs/",
+      "navigation_time": "2025-08-13 06:31:48.874332+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 135,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:32:01.666Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 06:32:01.666210+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 136,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:32:05.114Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 06:32:05.114214+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 137,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:32:07.435Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 06:32:07.435029+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 138,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:41:17.665Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 06:41:17.664955+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 139,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:41:47.816Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 06:41:47.816395+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 140,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:41:48.824Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 06:41:48.823979+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 141,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:42:00.425Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 06:42:00.424564+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 142,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T06:42:29.862Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 06:42:29.862488+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 143,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-13T07:13:00.356Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 144,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-13T09:56:57.363Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 145,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T09:56:57.393Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 09:56:57.393514+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 146,
+  "fields": {
+    "user": 1,
+    "action": "logout",
+    "timestamp": "2025-08-13T09:57:00.736Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 147,
+  "fields": {
+    "user": 6,
+    "action": "login",
+    "timestamp": "2025-08-13T10:15:25.419Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 148,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:15:25.448Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 10:15:25.448715+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 149,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:15:29.942Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:15:29.942352+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 150,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:15:35.039Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 10:15:35.038892+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 151,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:15:42.013Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 10:15:42.012836+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 152,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:15:47.813Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:15:47.812896+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 153,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:15:57.173Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:15:57.172775+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 154,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:16:13.282Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 10:16:13.281912+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 155,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:16:16.902Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:16:16.902438+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 156,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:16:45.535Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:16:45.534863+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 157,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:16:47.738Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:16:47.738161+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 158,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:16:48.458Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:16:48.457939+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 159,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:16:49.776Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:16:49.776228+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 160,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:16:50.819Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:16:50.818646+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 161,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:16:53.077Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:16:53.076923+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 162,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:16:54.038Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:16:54.038481+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 163,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:16:54.581Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:16:54.581432+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 164,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:17:03.522Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:17:03.522313+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 165,
+  "fields": {
+    "user": 6,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:17:05.346Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:17:05.346109+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 166,
+  "fields": {
+    "user": 6,
+    "action": "logout",
+    "timestamp": "2025-08-13T10:17:59.137Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 167,
+  "fields": {
+    "user": 1,
+    "action": "login",
+    "timestamp": "2025-08-13T10:18:07.237Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {},
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 168,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:18:07.258Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Dashboard",
+      "page_url": "/dashboard/",
+      "navigation_time": "2025-08-13 10:18:07.257972+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 169,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:18:10.171Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:18:10.171482+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 170,
+  "fields": {
+    "user": 1,
+    "action": "project_edited",
+    "timestamp": "2025-08-13T10:18:25.576Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {
+      "project_id": 23,
+      "project_name": "Building a Car",
+      "changes": {
+        "assigned_users": {
+          "old": "['Anthony', 'User 2', 'User', 'Ethan']",
+          "new": "['Anthony']"
+        }
+      }
+    },
+    "related_project": 23,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 171,
+  "fields": {
+    "user": 1,
+    "action": "project_assigned",
+    "timestamp": "2025-08-13T10:18:25.583Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": null,
+    "os_info": null,
+    "browser_info": null,
+    "additional_info": {
+      "project_id": 23,
+      "project_name": "Building a Car",
+      "assigned_users": [
+        "Anthony"
+      ],
+      "assigned_user_count": 1
+    },
+    "related_project": 23,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.systemlog",
+  "pk": 172,
+  "fields": {
+    "user": 1,
+    "action": "navigation",
+    "timestamp": "2025-08-13T10:18:25.597Z",
+    "ip_address": "127.0.0.1",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "os_info": "Windows",
+    "browser_info": "Chrome",
+    "additional_info": {
+      "page_name": "Projects Page",
+      "page_url": "/projects-page/",
+      "navigation_time": "2025-08-13 10:18:25.597668+00:00"
+    },
+    "related_project": null,
+    "related_task": null,
+    "related_user": null,
+    "related_client": null
+  }
+},
+{
+  "model": "home.aiconversation",
+  "pk": 1,
+  "fields": {
+    "user_id": "None",
+    "session_id": "38404e69-0a00-4c12-8fa2-d22930bf4528",
+    "question": "Hello, how can you help me?",
+    "answer": "That's an interesting question! I'm adding it to my knowledge base.",
+    "was_helpful": null,
+    "response_time": 0.003950357437133789,
+    "created_at": "2025-08-13T08:14:22.923Z"
+  }
+},
+{
+  "model": "home.aiconversation",
+  "pk": 2,
+  "fields": {
+    "user_id": "None",
+    "session_id": "6cc97d75-6dea-47e7-aac2-9be785dbe799",
+    "question": "Hello, how can you help me?",
+    "answer": "That's an interesting question! I'm adding it to my knowledge base.",
+    "was_helpful": null,
+    "response_time": 0.004620552062988281,
+    "created_at": "2025-08-13T08:21:05.847Z"
+  }
+},
+{
+  "model": "home.aiconversation",
+  "pk": 3,
+  "fields": {
+    "user_id": "None",
+    "session_id": "6cc97d75-6dea-47e7-aac2-9be785dbe799",
+    "question": "Hello, how can you help me?",
+    "answer": "That's an interesting question! I'm adding it to my knowledge base.",
+    "was_helpful": null,
+    "response_time": 0.0019791126251220703,
+    "created_at": "2025-08-13T08:21:07.560Z"
+  }
+},
+{
+  "model": "home.aiconversation",
+  "pk": 4,
+  "fields": {
+    "user_id": "None",
+    "session_id": "6cc97d75-6dea-47e7-aac2-9be785dbe799",
+    "question": "Hello, how can you help me?",
+    "answer": "That's an interesting question! I'm adding it to my knowledge base.",
+    "was_helpful": null,
+    "response_time": 0.0011928081512451172,
+    "created_at": "2025-08-13T08:21:07.589Z"
+  }
+},
+{
+  "model": "home.ailearningmetrics",
+  "pk": 1,
+  "fields": {
+    "total_conversations": 4,
+    "successful_responses": 4,
+    "average_response_time": 0.0029357075691223145,
+    "knowledge_base_size": 0,
+    "last_updated": "2025-08-13T08:21:07.601Z"
+  }
+}
+]

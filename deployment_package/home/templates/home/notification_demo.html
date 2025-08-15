@@ -1,0 +1,498 @@
+{% extends 'home/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Notification System Demo{% endblock %}
+
+{% block extra_css %}
+<style>
+    .demo-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .demo-section {
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-light);
+    }
+
+    .demo-section h2 {
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .demo-card {
+        background: var(--background-secondary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .demo-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+        border-color: var(--primary);
+    }
+
+    .demo-card h3 {
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .demo-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group label {
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .form-control {
+        padding: 0.75rem;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-small);
+        background: var(--background-primary);
+        color: var(--text-primary);
+        font-size: 0.875rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: var(--radius-small);
+        background: var(--primary);
+        color: var(--text-white);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+        background: var(--background-tertiary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-medium);
+    }
+
+    .btn-secondary:hover {
+        background: var(--background-secondary);
+    }
+
+    .notification-preview {
+        background: var(--background-tertiary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-small);
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .notification-preview h4 {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .notification-preview p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        margin: 0.25rem 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--background-secondary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 768px) {
+        .demo-container {
+            padding: 1rem;
+        }
+        
+        .demo-section {
+            padding: 1.5rem;
+        }
+        
+        .demo-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="demo-container">
+    <div class="demo-section">
+        <h2>Enhanced Notification System Demo</h2>
+        <p>This page demonstrates the new notification system with user tracking. All notifications now show which user triggered them.</p>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_notifications }}</div>
+                <div class="stat-label">Total Notifications</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ unread_count }}</div>
+                <div class="stat-label">Unread</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ today_count }}</div>
+                <div class="stat-label">Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ tracked_count }}</div>
+                <div class="stat-label">User Tracked</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>Create Test Notifications</h2>
+        <div class="demo-grid">
+            <div class="demo-card">
+                <h3>Task Status Change</h3>
+                <form class="demo-form" id="taskStatusForm">
+                    <div class="form-group">
+                        <label for="taskSelect">Select Task:</label>
+                        <select id="taskSelect" name="task_id" class="form-control" required>
+                            <option value="">Choose a task...</option>
+                            {% for task in available_tasks %}
+                                <option value="{{ task.id }}">{{ task.title }} ({{ task.project.name }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="newStatus">New Status:</label>
+                        <select id="newStatus" name="new_status" class="form-control" required>
+                            <option value="">Select status...</option>
+                            <option value="not_started">Not Started</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="in_progress_guidance_required">In Progress (Guidance Required)</option>
+                            <option value="completed">Completed</option>
+                            <option value="completed_review_pending">Completed (Review Pending)</option>
+                            <option value="completed_data_discrepancy_addressing">Completed (Data Discrepancy addressing)</option>
+                            <option value="on_hold">On Hold</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="statusReason">Reason (optional):</label>
+                        <textarea id="statusReason" name="reason" class="form-control" rows="3" placeholder="Why is the status changing?"></textarea>
+                    </div>
+                    <button type="submit" class="btn">Update Task Status</button>
+                </form>
+                
+                <div class="notification-preview" id="taskStatusPreview" style="display: none;">
+                    <h4>Notification Preview:</h4>
+                    <p><strong>Type:</strong> Task Status Change</p>
+                    <p><strong>Title:</strong> <span id="statusTitle"></span></p>
+                    <p><strong>Message:</strong> <span id="statusMessage"></span></p>
+                    <p><strong>Triggered By:</strong> {{ user.get_full_name|default:user.username }}</p>
+                </div>
+            </div>
+
+            <div class="demo-card">
+                <h3>Task Priority Change</h3>
+                <form class="demo-form" id="taskPriorityForm">
+                    <div class="form-group">
+                        <label for="priorityTaskSelect">Select Task:</label>
+                        <select id="priorityTaskSelect" name="task_id" class="form-control" required>
+                            <option value="">Choose a task...</option>
+                            {% for task in available_tasks %}
+                                <option value="{{ task.id }}">{{ task.title }} ({{ task.project.name }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPriority">New Priority:</label>
+                        <select id="newPriority" name="new_priority" class="form-control" required>
+                            <option value="">Select priority...</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="priorityReason">Reason (optional):</label>
+                        <textarea id="priorityReason" name="reason" class="form-control" rows="3" placeholder="Why is the priority changing?"></textarea>
+                    </div>
+                    <button type="submit" class="btn">Update Task Priority</button>
+                </form>
+                
+                <div class="notification-preview" id="taskPriorityPreview" style="display: none;">
+                    <h4>Notification Preview:</h4>
+                    <p><strong>Type:</strong> Priority Changed</p>
+                    <p><strong>Title:</strong> <span id="priorityTitle"></span></p>
+                    <p><strong>Message:</strong> <span id="priorityMessage"></span></p>
+                    <p><strong>Triggered By:</strong> {{ user.get_full_name|default:user.username }}</p>
+                </div>
+            </div>
+
+            <div class="demo-card">
+                <h3>Send Admin Message</h3>
+                <form class="demo-form" id="adminMessageForm">
+                    <div class="form-group">
+                        <label for="messageRecipient">Recipient:</label>
+                        <select id="messageRecipient" name="recipient_id" class="form-control" required>
+                            <option value="">Select recipient...</option>
+                            {% for user in available_users %}
+                                <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="messageTitle">Message Title:</label>
+                        <input type="text" id="messageTitle" name="title" class="form-control" placeholder="Enter message title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="messageContent">Message Content:</label>
+                        <textarea id="messageContent" name="content" class="form-control" rows="4" placeholder="Enter your message..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Send Message</button>
+                </form>
+                
+                <div class="notification-preview" id="adminMessagePreview" style="display: none;">
+                    <h4>Notification Preview:</h4>
+                    <p><strong>Type:</strong> Admin Message</p>
+                    <p><strong>Title:</strong> <span id="messageTitlePreview"></span></p>
+                    <p><strong>Message:</strong> <span id="messageContentPreview"></span></p>
+                    <p><strong>Triggered By:</strong> {{ user.get_full_name|default:user.username }} (Admin)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>Recent Notifications</h2>
+        <p>View the latest notifications with user tracking information:</p>
+        <a href="{% url 'admin_notifications_enhanced' %}" class="btn btn-secondary">View All Notifications</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Task Status Form
+    document.getElementById('taskStatusForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const taskId = document.getElementById('taskSelect').value;
+        const newStatus = document.getElementById('newStatus').value;
+        const reason = document.getElementById('statusReason').value;
+        
+        if (!taskId || !newStatus) {
+            alert('Please fill in all required fields');
+            return;
+        }
+        
+        // Show preview
+        const selectedTask = document.getElementById('taskSelect').options[document.getElementById('taskSelect').selectedIndex].text;
+        document.getElementById('statusTitle').textContent = `Task Status Changed: ${selectedTask.split(' (')[0]}`;
+        document.getElementById('statusMessage').textContent = `Task "${selectedTask.split(' (')[0]}" status changed to ${newStatus}${reason ? '. Reason: ' + reason : ''}`;
+        document.getElementById('taskStatusPreview').style.display = 'block';
+        
+        // Submit form
+        const formData = new FormData();
+        formData.append('update_type', 'status_changed');
+        formData.append('new_value', newStatus);
+        formData.append('reason', reason);
+        
+        fetch(`/tasks/${taskId}/update-with-notification/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Task updated successfully! Check notifications for the new entry.');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the task.');
+        });
+    });
+
+    // Task Priority Form
+    document.getElementById('taskPriorityForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const taskId = document.getElementById('priorityTaskSelect').value;
+        const newPriority = document.getElementById('newPriority').value;
+        const reason = document.getElementById('priorityReason').value;
+        
+        if (!taskId || !newPriority) {
+            alert('Please fill in all required fields');
+            return;
+        }
+        
+        // Show preview
+        const selectedTask = document.getElementById('priorityTaskSelect').options[document.getElementById('priorityTaskSelect').selectedIndex].text;
+        document.getElementById('priorityTitle').textContent = `Task Priority Changed: ${selectedTask.split(' (')[0]}`;
+        document.getElementById('priorityMessage').textContent = `Task "${selectedTask.split(' (')[0]}" priority changed to ${newPriority}${reason ? '. Reason: ' + reason : ''}`;
+        document.getElementById('taskPriorityPreview').style.display = 'block';
+        
+        // Submit form
+        const formData = new FormData();
+        formData.append('update_type', 'priority_changed');
+        formData.append('new_value', newPriority);
+        formData.append('reason', reason);
+        
+        fetch(`/tasks/${taskId}/update-with-notification/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Task priority updated successfully! Check notifications for the new entry.');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the task priority.');
+        });
+    });
+
+    // Admin Message Form
+    document.getElementById('adminMessageForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const recipientId = document.getElementById('messageRecipient').value;
+        const title = document.getElementById('messageTitle').value;
+        const content = document.getElementById('messageContent').value;
+        
+        if (!recipientId || !title || !content) {
+            alert('Please fill in all required fields');
+            return;
+        }
+        
+        // Show preview
+        document.getElementById('messageTitlePreview').textContent = title;
+        document.getElementById('messageContentPreview').textContent = content;
+        document.getElementById('adminMessagePreview').style.display = 'block';
+        
+        // Submit form
+        const formData = new FormData();
+        formData.append('recipient_id', recipientId);
+        formData.append('title', title);
+        formData.append('content', content);
+        
+        fetch('/admin/send-message/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Message sent successfully! Check notifications for the new entry.');
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while sending the message.');
+        });
+    });
+
+    // Get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,117 @@
+<!-- Theme Toggle Component -->
+<div class="theme-toggle-container">
+    <button id="theme-toggle" class="btn btn-outline-primary btn-sm theme-toggle-btn" onclick="toggleTheme()" title="Toggle Light/Dark Mode">
+        <i id="theme-icon" class="fas fa-moon"></i>
+        <span id="theme-text" class="ms-1">Dark Mode</span>
+    </button>
+</div>
+
+<style>
+.theme-toggle-container {
+    display: flex;
+    align-items: center;
+    margin-left: 1rem;
+}
+
+.theme-toggle-btn {
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    border: 2px solid var(--primary-blue);
+    background: transparent;
+    color: var(--primary-blue);
+}
+
+.theme-toggle-btn:hover {
+    background: var(--primary-blue);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+[data-theme="dark"] .theme-toggle-btn {
+    border-color: var(--primary-light);
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] .theme-toggle-btn:hover {
+    background: var(--primary-light);
+    color: var(--background-primary);
+}
+
+@media (max-width: 768px) {
+    .theme-toggle-container {
+        margin-left: 0.5rem;
+    }
+    
+    .theme-toggle-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.875rem;
+    }
+    
+    #theme-text {
+        display: none;
+    }
+}
+</style>
+
+<script>
+// Theme Management Functions
+function toggleTheme() {
+    const html = document.documentElement;
+    const body = document.body;
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const themeText = document.getElementById('theme-text');
+    
+    const currentTheme = html.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    // Set theme on html and body elements
+    html.setAttribute('data-theme', newTheme);
+    body.setAttribute('data-theme', newTheme);
+    
+    // Save to localStorage
+    localStorage.setItem('theme', newTheme);
+    
+    // Update toggle appearance
+    updateThemeToggle(newTheme);
+    
+    // Dispatch custom event for other components
+    window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
+}
+
+function updateThemeToggle(theme) {
+    const themeIcon = document.getElementById('theme-icon');
+    const themeText = document.getElementById('theme-text');
+    
+    if (theme === 'dark') {
+        themeIcon.className = 'fas fa-sun';
+        themeText.textContent = 'Light Mode';
+    } else {
+        themeIcon.className = 'fas fa-moon';
+        themeText.textContent = 'Dark Mode';
+    }
+}
+
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const html = document.documentElement;
+    const body = document.body;
+    
+    // Set the theme
+    html.setAttribute('data-theme', savedTheme);
+    body.setAttribute('data-theme', savedTheme);
+    
+    // Update toggle appearance
+    updateThemeToggle(savedTheme);
+}
+
+// Initialize theme when component loads
+document.addEventListener('DOMContentLoaded', initializeTheme);
+
+// Listen for theme changes from other components
+window.addEventListener('themeChanged', function(event) {
+    updateThemeToggle(event.detail.theme);
+});
+</script>

@@ -1,0 +1,11 @@
+# Production Dependencies
+Django==5.0.14
+django-environ==0.12.0
+django-widget-tweaks==1.5.0
+django-multiselectfield==0.1.13
+sqlparse==0.5.3
+whitenoise==6.9.0
+mysqlclient==2.2.7
+mssql-django==1.5
+gunicorn==21.2.0
+psycopg2-binary==2.9.9

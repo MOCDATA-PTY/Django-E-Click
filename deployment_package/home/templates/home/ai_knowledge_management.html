@@ -1,0 +1,184 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}AI Knowledge Management - E-Click{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-brain me-2"></i>
+                        AI Knowledge Management
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add">
+                        
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Question</label>
+                                <input type="text" name="question" class="form-control" required 
+                                       placeholder="What question should the AI answer?">
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Answer</label>
+                                <textarea name="answer" class="form-control" rows="3" required
+                                          placeholder="What should the AI respond with?"></textarea>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Category</label>
+                                <input type="text" name="category" class="form-control" 
+                                       placeholder="e.g., services, contact, company">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Tags (comma-separated)</label>
+                                <input type="text" name="tags" class="form-control" 
+                                       placeholder="e.g., web development, mobile, ai">
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>
+                                Add Knowledge
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-database me-2"></i>
+                        Knowledge Base Entries
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if knowledge_entries %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Question</th>
+                                        <th>Answer</th>
+                                        <th>Category</th>
+                                        <th>Confidence</th>
+                                        <th>Usage</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for entry in knowledge_entries %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ entry.question|truncatechars:50 }}</strong>
+                                        </td>
+                                        <td>{{ entry.answer|truncatechars:60 }}</td>
+                                        <td>
+                                            {% if entry.category %}
+                                                <span class="badge bg-info">{{ entry.category }}</span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar" role="progressbar" 
+                                                     style="width: {{ entry.confidence_score|floatformat:0 }}%">
+                                                    {{ entry.confidence_score|floatformat:1 }}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ entry.usage_count }}</span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-database fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No knowledge base entries yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        AI Learning Stats
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h3 class="text-primary">{{ stats.total_conversations }}</h3>
+                                <small class="text-muted">Total Conversations</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h3 class="text-success">{{ stats.success_rate|floatformat:1 }}%</h3>
+                                <small class="text-muted">Success Rate</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h3 class="text-info">{{ stats.knowledge_base_size }}</h3>
+                                <small class="text-muted">Knowledge Entries</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h3 class="text-warning">{{ stats.average_response_time }}s</h3>
+                                <small class="text-muted">Avg Response Time</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cog me-2"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="initialize">
+                        <button type="submit" class="btn btn-warning w-100 mb-2">
+                            <i class="fas fa-play me-2"></i>
+                            Initialize Knowledge Base
+                        </button>
+                    </form>
+                    
+                    <div class="alert alert-info">
+                        <small>
+                            <i class="fas fa-info-circle me-2"></i>
+                            The AI system learns from every conversation and improves over time.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

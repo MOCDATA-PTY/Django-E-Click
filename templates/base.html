@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Click{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        [type='text'],
+        [type='email'],
+        [type='url'],
+        [type='password'],
+        [type='number'],
+        [type='date'],
+        [type='datetime-local'],
+        [type='month'],
+        [type='search'],
+        [type='tel'],
+        [type='time'],
+        [type='week'],
+        [multiple],
+        textarea,
+        select {
+            @apply block w-full rounded-md border-slate-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-700 dark:text-white sm:text-sm;
+        }
+        
+        [type='checkbox'],
+        [type='radio'] {
+            @apply h-4 w-4 rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500 dark:bg-slate-700;
+        }
+        
+        select[multiple] {
+            @apply h-32;
+        }
+
+        /* Enhanced Chatbot Component Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .chatbot-toggle {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chatbot-toggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .chatbot-toggle:hover::before {
+            left: 100%;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .chatbot-toggle-content {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chatbot-icon {
+            width: 28px;
+            height: 28px;
+            fill: white;
+            transition: transform 0.3s ease;
+        }
+
+        .chatbot-toggle:hover .chatbot-icon {
+            transform: scale(1.1);
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: notification-pulse 2s infinite;
+        }
+
+        @keyframes notification-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); }
+            50% { box-shadow: 0 4px 20px rgba(102, 126, 234, 0.6), 0 0 0 10px rgba(102, 126, 234, 0.1); }
+            100% { box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); }
+        }
+
+        .chatbot-window {
+            position: absolute;
+            bottom: 90px;
+            right: 0;
+            width: 380px;
+            height: 550px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            transform: scale(0) translateY(20px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 1px solid #e2e8f0;
+            backdrop-filter: blur(10px);
+        }
+
+        .dark .chatbot-window {
+            background: #1e293b;
+            border-color: #475569;
+            color: white;
+        }
+
+        .chatbot-window.open {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chatbot-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .chatbot-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .avatar-ring {
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2, #667eea);
+            background-size: 200% 200%;
+            animation: gradient-shift 3s ease infinite;
+            z-index: -1;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .chatbot-info {
+            flex: 1;
+            z-index: 1;
+        }
+
+        .chatbot-info h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .chatbot-info p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .status-text {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-text::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: status-pulse 2s infinite;
+        }
+
+        @keyframes status-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chatbot-actions {
+            display: flex;
+            gap: 8px;
+            z-index: 1;
+        }
+
+        .chatbot-minimize,
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chatbot-minimize:hover,
+        .chatbot-close:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.1);
+        }
+
+        .chatbot-messages {
+            height: 320px;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .dark .chatbot-messages::-webkit-scrollbar-track {
+            background: #334155;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+
+        .dark .chatbot-messages::-webkit-scrollbar-thumb {
+            background: #64748b;
+        }
+
+        .message {
+            max-width: 85%;
+            margin-bottom: 16px;
+            animation: slideIn 0.4s ease;
+        }
+
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .bot-indicator {
+            font-weight: 600;
+        }
+
+        .message-time {
+            font-size: 11px;
+        }
+
+        .message-text {
+            margin-bottom: 8px;
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(15px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        .message.bot .message-content {
+            background: #f1f5f9;
+            color: #334155;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .message.bot .message-content {
+            background: #374151;
+            color: #f3f4f6;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .welcome-message .message-content {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: 2px solid #e2e8f0;
+        }
+
+        .dark .welcome-message .message-content {
+            background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+            border: 2px solid #4b5563;
+        }
+
+        .chatbot-input-container {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .dark .chatbot-input-container {
+            border-top-color: #475569;
+            background: #1f2937;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            padding: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .dark .input-wrapper {
+            background: #374151;
+            border-color: #4b5563;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .chatbot-input {
+            flex: 1;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 16px;
+            font-size: 14px;
+            outline: none;
+            background: transparent;
+            color: #1f2937;
+        }
+
+        .dark .chatbot-input {
+            color: white;
+        }
+
+        .chatbot-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .dark .chatbot-input::placeholder {
+            color: #6b7280;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .emoji-button,
+        .voice-button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #f3f4f6;
+            color: #6b7280;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .dark .emoji-button,
+        .dark .voice-button {
+            background: #4b5563;
+            color: #d1d5db;
+        }
+
+        .emoji-button:hover,
+        .voice-button:hover {
+            background: #e5e7eb;
+            color: #374151;
+            transform: scale(1.1);
+        }
+
+        .dark .emoji-button:hover,
+        .dark .voice-button:hover {
+            background: #6b7280;
+            color: white;
+        }
+
+        .chatbot-send {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .chatbot-send:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-icon {
+            width: 18px;
+            height: 18px;
+            fill: white;
+            transition: transform 0.2s ease;
+        }
+
+        .chatbot-send:hover .send-icon {
+            transform: translateX(2px);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 16px;
+            background: #f1f5f9;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+            max-width: 80px;
+        }
+
+        .dark .typing-indicator {
+            background: #374151;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #94a3b8;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .quick-action {
+            background: #f8fafc;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 500;
+        }
+
+        .dark .quick-action {
+            background: #374151;
+            color: #e2e8f0;
+            border-color: #4b5563;
+        }
+
+        .quick-action:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            border-color: transparent;
+        }
+
+        .action-icon {
+            font-size: 14px;
+        }
+
+        .action-text {
+            font-size: 11px;
+        }
+
+        @media (max-width: 480px) {
+            .chatbot-window {
+                width: 300px;
+                height: 450px;
+                bottom: 70px;
+                right: -10px;
+            }
+            
+            .chatbot-container {
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="{% url 'main:home' %}" class="text-xl font-bold text-slate-900 dark:text-white">E-Click</a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="{% url 'main:project_list' %}" class="border-transparent text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-700 dark:hover:text-slate-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Projects
+                        </a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="{% url 'main:dashboard' %}" class="border-transparent text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-700 dark:hover:text-slate-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <div class="ml-3 relative">
+                        <div class="flex items-center space-x-4">
+                            <button type="button" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300" onclick="toggleDarkMode()">
+                                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                </svg>
+                            </button>
+                            {% if user.is_authenticated %}
+                            <div class="flex items-center">
+                                <span class="text-sm text-slate-700 dark:text-slate-300">{{ user.username }}</span>
+                                <a href="{% url 'main:logout' %}" class="ml-4 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300">Logout</a>
+                            </div>
+                            {% else %}
+                            <a href="{% url 'main:login' %}" class="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300">Login</a>
+                            <a href="{% url 'main:signup' %}" class="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300">Sign up</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Enhanced Chatbot Component -->
+    <div class="chatbot-container">
+        <button class="chatbot-toggle" onclick="toggleChatbot()" id="chatbotToggle">
+            <div class="chatbot-toggle-content">
+                <svg class="chatbot-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                </svg>
+                <div class="notification-dot"></div>
+            </div>
+        </button>
+        
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <div class="chatbot-avatar">
+                    <div class="avatar-ring"></div>
+                    <span>🤖</span>
+                </div>
+                <div class="chatbot-info">
+                    <h3>E-Click Assistant</h3>
+                    <p class="status-text">Online • Ready to help!</p>
+                </div>
+                <div class="chatbot-actions">
+                    <button class="chatbot-minimize" onclick="minimizeChatbot()" title="Minimize">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 13H5v-2h14v2z"/>
+                        </svg>
+                    </button>
+                    <button class="chatbot-close" onclick="toggleChatbot()" title="Close">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="message bot welcome-message">
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="bot-indicator">🤖 E-Click Assistant</span>
+                            <span class="message-time" id="currentTime"></span>
+                        </div>
+                        <div class="message-text">
+                            👋 Hi there! I'm your E-Click Assistant. I can help you with:
+                        </div>
+                        <div class="quick-actions">
+                            <button class="quick-action" onclick="sendQuickMessage('light mode')">
+                                <span class="action-icon">🌞</span>
+                                <span class="action-text">Light Mode</span>
+                            </button>
+                            <button class="quick-action" onclick="sendQuickMessage('dark mode')">
+                                <span class="action-icon">🌙</span>
+                                <span class="action-text">Dark Mode</span>
+                            </button>
+                            <button class="quick-action" onclick="sendQuickMessage('help')">
+                                <span class="action-icon">❓</span>
+                                <span class="action-text">Help</span>
+                            </button>
+                            <button class="quick-action" onclick="sendQuickMessage('projects')">
+                                <span class="action-icon">📁</span>
+                                <span class="action-text">Projects</span>
+                            </button>
+                            <button class="quick-action" onclick="sendQuickMessage('dashboard')">
+                                <span class="action-icon">📊</span>
+                                <span class="action-text">Dashboard</span>
+                            </button>
+                            <button class="quick-action" onclick="sendQuickMessage('contact')">
+                                <span class="action-icon">📞</span>
+                                <span class="action-text">Contact</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chatbot-input-container">
+                <div class="input-wrapper">
+                    <input type="text" class="chatbot-input" id="chatbotInput" placeholder="Type your message..." onkeypress="handleKeyPress(event)">
+                    <div class="input-actions">
+                        <button class="emoji-button" onclick="toggleEmojiPicker()" title="Emoji">
+                            😊
+                        </button>
+                        <button class="voice-button" onclick="startVoiceInput()" title="Voice Input">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <button class="chatbot-send" onclick="sendMessage()" id="sendButton">
+                    <svg class="send-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check for dark mode preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Toggle dark mode function (for navbar button)
+        function toggleDarkMode() {
+            if (localStorage.theme === 'dark') {
+                localStorage.theme = 'light';
+                document.documentElement.classList.remove('dark');
+            } else {
+                localStorage.theme = 'dark';
+                document.documentElement.classList.add('dark');
+            }
+        }
+
+        // Enhanced Chatbot Functionality
+        let chatbotOpen = false;
+        let isTyping = false;
+        let isMinimized = false;
+
+        const responses = {
+            greetings: [
+                "Hello! 👋 How can I help you today?",
+                "Hi there! 😊 What can I do for you?",
+                "Hey! 🤖 Ready to assist you!",
+                "Greetings! ✨ How may I help?"
+            ],
+            
+            help: [
+                "I can help you with:\n• 🌞 Switch to light mode\n• 🌙 Switch to dark mode\n• 📁 Navigate to projects\n• 📊 Go to dashboard\n• 📞 Contact information\n• 💡 General assistance\n\nJust ask me naturally!",
+                "Here's what I can do:\n• Theme switching (light/dark mode)\n• Navigation help\n• Project management tips\n• Contact assistance\n• General E-Click assistance\n\nTry saying 'light mode' or 'dark mode'!"
+            ],
+            
+            lightMode: [
+                "☀️ Switching to light mode for you! Much brighter now!",
+                "🌞 Light mode activated! Hope you enjoy the bright interface!",
+                "✨ There we go! Light mode is now on. Looking good!"
+            ],
+            
+            darkMode: [
+                "🌙 Dark mode activated! Easy on the eyes!",
+                "🌃 Switched to dark mode! Perfect for night work!",
+                "✨ Dark mode is on! Sleek and professional!"
+            ],
+            
+            projects: [
+                "📁 You can access your projects from the navigation menu or visit your dashboard for an overview!",
+                "🚀 To manage projects, check out the Projects section in the main navigation!",
+                "📊 Your project dashboard has all the details you need about your active projects!"
+            ],
+            
+            dashboard: [
+                "📊 Your dashboard shows all your project statistics and recent activities!",
+                "🎯 The dashboard is your central hub for monitoring project progress!",
+                "📈 Check your dashboard for real-time project insights and updates!"
+            ],
+            
+            contact: [
+                "📞 You can contact us at:\n• Phone: +1 (555) 123-4567\n• Email: ethansevenster5@gmail.com\n• Address: 1234 Tech Avenue, Suite 500, San Francisco, CA 94107",
+                "📧 For support, email us at ethansevenster5@gmail.com or call +1 (555) 123-4567 during business hours (Monday-Friday: 9AM-6PM).",
+                "💬 Need help? Reach out via email at ethansevenster5@gmail.com or call our support line at +1 (555) 123-4567!"
+            ],
+            
+            thanks: [
+                "You're welcome! 😊 Happy to help!",
+                "My pleasure! 🤖 Anything else I can do?",
+                "Glad I could help! ✨ Feel free to ask more questions!",
+                "You're very welcome! 🎉 I'm here whenever you need me!"
+            ],
+            
+            goodbye: [
+                "Goodbye! 👋 Have a great day!",
+                "See you later! 😊 Take care!",
+                "Bye! 🤖 I'll be here when you need me!",
+                "Until next time! ✨ Happy working!"
+            ],
+            
+            default: [
+                "I'm not sure about that, but I can help with theme switching, navigation, contact info, and general E-Click questions! 🤔",
+                "Hmm, I didn't quite catch that. Try asking about light mode, dark mode, projects, contact, or help! 💡",
+                "I'm still learning! 🤖 Ask me about themes, navigation, contact info, or say 'help' for more options!",
+                "That's interesting! 🤔 I'm best at helping with themes, projects, navigation, and contact info. What can I help you with?"
+            ]
+        };
+
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            const toggleButton = document.getElementById('chatbotToggle');
+            chatbotOpen = !chatbotOpen;
+            
+            if (chatbotOpen) {
+                chatbotWindow.classList.add('open');
+                document.getElementById('chatbotInput').focus();
+                updateCurrentTime();
+                // Remove notification dot when opened
+                const notificationDot = document.querySelector('.notification-dot');
+                if (notificationDot) {
+                    notificationDot.style.display = 'none';
+                }
+            } else {
+                chatbotWindow.classList.remove('open');
+                isMinimized = false;
+            }
+        }
+
+        function minimizeChatbot() {
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            isMinimized = !isMinimized;
+            
+            if (isMinimized) {
+                chatbotWindow.style.height = '60px';
+                chatbotWindow.style.overflow = 'hidden';
+            } else {
+                chatbotWindow.style.height = '550px';
+                chatbotWindow.style.overflow = 'hidden';
+            }
+        }
+
+        function addMessage(content, isUser = false) {
+            const messagesContainer = document.getElementById('chatbotMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            if (isUser) {
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="user-indicator">👤 You</span>
+                            <span class="message-time">${currentTime}</span>
+                        </div>
+                        <div class="message-text">${content}</div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="bot-indicator">🤖 E-Click Assistant</span>
+                            <span class="message-time">${currentTime}</span>
+                        </div>
+                        <div class="message-text">${content.replace(/\n/g, '<br>')}</div>
+                    </div>
+                `;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTyping() {
+            if (isTyping) return;
+            isTyping = true;
+            
+            const messagesContainer = document.getElementById('chatbotMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTyping() {
+            isTyping = false;
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        function getRandomResponse(category) {
+            const responseArray = responses[category] || responses.default;
+            return responseArray[Math.floor(Math.random() * responseArray.length)];
+        }
+
+        function processMessage(message) {
+            const lowerMessage = message.toLowerCase().trim();
+            
+            // Theme switching
+            if (lowerMessage.includes('light mode') || lowerMessage.includes('light theme')) {
+                if (localStorage.theme !== 'light') {
+                    localStorage.theme = 'light';
+                    document.documentElement.classList.remove('dark');
+                }
+                return getRandomResponse('lightMode');
+            }
+            
+            if (lowerMessage.includes('dark mode') || lowerMessage.includes('dark theme')) {
+                if (localStorage.theme !== 'dark') {
+                    localStorage.theme = 'dark';
+                    document.documentElement.classList.add('dark');
+                }
+                return getRandomResponse('darkMode');
+            }
+            
+            // Greetings
+            if (lowerMessage.match(/^(hi|hello|hey|greetings|good morning|good afternoon|good evening)$/)) {
+                return getRandomResponse('greetings');
+            }
+            
+            // Help
+            if (lowerMessage.includes('help') || lowerMessage.includes('what can you do') || lowerMessage.includes('commands')) {
+                return getRandomResponse('help');
+            }
+            
+            // Projects
+            if (lowerMessage.includes('project') || lowerMessage.includes('work')) {
+                return getRandomResponse('projects');
+            }
+            
+            // Dashboard
+            if (lowerMessage.includes('dashboard') || lowerMessage.includes('stats') || lowerMessage.includes('overview')) {
+                return getRandomResponse('dashboard');
+            }
+            
+            // Contact
+            if (lowerMessage.includes('contact') || lowerMessage.includes('phone') || lowerMessage.includes('email') || lowerMessage.includes('support')) {
+                return getRandomResponse('contact');
+            }
+            
+            // Thanks
+            if (lowerMessage.includes('thank') || lowerMessage.includes('thanks') || lowerMessage.includes('thx')) {
+                return getRandomResponse('thanks');
+            }
+            
+            // Goodbye
+            if (lowerMessage.match(/^(bye|goodbye|see you|cya|farewell)$/)) {
+                return getRandomResponse('goodbye');
+            }
+            
+            // Default response
+            return getRandomResponse('default');
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatbotInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, true);
+            input.value = '';
+            
+            // Show typing indicator
+            showTyping();
+            
+            // Simulate response delay
+            setTimeout(() => {
+                hideTyping();
+                const response = processMessage(message);
+                addMessage(response);
+            }, 800 + Math.random() * 1200);
+        }
+
+        function sendQuickMessage(message) {
+            const input = document.getElementById('chatbotInput');
+            input.value = message;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Initialize chatbot state based on current theme
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial state message
+            setTimeout(() => {
+                const currentTheme = localStorage.theme || 'light';
+                const welcomeMessage = `Welcome to E-Click! 🚀 Currently in ${currentTheme} mode. I'm here to help you navigate and manage your projects efficiently!`;
+                // This welcome message is already shown in the initial HTML
+            }, 1000);
+        });
+
+        // Auto-close chatbot when clicking outside
+        document.addEventListener('click', function(event) {
+            const chatbotContainer = document.querySelector('.chatbot-container');
+            if (chatbotOpen && !chatbotContainer.contains(event.target)) {
+                toggleChatbot();
+            }
+        });
+
+        // Add some personality with occasional tips
+        const tips = [
+            "💡 Tip: Use keyboard shortcuts to navigate faster!",
+            "🎯 Pro tip: Organize your projects by priority for better workflow!",
+            "⚡ Quick tip: Dark mode can reduce eye strain during long work sessions!",
+            "🌟 Reminder: Regular project updates help keep teams aligned!"
+        ];
+
+        // Show random tip occasionally (every 5 minutes if chatbot is open)
+        setInterval(() => {
+            if (chatbotOpen && Math.random() < 0.3) {
+                const randomTip = tips[Math.floor(Math.random() * tips.length)];
+                setTimeout(() => {
+                    addMessage(randomTip);
+                }, 2000);
+            }
+        }, 300000);
+
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+
+        function toggleEmojiPicker() {
+            // Placeholder for emoji picker functionality
+            const emojis = ['😊', '👍', '🎉', '💡', '🚀', '✨', '🔥', '💪'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const input = document.getElementById('chatbotInput');
+            input.value += randomEmoji;
+            input.focus();
+        }
+
+        function startVoiceInput() {
+            // Placeholder for voice input functionality
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                
+                recognition.lang = 'en-US';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    document.getElementById('chatbotInput').value = transcript;
+                };
+                
+                recognition.start();
+            } else {
+                addMessage('Voice input is not supported in your browser. Please type your message.', false);
+            }
+        }
+
+        // Auto-show notification dot after 5 seconds
+        setTimeout(() => {
+            const notificationDot = document.querySelector('.notification-dot');
+            if (notificationDot && !chatbotOpen) {
+                notificationDot.style.display = 'block';
+            }
+        }, 5000);
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
