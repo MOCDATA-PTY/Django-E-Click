@@ -1,0 +1,277 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}Comprehensive System Report - E-Click{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .report-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .report-title {
+        color: #dc2626;
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .report-subtitle {
+        color: #6b7280;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .report-description {
+        color: #374151;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+    
+    .report-form {
+        background: #f9fafb;
+        padding: 2rem;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 1rem;
+        background: white;
+        color: #374151;
+    }
+    
+    .form-select:focus {
+        outline: none;
+        border-color: #dc2626;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+    
+    .generate-btn {
+        background: #dc2626;
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+    }
+    
+    .generate-btn:hover {
+        background: #b91c1c;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+    
+    .generate-btn:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .feature-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        text-align: center;
+    }
+    
+    .feature-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #dc2626;
+    }
+    
+    .feature-title {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-description {
+        color: #6b7280;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .info-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1.5rem 0;
+    }
+    
+    .info-box h4 {
+        color: #1e40af;
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+    
+    .info-box p {
+        color: #1e40af;
+        margin: 0;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .loading {
+        display: none;
+        text-align: center;
+        margin: 1rem 0;
+    }
+    
+    .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #dc2626;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="report-container">
+    <div class="report-header">
+        <h1 class="report-title">Comprehensive System Report</h1>
+        <p class="report-subtitle">Generate Executive-Level System Analytics</p>
+        <p class="report-description">
+            Create a comprehensive PDF report covering all projects, clients, and system metrics. 
+            This report provides detailed insights into system performance, project status, and strategic recommendations.
+        </p>
+    </div>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">System Performance</h3>
+            <p class="feature-description">Complete overview of system-wide metrics and KPIs</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3 class="feature-title">Project Analytics</h3>
+            <p class="feature-description">Detailed analysis of all projects and their status</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">👥</div>
+            <h3 class="feature-title">Client Insights</h3>
+            <p class="feature-description">Client performance metrics and engagement analysis</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3 class="feature-title">Strategic Recommendations</h3>
+            <p class="feature-description">Actionable insights for system improvement</p>
+        </div>
+    </div>
+    
+    <div class="info-box">
+        <h4>📋 Report Contents</h4>
+        <p>
+            The comprehensive system report includes: Executive Summary, System Performance Dashboard, 
+            Project Status Distribution, Task Priority Analysis, Top Performing Projects, Client Performance Overview, 
+            Recent Activity Summary, Key Performance Indicators (KPIs), and Strategic Recommendations.
+        </p>
+    </div>
+    
+    <div class="report-form">
+        <form method="POST" id="reportForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="days_filter" class="form-label">Reporting Period</label>
+                <select name="days_filter" id="days_filter" class="form-select" required>
+                    <option value="">Select reporting period</option>
+                    <option value="7">Last 7 days</option>
+                    <option value="14">Last 14 days</option>
+                    <option value="30" selected>Last 30 days</option>
+                    <option value="60">Last 60 days</option>
+                    <option value="90">Last 90 days</option>
+                    <option value="180">Last 6 months</option>
+                    <option value="365">Last year</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="generate-btn" id="generateBtn">
+                🚀 Generate Comprehensive System Report
+            </button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generating your comprehensive system report...</p>
+            <p><small>This may take a few moments depending on system size</small></p>
+        </div>
+    </div>
+    
+    <div class="info-box">
+        <h4>💡 Usage Tips</h4>
+        <p>
+            • Use shorter periods (7-30 days) for recent performance analysis<br>
+            • Use longer periods (90-365 days) for trend analysis and annual reports<br>
+            • The report is automatically generated and downloaded as a PDF<br>
+            • All data is real-time and reflects current system status
+        </p>
+    </div>
+</div>
+
+<script>
+document.getElementById('reportForm').addEventListener('submit', function(e) {
+    const generateBtn = document.getElementById('generateBtn');
+    const loading = document.getElementById('loading');
+    
+    // Show loading state
+    generateBtn.disabled = true;
+    generateBtn.textContent = '⏳ Generating Report...';
+    loading.style.display = 'block';
+    
+    // The form will submit normally and download the PDF
+    // The loading state will be cleared when the page reloads
+});
+</script>
+{% endblock %}

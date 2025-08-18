@@ -16,10 +16,18 @@ class Project(models.Model):
         ('completed_data_discrepancy_addressing', 'Completed (Data Discrepancy addressing)'),
     ]
     
+    PRIORITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('urgent', 'Urgent'),
+    ]
+    
     name = models.CharField(max_length=200)
     client = models.CharField(max_length=200)
     client_email = models.EmailField()
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='planned')
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium', help_text='Priority level of this project')
     assigned_users = models.ManyToManyField(User, blank=True, related_name='assigned_projects', help_text='Users assigned to this project')
     client_username = models.CharField(max_length=100, blank=True, help_text="Client's username for login")
     created_at = models.DateTimeField(auto_now_add=True)

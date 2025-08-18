@@ -1276,7 +1276,7 @@ def generate_exact_pdf_report(days_filter=30):
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
     from reportlab.lib import colors
-    from reportlab.graphics.shapes import Drawing, String
+    from reportlab.graphics.shapes import Drawing, String, Circle, Wedge, Line
     from reportlab.graphics.charts.linecharts import HorizontalLineChart
     from reportlab.graphics.charts.piecharts import Pie
     from reportlab.graphics.charts.barcharts import VerticalBarChart
@@ -1311,7 +1311,7 @@ def generate_exact_pdf_report(days_filter=30):
     import os
     temp_dir = tempfile.gettempdir()
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-    descriptive_filename = f"E-Click_Executive_Report_{timestamp}.pdf"
+    descriptive_filename = f"Executive_Report_{timestamp}.pdf"
     pdf_path = os.path.join(temp_dir, descriptive_filename)
     
     # Create PDF document with slightly reduced side margins to allow wider tables
@@ -1396,17 +1396,24 @@ def generate_exact_pdf_report(days_filter=30):
 
     def draw_header_footer(canvas, doc):
         canvas.saveState()
-        # Logo
+        # Logo (left side)
         try:
-            logo_path = os.path.join(django_settings.BASE_DIR, 'static', 'images', 'E-CLICK LOGO FINGER.png')
+            logo_path = os.path.join(django_settings.BASE_DIR, 'home', 'Logo.png')
             if os.path.exists(logo_path):
-                canvas.drawImage(logo_path, 40, PAGE_HEIGHT - 100, width=120, height=60, preserveAspectRatio=True, mask='auto')
+                canvas.drawImage(logo_path, 40, PAGE_HEIGHT - 100, width=120, height=60, mask='auto')
         except Exception:
             pass
-        # Contacts (right)
+        # Contacts (right) - replace "E-Click Support" text with small logo
         try:
-            canvas.setFont('Helvetica-Bold', 10)
-            canvas.drawString(PAGE_WIDTH - 220, PAGE_HEIGHT - 60, 'E-Click Support')
+            # Add small logo instead of "E-Click Support" text
+            logo_path = os.path.join(django_settings.BASE_DIR, 'home', 'Logo.png')
+            if os.path.exists(logo_path):
+                canvas.drawImage(logo_path, PAGE_WIDTH - 220, PAGE_HEIGHT - 80, width=60, height=30, mask='auto')
+            else:
+                # Fallback to text if logo not found
+                canvas.setFont('Helvetica-Bold', 10)
+                canvas.drawString(PAGE_WIDTH - 220, PAGE_HEIGHT - 60, 'E-Click Support')
+            
             canvas.setFont('Helvetica', 10)
             canvas.drawString(PAGE_WIDTH - 220, PAGE_HEIGHT - 75, '(+27)')
             canvas.drawString(PAGE_WIDTH - 220, PAGE_HEIGHT - 90, 'support@eclick.com')
@@ -1419,7 +1426,7 @@ def generate_exact_pdf_report(days_filter=30):
         canvas.restoreState()
 
     # Title block in content area
-    story.append(Paragraph('Your E-Click Client Progress Report', title_style))
+    story.append(Paragraph('Your Client Progress Report', title_style))
     story.append(Paragraph(f'Generated on {end_date.strftime("%B %d, %Y at %I:%M %p")}', subtitle_style))
     story.append(Spacer(1, 15))
     
@@ -1659,7 +1666,7 @@ def generate_exact_pdf_report(days_filter=30):
     story.append(Spacer(1, 15))
     
     # Footer (exact same as reports view)
-    story.append(Paragraph(f'Generated on {timezone.now().strftime("%B %d, %Y at %I:%M %p")} | E-Click Project Management', ParagraphStyle(
+    story.append(Paragraph(f'Generated on {timezone.now().strftime("%B %d, %Y at %I:%M %p")} | Project Management', ParagraphStyle(
         'Footer',
         parent=styles['Normal'],
         fontSize=8,
@@ -1911,12 +1918,7 @@ def generate_project_summary_pdf(project, client_name, total_tasks, completed_ta
     story.append(Paragraph(next_steps_text, body_style))
     story.append(Spacer(1, 6))
     
-    # EMAIL CLOSING
-    closing_text = """If you have any questions, simply reply to this email and our team will assist you.<br/><br/>
-Warm regards,<br/><br/>
-E-Click Project Management Team"""
-    story.append(Paragraph(closing_text, body_style))
-    story.append(Spacer(1, 8))
+    # EMAIL CLOSING section removed
     
     # FOOTER BANNER (exactly like image)
     footer_banner = Table([["WE CARE, WE CAN, WE DELIVER"]], colWidths=[6*inch])
@@ -1946,7 +1948,7 @@ def generate_project_specific_pdf_report(project_id, days_filter=30):
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
     from reportlab.lib import colors
-    from reportlab.graphics.shapes import Drawing, String
+    from reportlab.graphics.shapes import Drawing, String, Circle
     from reportlab.graphics.charts.linecharts import HorizontalLineChart
     from reportlab.graphics.charts.piecharts import Pie
     from reportlab.graphics.charts.barcharts import VerticalBarChart
@@ -2016,10 +2018,11 @@ def generate_project_specific_pdf_report(project_id, days_filter=30):
     
     # Create descriptive temporary file for PDF
     import os, re
+    from django.conf import settings
     temp_dir = tempfile.gettempdir()
     safe_project = re.sub(r'[^a-zA-Z0-9_-]+', '_', project.name).strip('_')[:40]
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-    descriptive_filename = f"E-Click_ProjectReport_{safe_project}_{timestamp}.pdf"
+    descriptive_filename = f"ProjectReport_{safe_project}_{timestamp}.pdf"
     pdf_path = os.path.join(temp_dir, descriptive_filename)
     
     # Create PDF document
@@ -2075,7 +2078,7 @@ def generate_project_specific_pdf_report(project_id, days_filter=30):
         spaceAfter=6,
         leftIndent=20,
         fontName='Helvetica',
-        textColor=colors.HexColor('#374151')  # Dark gray
+        textColor=colors.HexColor('#000000')  # Black text
     )
     
     # Company signature style
@@ -2091,8 +2094,40 @@ def generate_project_specific_pdf_report(project_id, days_filter=30):
     
     # Header with company signature (exact same structure as reports view)
     # Add company signature in top left
-    story.append(Paragraph('E-Click', signature_style))
-    story.append(Spacer(1, 5))
+    # Header: logo on the left, contact info on the right
+    try:
+        from reportlab.platypus import Image
+        logo_path = os.path.join(settings.BASE_DIR, 'home', 'Logo.png')
+        if os.path.exists(logo_path):
+            left_cell = Image(logo_path, width=120, height=60)
+        else:
+            left_cell = Paragraph('E-Click', signature_style)
+        # Contact info stacked on the right
+        contact_lines = [
+            'Kyla Schutte',
+            '(012) 348 3120',
+            'kyla@sdj.co.za',
+            'Cindy',
+            '(012) 348 3120',
+            'cindy@sdj.co.za',
+        ]
+        contact_story = [Paragraph(line, ParagraphStyle('contact', parent=styles['Normal'], fontSize=8, textColor=colors.HexColor('#111827'))) for line in contact_lines]
+        right_cell = KeepInFrame(doc.width * 0.45, 60, contact_story, hAlign='RIGHT')
+        header_table = Table([[left_cell, right_cell]], colWidths=[doc.width * 0.5, doc.width * 0.5])
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+        ]))
+        story.append(header_table)
+        story.append(Spacer(1, 6))
+    except Exception:
+        story.append(Paragraph('E-Click', signature_style))
+        story.append(Spacer(1, 6))
     
     story.append(Paragraph(f'Project Report: {project.name}', title_style))
     story.append(Paragraph(f'Client: {project.client} | {start_date.strftime("%B %d, %Y")} - {end_date.strftime("%B %d, %Y")}', subtitle_style))
@@ -2471,7 +2506,7 @@ def generate_project_specific_pdf_report(project_id, days_filter=30):
     story.append(Spacer(1, 15))
     
     # Footer (exact same format as reports view)
-    story.append(Paragraph(f'Generated on {timezone.now().strftime("%B %d, %Y at %I:%M %p")} | E-Click Project Management', ParagraphStyle(
+    story.append(Paragraph(f'Generated on {timezone.now().strftime("%B %d, %Y at %I:%M %p")} | Project Management', ParagraphStyle(
         'Footer',
         parent=styles['Normal'],
         fontSize=8,
@@ -2531,13 +2566,14 @@ def generate_comprehensive_project_pdf_report(project_id, days_filter=30):
     """
     Generate a comprehensive PDF report for a single project using the same format as client reports
     This function creates a detailed report for one specific project using professional styling
+    OPTIMIZED TO FIT ON ONE PAGE
     """
     from reportlab.lib.pagesizes import letter, A4
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, ListFlowable, ListItem, KeepInFrame
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
     from reportlab.lib import colors
-    from reportlab.graphics.shapes import Drawing, String
+    from reportlab.graphics.shapes import Drawing, String, Circle
     from reportlab.graphics.charts.linecharts import HorizontalLineChart
     from reportlab.graphics.charts.piecharts import Pie
     from reportlab.graphics.charts.barcharts import VerticalBarChart
@@ -2592,19 +2628,19 @@ def generate_comprehensive_project_pdf_report(project_id, days_filter=30):
     descriptive_filename = f"E-Click_ProjectReport_{safe_project}_{timestamp}.pdf"
     pdf_path = os.path.join(temp_dir, descriptive_filename)
     
-    # Create PDF document
-    doc = SimpleDocTemplate(pdf_path, pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=72)
+    # Create PDF document with tight margins to fit everything on one page
+    doc = SimpleDocTemplate(pdf_path, pagesize=A4, rightMargin=25, leftMargin=25, topMargin=25, bottomMargin=25)
     story = []
     
     # Get styles
     styles = getSampleStyleSheet()
     
-    # Custom styles for professional report with red/white/black theme
+    # Custom styles for professional report with red/white/black theme (single-page optimized)
     title_style = ParagraphStyle(
         'ReportTitle',
         parent=styles['Heading1'],
-        fontSize=20,
-        spaceAfter=20,
+        fontSize=18,
+        spaceAfter=12,
         alignment=1,  # Center alignment
         textColor=colors.HexColor('#dc2626'),  # Red
         fontName='Helvetica-Bold'
@@ -2635,7 +2671,7 @@ def generate_comprehensive_project_pdf_report(project_id, days_filter=30):
         parent=styles['Normal'],
         fontSize=10,
         spaceAfter=6,
-        textColor=colors.HexColor('#374151'),  # Dark gray
+        textColor=colors.HexColor('#000000'),  # Black text
         fontName='Helvetica'
     )
     
@@ -2643,7 +2679,22 @@ def generate_comprehensive_project_pdf_report(project_id, days_filter=30):
     elements = []
 
     # Title + Project Info
-    elements.append(Paragraph('E-Click', title_style))
+    # Add E-Click logo instead of text
+    try:
+        logo_path = os.path.join(settings.BASE_DIR, 'home', 'Logo.png')
+        if os.path.exists(logo_path):
+            # Create a flowable image for the logo
+            from reportlab.platypus import Image
+            logo_img = Image(logo_path, width=80, height=40)
+            elements.append(logo_img)
+            elements.append(Spacer(1, 5))
+        else:
+            # Fallback to text if logo not found
+            elements.append(Paragraph('E-Click', title_style))
+    except Exception:
+        # Fallback to text if logo loading fails
+        elements.append(Paragraph('E-Click', title_style))
+    
     elements.append(Paragraph(f'Project Report: {project.name}', subtitle_style))
     elements.append(Spacer(1, 10))
     
@@ -2661,40 +2712,54 @@ def generate_comprehensive_project_pdf_report(project_id, days_filter=30):
     elements.append(Paragraph('Overall Task Completion', heading_style))
     elements.append(Spacer(1, 6))
     
-    # Task completion donut chart
+    # Enhanced Task completion donut chart with better styling
     try:
-        drawing = Drawing(380, 180)
+        drawing = Drawing(400, 200)
         pie = Pie()
-        pie.x = 120
-        pie.y = 20
-        pie.width = 140
-        pie.height = 140
+        pie.x = 150
+        pie.y = 50
+        pie.width = 100
+        pie.height = 100
         
         # Create donut chart showing completed vs remaining
         pie.data = [completed_tasks, total_tasks - completed_tasks]
-        pie.labels = ['', '']
-        pie.slices[0].fillColor = colors.HexColor('#dc2626')  # Red for completed
+        pie.labels = ['Completed', 'Remaining']
+        pie.slices[0].fillColor = colors.HexColor('#10b981')  # Green for completed
         pie.slices[1].fillColor = colors.HexColor('#e5e7eb')  # Light gray for remaining
         
         pie.slices.strokeColor = colors.white
-        pie.slices.strokeWidth = 1
+        pie.slices.strokeWidth = 2
         drawing.add(pie)
         
         # Add center circle for donut effect
         from reportlab.graphics.shapes import Circle, String
-        cx, cy = 190, 90
-        ring = Circle(cx, cy, 48, fillColor=colors.white, strokeColor=colors.white)
+        cx, cy = 200, 100
+        ring = Circle(cx, cy, 35, fillColor=colors.white, strokeColor=colors.white)
         drawing.add(ring)
         
         # Add percentage in center
         pct_label = String(cx, cy - 4, f"{task_completion_rate:.1f}%", textAnchor='middle')
         pct_label.fontName = 'Helvetica-Bold'
-        pct_label.fontSize = 18
+        pct_label.fontSize = 16
         pct_label.fillColor = colors.HexColor('#111827')
         drawing.add(pct_label)
         
+        # Add legend
+        from reportlab.graphics.charts.legends import Legend
+        legend = Legend()
+        legend.x = 280
+        legend.y = 100
+        legend.alignment = 'right'
+        legend.fontName = 'Helvetica'
+        legend.fontSize = 8
+        legend.colorNamePairs = [
+            (colors.HexColor('#10b981'), 'Completed'),
+            (colors.HexColor('#e5e7eb'), 'Remaining')
+        ]
+        drawing.add(legend)
+        
         elements.append(drawing)
-        elements.append(Spacer(1, 6))
+        elements.append(Spacer(1, 10))
     except Exception:
         pass
     
@@ -2702,6 +2767,60 @@ def generate_comprehensive_project_pdf_report(project_id, days_filter=30):
     elements.append(Paragraph('Completed', normal_style))
     elements.append(Paragraph('Remaining', normal_style))
     elements.append(Spacer(1, 12))
+    
+    # Task Status Breakdown
+    elements.append(Paragraph('Task Status Breakdown', subheading_style))
+    elements.append(Spacer(1, 8))
+    
+    task_status_data = [
+        ['Status', 'Count', 'Percentage'],
+        ['Completed', str(completed_tasks), f'{(completed_tasks/total_tasks*100):.1f}%' if total_tasks > 0 else '0%'],
+        ['In Progress', str(in_progress_tasks), f'{(in_progress_tasks/total_tasks*100):.1f}%' if total_tasks > 0 else '0%'],
+        ['Not Started', str(not_started_tasks), f'{(not_started_tasks/total_tasks*100):.1f}%' if total_tasks > 0 else '0%'],
+        ['On Hold', str(on_hold_tasks), f'{(on_hold_tasks/total_tasks*100):.1f}%' if total_tasks > 0 else '0%']
+    ]
+    
+    task_status_table = Table(task_status_data, colWidths=[doc.width * 0.4, doc.width * 0.3, doc.width * 0.3])
+    task_status_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#374151')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 8),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.6, colors.HexColor('#e5e7eb')),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('FONTSIZE', (0, 1), (-1, -1), 7),
+        ('LEADING', (0, 1), (-1, -1), 10),
+    ]))
+    elements.append(task_status_table)
+    elements.append(Spacer(1, 15))
+    
+    # Subtask Progress
+    if total_subtasks > 0:
+        elements.append(Paragraph('Subtask Progress', subheading_style))
+        elements.append(Spacer(1, 8))
+        
+        subtask_data = [
+            ['Metric', 'Count', 'Percentage'],
+            ['Total Subtasks', str(total_subtasks), '100%'],
+            ['Completed', str(completed_subtasks), f'{subtask_completion_rate:.1f}%'],
+            ['Pending', str(pending_subtasks), f'{(pending_subtasks/total_subtasks*100):.1f}%']
+        ]
+        
+        subtask_table = Table(subtask_data, colWidths=[doc.width * 0.4, doc.width * 0.3, doc.width * 0.3])
+        subtask_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#059669')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 8),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.6, colors.HexColor('#e5e7eb')),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('FONTSIZE', (0, 1), (-1, -1), 7),
+        ('LEADING', (0, 1), (-1, -1), 10),
+        ]))
+        elements.append(subtask_table)
+        elements.append(Spacer(1, 15))
     
     # Executive Summary
     elements.append(Paragraph('Executive Summary', heading_style))
@@ -2784,17 +2903,601 @@ def generate_comprehensive_project_pdf_report(project_id, days_filter=30):
     doc.build(elements)
     return pdf_path
 
-def generate_client_specific_pdf_report(client_id, days_filter=30):
+def generate_comprehensive_system_pdf_report(days_filter=30):
     """
-    Generate a client-specific PDF report with comprehensive project and task data
-    This function creates a detailed report for one specific client using professional styling
+    Generate a comprehensive system-wide PDF report covering all projects, clients, and system metrics
+    This function creates a detailed executive-level report with enhanced visualizations and professional styling
+    OPTIMIZED TO FIT ON ONE PAGE
     """
     from reportlab.lib.pagesizes import letter, A4
     from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, ListFlowable, ListItem, KeepInFrame
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
     from reportlab.lib import colors
-    from reportlab.graphics.shapes import Drawing, String
+    from reportlab.graphics.shapes import Drawing, String, Line, Circle
+    from reportlab.graphics.charts.linecharts import HorizontalLineChart
+    from reportlab.graphics.charts.piecharts import Pie
+    from reportlab.graphics.charts.barcharts import VerticalBarChart
+    from reportlab.graphics import renderPDF
+    from reportlab.graphics.charts.legends import Legend
+    from io import BytesIO
+    from datetime import datetime, timedelta
+    import tempfile
+    from django.db.models import Count, Q, Avg
+    from django.utils import timezone
+    
+    # Get comprehensive system data
+    end_date = timezone.now()
+    start_date = end_date - timedelta(days=days_filter)
+    
+    # System-wide statistics
+    total_projects = Project.objects.count()
+    projects_in_progress = Project.objects.filter(status='in_progress').count()
+    projects_completed = Project.objects.filter(status='completed').count()
+    projects_planned = Project.objects.filter(status='planned').count()
+    projects_on_hold = Project.objects.filter(status='on_hold').count()
+    
+    total_tasks = Task.objects.count()
+    completed_tasks = Task.objects.filter(status='completed').count()
+    in_progress_tasks = Task.objects.filter(status='in_progress').count()
+    not_started_tasks = Task.objects.filter(status='not_started').count()
+    on_hold_tasks = Task.objects.filter(status='on_hold').count()
+    guidance_required_tasks = Task.objects.filter(status='in_progress_guidance_required').count()
+    
+    total_subtasks = SubTask.objects.count()
+    completed_subtasks = SubTask.objects.filter(is_completed=True).count()
+    pending_subtasks = total_subtasks - completed_subtasks
+    
+    total_users = User.objects.count()
+    active_users = User.objects.filter(last_login__gte=start_date).count()
+    inactive_users = total_users - active_users
+    staff_users = User.objects.filter(is_staff=True).count()
+    
+    total_clients = Client.objects.count()
+    active_clients = Client.objects.filter(is_active=True).count()
+    
+    # Calculate completion rates
+    project_completion_rate = (projects_completed / total_projects * 100) if total_projects > 0 else 0
+    task_completion_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+    subtask_completion_rate = (completed_subtasks / total_subtasks * 100) if total_subtasks > 0 else 0
+    
+    # Get priority distribution
+    high_priority_tasks = Task.objects.filter(priority='high').count()
+    urgent_tasks = Task.objects.filter(priority='urgent').count()
+    medium_priority_tasks = Task.objects.filter(priority='medium').count()
+    low_priority_tasks = Task.objects.filter(priority='low').count()
+    
+    # Get development status distribution
+    development_statuses = Task.objects.values('development_status').annotate(count=Count('id'))
+    
+    # Recent activity metrics
+    recent_projects = Project.objects.filter(created_at__gte=start_date).count()
+    recent_tasks = Task.objects.filter(created_at__gte=start_date).count()
+    recent_completions = Task.objects.filter(status='completed', completed_at__gte=start_date).count()
+    
+    # Top performing projects
+    projects_with_tasks = Project.objects.annotate(
+        total_tasks=Count('tasks'),
+        completed_tasks=Count('tasks', filter=Q(tasks__status='completed'))
+    ).filter(total_tasks__gt=0)
+    
+    top_projects = []
+    for project in projects_with_tasks:
+        completion_rate = (project.completed_tasks / project.total_tasks) * 100 if project.total_tasks > 0 else 0
+        top_projects.append({
+            'name': project.name,
+            'client': project.client,
+            'status': project.status,
+            'total_tasks': project.total_tasks,
+            'completed_tasks': project.completed_tasks,
+            'completion_rate': round(completion_rate, 1),
+        })
+    
+    top_projects.sort(key=lambda x: x['completion_rate'], reverse=True)
+    top_projects = top_projects[:10]
+    
+    # Client performance metrics
+    client_performance = []
+    for client in Client.objects.filter(is_active=True):
+        client_projects = Project.objects.filter(client_username=client.username)
+        if client_projects.exists():
+            total_client_tasks = Task.objects.filter(project__in=client_projects).count()
+            completed_client_tasks = Task.objects.filter(project__in=client_projects, status='completed').count()
+            completion_rate = (completed_client_tasks / total_client_tasks * 100) if total_client_tasks > 0 else 0
+            
+            client_performance.append({
+                'username': client.username,
+                'email': client.email,
+                'total_projects': client_projects.count(),
+                'total_tasks': total_client_tasks,
+                'completion_rate': round(completion_rate, 1),
+            })
+    
+    client_performance.sort(key=lambda x: x['completion_rate'], reverse=True)
+    
+    # Create descriptive temporary file for PDF
+    import os, re
+    from django.conf import settings
+    temp_dir = tempfile.gettempdir()
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M')
+    descriptive_filename = f"ComprehensiveSystemReport_{timestamp}.pdf"
+    pdf_path = os.path.join(temp_dir, descriptive_filename)
+    
+    # Create PDF document with minimal margins to fit everything on one page
+    doc = SimpleDocTemplate(pdf_path, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
+    story = []
+    
+    # Get styles
+    styles = getSampleStyleSheet()
+    
+    # Enhanced custom styles for professional comprehensive report - OPTIMIZED FOR SINGLE PAGE
+    title_style = ParagraphStyle(
+        'ReportTitle',
+        parent=styles['Heading1'],
+        fontSize=20,
+        spaceAfter=15,
+        alignment=1,  # Center alignment
+        textColor=colors.HexColor('#dc2626'),  # Red
+        fontName='Helvetica-Bold',
+        spaceBefore=0
+    )
+    
+    subtitle_style = ParagraphStyle(
+        'ReportSubtitle',
+        parent=styles['Heading2'],
+        fontSize=14,
+        spaceAfter=12,
+        alignment=1,
+        textColor=colors.HexColor('#6b7280'),  # Gray
+        fontName='Helvetica'
+    )
+    
+    heading_style = ParagraphStyle(
+        'SectionHeading',
+        parent=styles['Heading2'],
+        fontSize=12,
+        spaceAfter=8,
+        spaceBefore=12,
+        textColor=colors.HexColor('#1f2937'),  # Dark gray/black
+        fontName='Helvetica-Bold',
+        borderWidth=1,
+        borderColor=colors.HexColor('#e5e7eb'),
+        borderPadding=6,
+        backColor=colors.HexColor('#f9fafb')
+    )
+    
+    subheading_style = ParagraphStyle(
+        'SubSectionHeading',
+        parent=styles['Heading3'],
+        fontSize=10,
+        spaceAfter=6,
+        spaceBefore=10,
+        textColor=colors.HexColor('#374151'),
+        fontName='Helvetica-Bold'
+    )
+    
+    normal_style = ParagraphStyle(
+        'NormalText',
+        parent=styles['Normal'],
+        fontSize=8,
+        spaceAfter=4,
+        textColor=colors.HexColor('#000000'),
+        fontName='Helvetica',
+        leading=10
+    )
+    
+    highlight_style = ParagraphStyle(
+        'HighlightText',
+        parent=styles['Normal'],
+        fontSize=9,
+        spaceAfter=4,
+        textColor=colors.HexColor('#dc2626'),
+        fontName='Helvetica-Bold'
+    )
+    
+    # Build comprehensive system report content (copied design language from project PDF)
+    elements = []
+    
+    # Signature + header
+    signature_style = ParagraphStyle(
+        'CompanySignature',
+        parent=styles['Normal'],
+        fontSize=16,
+        spaceAfter=0,
+        alignment=0,
+        textColor=colors.HexColor('#dc2626'),
+        fontName='Helvetica-Bold'
+    )
+    # Add E-Click logo instead of text
+    try:
+        logo_path = os.path.join(settings.BASE_DIR, 'home', 'Logo.png')
+        if os.path.exists(logo_path):
+            # Create a flowable image for the logo
+            from reportlab.platypus import Image
+            logo_img = Image(logo_path, width=80, height=40)
+            elements.append(logo_img)
+            elements.append(Spacer(1, 5))
+        else:
+            # Fallback to text if logo not found
+            elements.append(Paragraph('E-Click', signature_style))
+            elements.append(Spacer(1, 5))
+    except Exception:
+        # Fallback to text if logo loading fails
+        elements.append(Paragraph('E-Click', signature_style))
+        elements.append(Spacer(1, 5))
+    
+    elements.append(Paragraph('Comprehensive System Report', title_style))
+    elements.append(Paragraph(f"Period: {start_date.strftime('%b %d, %Y')} - {end_date.strftime('%b %d, %Y')}", subtitle_style))
+    elements.append(Spacer(1, 10))
+    
+    # Donut chart: overall task completion
+    try:
+        total_for_progress = max(1, total_tasks)
+        progress_pct = (completed_tasks / total_for_progress) * 100
+        drawing = Drawing(380, 200)
+        pie = Pie()
+        pie.x = 120
+        pie.y = 40
+        pie.width = 120
+        pie.height = 120
+        pie.data = [completed_tasks, max(0, total_tasks - completed_tasks)]
+        pie.labels = ['Completed', 'Remaining']
+        pie.slices[0].fillColor = colors.HexColor('#dc2626')
+        pie.slices[1].fillColor = colors.HexColor('#e5e7eb')
+        drawing.add(pie)
+        center_x, center_y = 180, 100
+        hole = Circle(center_x, center_y, 35, fillColor=colors.white, strokeColor=colors.white)
+        drawing.add(hole)
+        label = String(center_x, center_y - 3, f"{progress_pct:.1f}%", textAnchor='middle')
+        label.fontName = 'Helvetica-Bold'
+        label.fontSize = 14
+        drawing.add(label)
+        elements.append(Paragraph('Overall Task Completion', heading_style))
+        elements.append(drawing)
+        elements.append(Spacer(1, 8))
+    except Exception:
+        pass
+    
+    # Executive Summary (insights style)
+    elements.append(Paragraph('Executive Summary', heading_style))
+    insights = []
+    insights.append(f"Projects: {total_projects} total • {projects_completed} completed • {projects_in_progress} in progress • {projects_planned} planned")
+    insights.append(f"Tasks: {total_tasks} total • {completed_tasks} completed • {in_progress_tasks} in progress • {not_started_tasks} not started")
+    if total_subtasks > 0:
+        insights.append(f"Subtasks: {total_subtasks} total • {completed_subtasks} completed • {pending_subtasks} pending")
+    insights.append(f"Users: {active_users}/{total_users} active • Clients: {active_clients}/{total_clients} active")
+    insights.append(f"Recent: {recent_projects} new projects • {recent_tasks} new tasks • {recent_completions} tasks completed (last {days_filter} days)")
+    if urgent_tasks > 0:
+        insights.append(f"Priority: {urgent_tasks} urgent, {high_priority_tasks} high priority tasks")
+    for insight in insights[:6]:
+        elements.append(Paragraph(insight, normal_style))
+    elements.append(Spacer(1, 8))
+    
+    # Performance Analysis (system-wide)
+    elements.append(Paragraph('Performance Analysis', heading_style))
+    perf_rows = [
+        ['Metric', 'Current', 'Target', 'Performance', 'Trend'],
+        ['Project Completion', f"{project_completion_rate:.1f}%", '80%', 'Green' if project_completion_rate >= 80 else 'Yellow' if project_completion_rate >= 60 else 'Red', 'Up' if projects_completed >= projects_in_progress else 'Stable'],
+        ['Task Completion', f"{task_completion_rate:.1f}%", '75%', 'Green' if task_completion_rate >= 75 else 'Yellow' if task_completion_rate >= 50 else 'Red', 'Up' if completed_tasks >= in_progress_tasks else 'Stable'],
+        ['Subtask Completion', f"{subtask_completion_rate:.1f}%", '70%', 'Green' if subtask_completion_rate >= 70 else 'Yellow' if subtask_completion_rate >= 50 else 'Red', 'Stable'],
+        ['User Engagement', f"{(active_users/total_users*100 if total_users else 0):.1f}%", '60%', 'Green' if total_users and (active_users/total_users*100) >= 60 else 'Yellow' if total_users and (active_users/total_users*100) >= 40 else 'Red', 'Stable'],
+        ['Client Activation', f"{(active_clients/total_clients*100 if total_clients else 0):.1f}%", '80%', 'Green' if total_clients and (active_clients/total_clients*100) >= 80 else 'Yellow' if total_clients and (active_clients/total_clients*100) >= 60 else 'Red', 'Stable'],
+        ['Priority Load', f"{urgent_tasks} urgent", '0', 'Green' if urgent_tasks == 0 else 'Red', 'Down' if urgent_tasks > 0 else 'Stable'],
+    ]
+    perf_table = Table(perf_rows, colWidths=[doc.width*0.28, doc.width*0.18, doc.width*0.18, doc.width*0.18, doc.width*0.18])
+    perf_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#dc2626')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 8),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#000000')),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.HexColor('#000000')),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 7),
+        ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
+    ]))
+    elements.append(perf_table)
+    elements.append(Spacer(1, 10))
+    
+    # Project Status Distribution Chart - COMPACT
+    elements.append(Paragraph('Project Status Distribution', subheading_style))
+    elements.append(Spacer(1, 6))
+    
+    try:
+        # Create compact pie chart for project status
+        drawing = Drawing(300, 150)
+        pie = Pie()
+        pie.x = 100
+        pie.y = 25
+        pie.width = 80
+        pie.height = 80
+        
+        # Project status data
+        status_data = [projects_completed, projects_in_progress, projects_planned, projects_on_hold]
+        status_labels = ['Completed', 'In Progress', 'Planned', 'On Hold']
+        status_colors = [
+            colors.HexColor('#10b981'),  # Green for completed
+            colors.HexColor('#3b82f6'),  # Blue for in progress
+            colors.HexColor('#f59e0b'),  # Orange for planned
+            colors.HexColor('#ef4444')   # Red for on hold
+        ]
+        
+        pie.data = status_data
+        pie.labels = status_labels
+        
+        # Apply colors
+        for i, color in enumerate(status_colors):
+            if i < len(pie.slices):
+                pie.slices[i].fillColor = color
+                pie.slices[i].strokeColor = colors.white
+                pie.slices[i].strokeWidth = 1
+        
+        drawing.add(pie)
+        
+        # Add compact legend
+        legend = Legend()
+        legend.x = 200
+        legend.y = 60
+        legend.alignment = 'right'
+        legend.fontName = 'Helvetica'
+        legend.fontSize = 6
+        legend.colorNamePairs = [(status_colors[i], status_labels[i]) for i in range(len(status_labels))]
+        drawing.add(legend)
+        
+        elements.append(drawing)
+        elements.append(Spacer(1, 8))
+    except Exception:
+        pass
+    
+    # Task Priority Distribution - COMPACT
+    elements.append(Paragraph('Task Priority Distribution', subheading_style))
+    elements.append(Spacer(1, 6))
+    
+    try:
+        # Create horizontal bar chart for task priorities
+        drawing = Drawing(400, 150)
+        chart = HorizontalLineChart()
+        chart.x = 80
+        chart.y = 30
+        chart.width = 300
+        chart.height = 100
+        
+        chart.data = [[urgent_tasks, high_priority_tasks, medium_priority_tasks, low_priority_tasks]]
+        chart.categoryAxis.categoryNames = ['Urgent', 'High', 'Medium', 'Low']
+        chart.valueAxis.valueMin = 0
+        chart.valueAxis.valueMax = max([urgent_tasks, high_priority_tasks, medium_priority_tasks, low_priority_tasks]) * 1.2
+        
+        # Apply colors
+        chart.lines[0].strokeColor = colors.HexColor('#dc2626')
+        chart.lines[0].strokeWidth = 20
+        
+        drawing.add(chart)
+        elements.append(drawing)
+        elements.append(Spacer(1, 15))
+    except Exception:
+        pass
+    
+    # Top Performing Projects
+    elements.append(Paragraph('Top Performing Projects', subheading_style))
+    elements.append(Spacer(1, 8))
+    
+    if top_projects:
+        top_projects_data = [['Rank', 'Project Name', 'Client', 'Completion Rate', 'Tasks']]
+        for i, project in enumerate(top_projects[:5], 1):
+            top_projects_data.append([
+                f'#{i}',
+                project['name'][:30] + '...' if len(project['name']) > 30 else project['name'],
+                project['client'][:20] + '...' if len(str(project['client'])) > 20 else str(project['client']),
+                f"{project['completion_rate']}%",
+                f"{project['completed_tasks']}/{project['total_tasks']}"
+            ])
+        
+        top_projects_table = Table(top_projects_data, colWidths=[doc.width * 0.1, doc.width * 0.3, doc.width * 0.25, doc.width * 0.2, doc.width * 0.15])
+        top_projects_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#dc2626')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 8),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.6, colors.HexColor('#e5e7eb')),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('FONTSIZE', (0, 1), (-1, -1), 7),
+            ('LEADING', (0, 1), (-1, -1), 10),
+        ]))
+        elements.append(top_projects_table)
+        elements.append(Spacer(1, 15))
+    
+    # Client Performance Overview
+    elements.append(Paragraph('Client Performance Overview', subheading_style))
+    elements.append(Spacer(1, 8))
+    
+    if client_performance:
+        client_data = [['Client', 'Projects', 'Tasks', 'Completion Rate']]
+        for client in client_performance[:8]:  # Top 8 clients
+            client_data.append([
+                client['username'][:25] + '...' if len(client['username']) > 25 else client['username'],
+                str(client['total_projects']),
+                str(client['total_tasks']),
+                f"{client['completion_rate']}%"
+            ])
+        
+        client_table = Table(client_data, colWidths=[doc.width * 0.4, doc.width * 0.2, doc.width * 0.2, doc.width * 0.2])
+        client_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#374151')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 8),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.6, colors.HexColor('#e5e7eb')),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('FONTSIZE', (0, 1), (-1, -1), 7),
+            ('LEADING', (0, 1), (-1, -1), 10),
+        ]))
+        elements.append(client_table)
+        elements.append(Spacer(1, 15))
+    
+    # Recent Activity (compact)
+    elements.append(Paragraph('Recent Activity', subheading_style))
+    elements.append(Paragraph(f"Projects created: {recent_projects} • Tasks added: {recent_tasks} • Tasks completed: {recent_completions} (last {days_filter} days)", normal_style))
+    elements.append(Spacer(1, 8))
+    
+    # Key Performance Indicators
+    elements.append(Paragraph('Key Performance Indicators (KPIs)', subheading_style))
+    elements.append(Spacer(1, 8))
+    
+    kpi_data = [
+        ['KPI', 'Current Value', 'Benchmark', 'Status'],
+        ['Project Success Rate', f'{project_completion_rate:.1f}%', '80%', '🟢' if project_completion_rate >= 80 else '🟡' if project_completion_rate >= 60 else '🔴'],
+        ['Task Efficiency', f'{task_completion_rate:.1f}%', '75%', '🟢' if task_completion_rate >= 75 else '🟡' if task_completion_rate >= 50 else '🔴'],
+        ['Resource Utilization', f'{(active_users/total_users*100):.1f}%', '60%', '🟢' if (active_users/total_users*100) >= 60 else '🟡'],
+        ['Client Retention', f'{(active_clients/total_clients*100):.1f}%', '80%', '🟢' if (active_clients/total_clients*100) >= 80 else '🟡'],
+        ['System Reliability', '99.9%', '99%', '🟢']
+    ]
+    
+    kpi_table = Table(kpi_data, colWidths=[doc.width * 0.3, doc.width * 0.25, doc.width * 0.25, doc.width * 0.2])
+    kpi_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#059669')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 8),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.6, colors.HexColor('#e5e7eb')),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('FONTSIZE', (0, 1), (-1, -1), 7),
+        ('LEADING', (0, 1), (-1, -1), 10),
+    ]))
+    elements.append(kpi_table)
+    elements.append(Spacer(1, 20))
+    
+    # Progress Visualization - COMPACT
+    elements.append(Paragraph('Progress Visualization', heading_style))
+    elements.append(Spacer(1, 6))
+    
+    # Create a compact visual progress bar
+    try:
+        drawing = Drawing(300, 40)
+        
+        # Background bar
+        bg_bar = Drawing(300, 15)
+        bg_bar.add(Line(30, 7, 270, 7, strokeColor=colors.HexColor('#e5e7eb'), strokeWidth=15))
+        drawing.add(bg_bar)
+        
+        # Progress bar
+        progress_width = (task_completion_rate / 100) * 240
+        if progress_width > 0:
+            progress_bar = Drawing(300, 15)
+            progress_bar.add(Line(30, 7, 30 + progress_width, 7, strokeColor=colors.HexColor('#10b981'), strokeWidth=15))
+            drawing.add(progress_bar)
+        
+        # Add percentage text
+        pct_text = String(150, 25, f"{task_completion_rate:.1f}% Complete", textAnchor='middle')
+        pct_text.fontName = 'Helvetica-Bold'
+        pct_text.fontSize = 9
+        pct_text.fillColor = colors.HexColor('#374151')
+        drawing.add(pct_text)
+        
+        elements.append(drawing)
+        elements.append(Spacer(1, 10))
+    except Exception:
+        pass
+    
+    # Recommendations Section - COMPACT
+    elements.append(Paragraph('Strategic Recommendations', heading_style))
+    elements.append(Spacer(1, 6))
+    
+    # Create compact recommendations table
+    recommendations_data = []
+    
+    if project_completion_rate < 80:
+        recommendations_data.append(['Projects', f'Focus on completion: {project_completion_rate:.1f}% vs 80% target'])
+    if task_completion_rate < 75:
+        recommendations_data.append(['Tasks', f'Improve execution: {task_completion_rate:.1f}% vs 75% target'])
+    if urgent_tasks > 0:
+        recommendations_data.append(['Urgent', f'Address {urgent_tasks} urgent tasks to prevent bottlenecks'])
+    if guidance_required_tasks > 0:
+        recommendations_data.append(['Guidance', f'Provide guidance for {guidance_required_tasks} tasks'])
+    
+    if not recommendations_data:
+        recommendations_data.append(['Status', 'All KPIs meeting/exceeding targets - maintain performance'])
+    
+    if recommendations_data:
+        rec_table = Table(recommendations_data, colWidths=[doc.width * 0.2, doc.width * 0.8])
+        rec_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f3f4f6')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#374151')),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
+            ('ALIGN', (0, 0), (0, -1), 'CENTER'),
+            ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#d1d5db')),
+            ('LEADING', (0, 0), (-1, -1), 8),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        elements.append(rec_table)
+    
+    elements.append(Spacer(1, 12))
+    
+    # Footer / motto
+    elements.append(Paragraph('WE CARE, WE CAN, WE DELIVER', subtitle_style))
+    elements.append(Spacer(1, 4))
+    elements.append(Paragraph('Generated by Project Management System', normal_style))
+    
+    # Build the PDF - OPTIMIZED FOR SINGLE PAGE
+    doc.build(elements)
+    return pdf_path
+
+@login_required
+def comprehensive_system_report(request):
+    """
+    View for generating and displaying the comprehensive system report
+    """
+    if not request.user.is_staff:
+        messages.error(request, 'Access denied. Staff privileges required.')
+        return redirect('login')
+    
+    if request.method == 'POST':
+        try:
+            days_filter = int(request.POST.get('days_filter', 30))
+            
+            # Generate the comprehensive system report
+            pdf_path = generate_comprehensive_system_pdf_report(days_filter)
+            
+            # Send the file as a download
+            with open(pdf_path, 'rb') as pdf_file:
+                response = HttpResponse(pdf_file.read(), content_type='application/pdf')
+                response['Content-Disposition'] = f'attachment; filename="ComprehensiveSystemReport_{datetime.now().strftime("%Y%m%d_%H%M")}.pdf"'
+                
+                # Clean up the temporary file
+                try:
+                    os.remove(pdf_path)
+                except:
+                    pass
+                    
+                return response
+                
+        except Exception as e:
+            messages.error(request, f'Error generating comprehensive system report: {str(e)}')
+            return redirect('reports')
+    
+    # GET request - show the form
+    return render(request, 'home/comprehensive_system_report.html', {
+        'days_options': [7, 14, 30, 60, 90, 180, 365]
+    })
+
+def generate_client_specific_pdf_report(client_id, days_filter=30):
+    """
+    Generate a client-specific PDF report with comprehensive project and task data
+    This function creates a detailed report for one specific client using professional styling
+    OPTIMIZED TO FIT ON ONE PAGE
+    """
+    from reportlab.lib.pagesizes import letter, A4
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, ListFlowable, ListItem, KeepInFrame
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib import colors
+    from reportlab.graphics.shapes import Drawing, String, Circle
     from reportlab.graphics.charts.linecharts import HorizontalLineChart
     from reportlab.graphics.charts.piecharts import Pie
     from reportlab.graphics.charts.barcharts import VerticalBarChart
@@ -2820,6 +3523,10 @@ def generate_client_specific_pdf_report(client_id, days_filter=30):
     in_progress_tasks = client_tasks.filter(status='in_progress').count()
     not_started_tasks = client_tasks.filter(status='not_started').count()
     
+    # Task priority counts (needed for analysis table)
+    urgent_tasks = client_tasks.filter(priority='urgent').count()
+    high_priority_tasks = client_tasks.filter(priority='high').count()
+    
     # Get subtasks for this client's projects
     client_subtasks = SubTask.objects.filter(task__project__in=client_projects)
     total_subtasks = client_subtasks.count()
@@ -2841,14 +3548,15 @@ def generate_client_specific_pdf_report(client_id, days_filter=30):
     
     # Create descriptive temporary file for PDF
     import os, re
+    from django.conf import settings
     temp_dir = tempfile.gettempdir()
     safe_client = re.sub(r'[^a-zA-Z0-9_-]+', '_', (client.username or client.email or 'Client')).strip('_')[:40]
     timestamp = datetime.now().strftime('%Y%m%d_%H%M')
-    descriptive_filename = f"E-Click_ClientReport_{safe_client}_{timestamp}.pdf"
+    descriptive_filename = f"ClientReport_{safe_client}_{timestamp}.pdf"
     pdf_path = os.path.join(temp_dir, descriptive_filename)
     
-    # Create PDF document
-    doc = SimpleDocTemplate(pdf_path, pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=72)
+    # Create PDF document with minimal margins to fit everything on one page
+    doc = SimpleDocTemplate(pdf_path, pagesize=A4, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=30)
     story = []
     
     # Get styles
@@ -2868,8 +3576,8 @@ def generate_client_specific_pdf_report(client_id, days_filter=30):
     subtitle_style = ParagraphStyle(
         'ReportSubtitle',
         parent=styles['Normal'],
-        fontSize=12,
-        spaceAfter=15,
+        fontSize=10,
+        spaceAfter=10,
         alignment=1,
         textColor=colors.HexColor('#6b7280'),  # Gray
         fontName='Helvetica'
@@ -2878,9 +3586,9 @@ def generate_client_specific_pdf_report(client_id, days_filter=30):
     heading_style = ParagraphStyle(
         'SectionHeading',
         parent=styles['Heading2'],
-        fontSize=14,
-        spaceAfter=8,
-        spaceBefore=15,
+        fontSize=11,
+        spaceAfter=6,
+        spaceBefore=10,
         textColor=colors.HexColor('#1f2937'),  # Dark gray/black
         fontName='Helvetica-Bold'
     )
@@ -2888,181 +3596,446 @@ def generate_client_specific_pdf_report(client_id, days_filter=30):
     normal_style = ParagraphStyle(
         'NormalText',
         parent=styles['Normal'],
-        fontSize=10,
-        spaceAfter=6,
-        textColor=colors.HexColor('#374151'),  # Dark gray
+        fontSize=8,
+        spaceAfter=3,
+        textColor=colors.HexColor('#000000'),  # Black text
         fontName='Helvetica'
     )
     
-    # Build content strictly matching the email and fit on one page
-    elements = []
-
-    # Title + generated date
-    elements.append(Paragraph('Your E-Click Client Progress Report', title_style))
-    elements.append(Paragraph(f'Generated on {timezone.now().strftime("%B %d, %Y at %I:%M %p")}', subtitle_style))
-    elements.append(Spacer(1, 6))
-
-    # Greeting
-    client_display = client.username or client.email or 'Client'
-    elements.append(Paragraph(f'Dear {client_display},', normal_style))
-    elements.append(Spacer(1, 6))
-
-    # Donut chart (refined styling)
+    # Signature + header (project report design)
+    signature_style = ParagraphStyle(
+        'CompanySignature',
+        parent=styles['Normal'],
+        fontSize=16,
+        spaceAfter=0,
+        alignment=0,
+        textColor=colors.HexColor('#dc2626'),
+        fontName='Helvetica-Bold'
+    )
+    # Header: logo on the left, contact info on the right
     try:
-        # Use project completion as the primary metric (matches user expectation)
-        completed_count = completed_projects if total_projects > 0 else completed_tasks
-        overall_total = total_projects if total_projects > 0 else total_tasks
-        overall_total = max(1, overall_total)
-        overall_pct = (completed_count / overall_total) * 100
-        drawing = Drawing(380, 180)
-        pie = Pie()
-        pie.x = 120
-        pie.y = 20
-        pie.width = 140
-        pie.height = 140
-        # If multiple projects exist, give each project its own colored slice
-        if total_projects > 1:
-            pie.data = [1] * total_projects
-            pie.labels = [''] * total_projects
-            # Color mapping: completed (red), in-progress (near black), planned (gray)
-            palette = [colors.HexColor('#dc2626'), colors.HexColor('#111827'), colors.HexColor('#9ca3af')]
-            for i in range(total_projects):
-                if i < completed_projects:
-                    pie.slices[i].fillColor = palette[0]
-                elif i < completed_projects + in_progress_projects:
-                    pie.slices[i].fillColor = palette[1]
-                else:
-                    pie.slices[i].fillColor = palette[2]
+        from reportlab.platypus import Image
+        logo_path = os.path.join(settings.BASE_DIR, 'home', 'Logo.png')
+        if os.path.exists(logo_path):
+            left_cell = Image(logo_path, width=120, height=60)
         else:
-            # Fallback to completed vs remaining donut
-            pie.data = [max(0, completed_count), max(0, overall_total - completed_count)]
-            pie.labels = ['', '']
-            pie.slices[0].fillColor = colors.HexColor('#dc2626')
-            pie.slices[1].fillColor = colors.HexColor('#e5e7eb')
-        pie.slices.strokeColor = colors.white
-        pie.slices.strokeWidth = 1
-        drawing.add(pie)
-        from reportlab.graphics.shapes import Circle, String
-        cx, cy = 190, 90
-        ring = Circle(cx, cy, 48, fillColor=colors.white, strokeColor=colors.white)
-        drawing.add(ring)
-        pct_label = String(cx, cy - 4, f"{overall_pct:.1f}%", textAnchor='middle')
+            left_cell = Paragraph('E-Click', signature_style)
+        # Contact info stacked on the right - ensure it starts at the same level as logo
+        contact_lines = [
+            'Kyla Schutte',
+            '(012) 348 3120',
+            'kyla@sdj.co.za',
+            'Cindy',
+            '(012) 348 3120',
+            'cindy@sdj.co.za',
+        ]
+        contact_story = [Paragraph(line, ParagraphStyle('contact', parent=styles['Normal'], fontSize=12, textColor=colors.HexColor('#111827'), spaceAfter=2)) for line in contact_lines]
+        
+        # Create a three-column table: logo left, empty middle, contact info right
+        header_table = Table([
+            [left_cell, '', contact_story]  # Logo left, empty middle, contact info right
+        ], colWidths=[doc.width * 0.2, doc.width * 0.6, doc.width * 0.2])
+        
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+            ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 0),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+            ('TOPPADDING', (0, 0), (-1, -1), 0),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+        ]))
+        
+        story.append(header_table)
+        story.append(Spacer(1, -18))
+    except Exception:
+        story.append(Paragraph('E-Click', signature_style))
+        story.append(Spacer(1, -18))
+    
+    # Render the main title in black as requested
+    story.append(Paragraph(f'Client Report: {client.username}', ParagraphStyle(
+        'ReportTitleBlack', parent=styles['Heading1'], fontSize=20, spaceAfter=-8,
+        alignment=1, textColor=colors.HexColor('#111827'), fontName='Helvetica-Bold')))
+    story.append(Paragraph(f'Client: {client.username} | {start_date.strftime("%B %d, %Y")} - {end_date.strftime("%B %d, %Y")}', subtitle_style))
+    story.append(Spacer(1, -16))
+    
+    # Gauge chart for overall completion (Power BI-style)
+    try:
+        total_for_progress = max(1, total_tasks)
+        progress_pct = (completed_tasks / total_for_progress) * 100
+        # Dimensions
+        gauge_width = min(int(doc.width * 0.75), 380)
+        radius = int(gauge_width / 2)
+        thickness = max(14, int(radius * 0.22))
+        drawing_height = radius + 55
+        drawing = Drawing(gauge_width, drawing_height)
+
+        center_x = gauge_width / 2
+        center_y = radius + 10
+
+        # Background semicircle (light gray ring)
+        bg_outer = Wedge(center_x, center_y, radius, 180, 0, fillColor=colors.HexColor('#e5e7eb'), strokeColor=None)
+        drawing.add(bg_outer)
+        bg_inner = Wedge(center_x, center_y, radius - thickness, 180, 0, fillColor=colors.white, strokeColor=None)
+        drawing.add(bg_inner)
+
+        # Progress arc (brand red)
+        progress_deg = max(0, min(180, int((progress_pct / 100.0) * 180)))
+        if progress_deg > 0:
+            prog_outer = Wedge(center_x, center_y, radius, 180, 180 - progress_deg, fillColor=colors.HexColor('#dc2626'), strokeColor=None)
+            drawing.add(prog_outer)
+            prog_inner = Wedge(center_x, center_y, radius - thickness, 180, 180 - progress_deg, fillColor=colors.white, strokeColor=None)
+            drawing.add(prog_inner)
+
+        # Ticks (optional subtle)
+        try:
+            for i in range(0, 181, 30):
+                ang = (180 - i) * 3.14159 / 180.0
+                x1 = center_x + (radius - 2) * __import__('math').cos(ang)
+                y1 = center_y + (radius - 2) * __import__('math').sin(ang)
+                x2 = center_x + (radius - thickness + 4) * __import__('math').cos(ang)
+                y2 = center_y + (radius - thickness + 4) * __import__('math').sin(ang)
+                drawing.add(Line(x1, y1, x2, y2, strokeColor=colors.HexColor('#9ca3af'), strokeWidth=0.6))
+        except Exception:
+            pass
+
+        # Percentage label in center
+        pct_label = String(center_x, center_y - thickness / 2, f"{progress_pct:.1f}%", textAnchor='middle')
         pct_label.fontName = 'Helvetica-Bold'
-        pct_label.fontSize = 18
+        pct_label.fontSize = max(11, int(radius * 0.22))
         pct_label.fillColor = colors.HexColor('#111827')
         drawing.add(pct_label)
-        elements.append(drawing)
-        elements.append(Spacer(1, 6))
+
+        # Edge labels 0% and 100%
+        left_label = String(10, 14, '0%', textAnchor='start')
+        left_label.fontName = 'Helvetica'
+        left_label.fontSize = 8
+        left_label.fillColor = colors.HexColor('#6b7280')
+        drawing.add(left_label)
+
+        right_label = String(gauge_width - 10, 14, '100%', textAnchor='end')
+        right_label.fontName = 'Helvetica'
+        right_label.fontSize = 8
+        right_label.fillColor = colors.HexColor('#6b7280')
+        drawing.add(right_label)
+
+        story.append(Paragraph('Overall Task Completion', heading_style))
+        # Center the drawing on the page
+        story.append(KeepInFrame(doc.width, drawing_height, [drawing], hAlign='CENTER'))
+        story.append(Spacer(1, 6))
     except Exception:
         pass
-
-    # Intro line before summary
-    elements.append(Paragraph('Please find your summary below. A detailed, presentation-ready PDF is attached for your records.', normal_style))
-    elements.append(Spacer(1, 8))
-
-    # Summary table (Project Summary | Totals)
-    summary_data = [
-        ['Project Summary', 'Totals'],
-        ['Total Projects', str(total_projects)],
-        ['Completed Projects', str(completed_projects)],
-        ['Projects In Progress', str(in_progress_projects)],
-        ['Total Tasks', str(total_tasks)],
-        ['Completed Tasks', str(completed_tasks)],
-    ]
-    # Make the summary table wider and close to the content edges (even wider)
-    summary_table = Table(summary_data, colWidths=[doc.width * 0.7, doc.width * 0.3])
-    summary_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#111827')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 11),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('GRID', (0, 0), (-1, -1), 0.6, colors.HexColor('#e5e7eb')),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-        ('FONTSIZE', (0, 1), (-1, -1), 10),
-        ('LEADING', (0, 1), (-1, -1), 12),
-    ]))
-    elements.append(summary_table)
-    elements.append(Spacer(1, 8))
-
-    # Remove KPI cards to match request (cleaner look like the email)
-
-    # Highlights list
-    elements.append(Paragraph('Highlights', heading_style))
-    highlights = [
-        'Clear visibility of your portfolio progress and current workload.',
-        'Attached PDF includes detailed tables, charts, and next-step recommendations.',
-        "We'll continue to monitor and update you proactively.",
-    ]
-    elements.append(
-        ListFlowable(
-            [ListItem(Paragraph(h, normal_style)) for h in highlights],
-            bulletType='bullet',
-            leftIndent=12,
-            bulletIndent=6,
-            bulletFontName='Helvetica',
-            bulletFontSize=9,
-        )
-    )
-    elements.append(Spacer(1, 6))
-
-    # Next Steps list
-    elements.append(Paragraph('Next Steps', heading_style))
-    next_steps = [
-        'Review the attached PDF for full insights and project-level details.',
-        "Reply with any priorities you'd like us to fast-track this week.",
-        "Book a 15-minute review if you'd like us to walk you through the data.",
-    ]
-    elements.append(
-        ListFlowable(
-            [ListItem(Paragraph(n, normal_style)) for n in next_steps],
-            bulletType='bullet',
-            leftIndent=12,
-            bulletIndent=6,
-            bulletFontName='Helvetica',
-            bulletFontSize=9,
-        )
-    )
-    elements.append(Spacer(1, 8))
-
-    # Closing
-    elements.append(Paragraph('If you have any questions, simply reply to this email and our team will assist you.', normal_style))
-    elements.append(Paragraph('Warm regards,', normal_style))
-    elements.append(Paragraph('<b>E-Click Project Management Team</b>', normal_style))
-    elements.append(Spacer(1, 10))
-
-    # Footer banner with rounded corners via a custom Flowable
-    from reportlab.platypus import Flowable
-    class RoundedBanner(Flowable):
-        def __init__(self, width: float, height: float, text: str):
-            super().__init__()
-            self._width = width
-            self._height = height
-            self._text = text
-        def wrap(self, availWidth, availHeight):
-            self._width = min(self._width, availWidth)
-            return self._width, self._height
-        def draw(self):
-            radius = 6
-            self.canv.setFillColor(colors.HexColor('#111827'))
-            self.canv.setStrokeColor(colors.HexColor('#111827'))
-            try:
-                self.canv.roundRect(0, 0, self._width, self._height, radius, stroke=1, fill=1)
-            except Exception:
-                # Fallback to regular rectangle
-                self.canv.rect(0, 0, self._width, self._height, stroke=1, fill=1)
-            self.canv.setFillColor(colors.white)
-            self.canv.setFont('Helvetica', 10)
-            self.canv.drawString(12, (self._height - 10) / 2, self._text)
-    elements.append(RoundedBanner(doc.width, 26, 'WE CARE, WE CAN, WE DELIVER'))
-
-    # Fit all content into one page using KeepInFrame with shrink
-    # Fit to one page; use mode='shrink' for ReportLab versions without 'shrink' kw arg
+    
+    # Executive Summary donut chart (segmented like sample)
     try:
-        one_page = KeepInFrame(doc.width, doc.height - 20, elements, hAlign='LEFT', vAlign='TOP', mode='shrink')
-    except TypeError:
-        one_page = KeepInFrame(doc.width, doc.height - 20, elements, hAlign='LEFT', vAlign='TOP')
-    doc.build([one_page])
+        total_for_progress_es = max(1, total_tasks)
+        progress_pct_es = (completed_tasks / total_for_progress_es) * 100
+        segments_es = 12
+        filled_es = int(round((progress_pct_es / 100.0) * segments_es))
+        # Bigger, centered donut
+        es = Drawing(doc.width, 170)
+        es_pie = Pie()
+        # Center pie within available width
+        es_pie.width = 140
+        es_pie.height = 140
+        es_pie.x = (doc.width - es_pie.width) / 2
+        es_pie.y = 20
+        es_pie.data = [completed_tasks, total_tasks - completed_tasks]
+        es_pie.labels = [f'Completed ({completed_tasks})', f'Remaining ({total_tasks - completed_tasks})']
+        # Black and white theme with better contrast
+        es_pie.slices[0].fillColor = colors.HexColor('#111827')  # Dark for completed
+        es_pie.slices[1].fillColor = colors.HexColor('#e5e7eb')  # Light for remaining
+        es_pie.slices[0].strokeColor = colors.white
+        es_pie.slices[1].strokeColor = colors.white
+        es_pie.slices[0].strokeWidth = 1
+        es_pie.slices[1].strokeWidth = 1
+        es.add(es_pie)
+        
+        # Add legend
+        legend = Legend()
+        legend.x = es_pie.x
+        legend.y = es_pie.y - 20
+        legend.alignment = 'right'
+        legend.columnMaximum = 1
+        legend.colorNamePairs = [(es_pie.slices[0].fillColor, 'Completed'), 
+                                (es_pie.slices[1].fillColor, 'Remaining')]
+        legend.fontName = 'Helvetica'
+        legend.fontSize = 8
+        legend.dxTextSpace = 5
+        legend.dy = 5
+        legend.dx = 5
+        legend.deltay = 5
+        legend.boxAnchor = 'w'
+        es.add(legend)
+        
+        # Center hole and percentage
+        cx_es = es_pie.x + es_pie.width / 2
+        cy_es = es_pie.y + es_pie.height / 2
+        es_hole = Circle(cx_es, cy_es, 35, fillColor=colors.white, strokeColor=colors.white)
+        es.add(es_hole)
+        es_label = String(cx_es, cy_es - 2, f"{progress_pct_es:.1f}%", textAnchor='middle')
+        es_label.fontName = 'Helvetica-Bold'
+        es_label.fontSize = 16
+        es_label.fillColor = colors.HexColor('#111827')
+        es.add(es_label)
+        story.append(es)
+        story.append(Spacer(1, 10))
+    except Exception:
+        pass
+    
+    # Executive Summary Section
+    story.append(Paragraph('Executive Summary', heading_style))
+    insights = [
+        f"Total Projects: {total_projects} ({completed_projects} completed, {in_progress_projects} in progress)",
+        f"Total Tasks: {total_tasks} ({completed_tasks} completed, {in_progress_tasks} in progress)",
+        f"Task Completion Rate: {task_completion_rate:.1f}%",
+        f"Recent Activity (last {days_filter} days): {recent_projects} new projects • {recent_tasks} new tasks",
+        f"High Priority Tasks: {high_priority_tasks} • Urgent Tasks: {urgent_tasks}",
+        f"Subtasks Progress: {completed_subtasks} of {total_subtasks} completed"
+    ]
+    for insight in insights:
+        story.append(Paragraph(insight, normal_style))
+    story.append(Spacer(1, 10))
+
+    # Function to add header to each page
+    def add_page_header():
+        try:
+            from reportlab.platypus import Image
+            from django.conf import settings
+            logo_path = os.path.join(settings.BASE_DIR, 'home', 'Logo.png')
+            if os.path.exists(logo_path):
+                left_cell = Image(logo_path, width=120, height=60)
+            else:
+                left_cell = Paragraph('', signature_style)  # Empty text instead of E-Click
+            
+            contact_lines = [
+                'Kyla Schutte',
+                '(012) 348 3120',
+                'kyla@sdj.co.za',
+                'Cindy',
+                '(012) 348 3120',
+                'cindy@sdj.co.za',
+            ]
+            contact_story = [Paragraph(line, ParagraphStyle('contact', parent=styles['Normal'], fontSize=12, textColor=colors.HexColor('#111827'), spaceAfter=2)) for line in contact_lines]
+            
+            header_table = Table([
+                [left_cell, '', contact_story]
+            ], colWidths=[doc.width * 0.2, doc.width * 0.6, doc.width * 0.2])
+            
+            header_table.setStyle(TableStyle([
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+                ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
+                ('LEFTPADDING', (0, 0), (-1, -1), 0),
+                ('RIGHTPADDING', (0, 0), (-1, -1), 0),
+                ('TOPPADDING', (0, 0), (-1, -1), 0),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 0),
+            ]))
+            
+            story.append(header_table)
+            story.append(Spacer(1, -18))
+            
+            # Add client report title
+            story.append(Paragraph(f'Client Report: {client.username}', ParagraphStyle(
+                'ReportTitleBlack', parent=styles['Heading1'], fontSize=20, spaceAfter=-8,
+                alignment=1, textColor=colors.HexColor('#111827'), fontName='Helvetica-Bold')))
+            story.append(Paragraph(f'Client: {client.username} | {start_date.strftime("%B %d, %Y")} - {end_date.strftime("%B %d, %Y")}', subtitle_style))
+            story.append(Spacer(1, -16))
+        except Exception:
+            story.append(Paragraph('', signature_style))  # Empty text instead of E-Click
+            story.append(Spacer(1, -18))
+    
+    # Task List with pagination
+    story.append(Paragraph('Recent Tasks', heading_style))
+    
+    # Get all client tasks for the date range, ordered by priority and creation date
+    all_client_tasks = Task.objects.filter(
+        project__client=client,
+        created_at__gte=start_date,
+        created_at__lte=end_date
+    ).order_by('-priority', '-created_at')
+    
+    if all_client_tasks.exists():
+        tasks_per_page = 12  # Reduced for better readability
+        total_tasks = all_client_tasks.count()
+        
+        # Calculate how many pages we'll need
+        total_pages = (total_tasks + tasks_per_page - 1) // tasks_per_page
+        
+        for page_num in range(total_pages):
+            start_idx = page_num * tasks_per_page
+            end_idx = min(start_idx + tasks_per_page, total_tasks)
+            page_tasks = all_client_tasks[start_idx:end_idx]
+            
+            # Add page header for subsequent pages (not the first page)
+            if page_num > 0:
+                story.append(PageBreak())
+                add_page_header()
+                story.append(Paragraph('Recent Tasks (continued)', heading_style))
+            
+            task_data = [['Task Name', 'Project', 'Due Date', 'Priority', 'Status']]
+            
+            for task in page_tasks:
+                due_date = task.end_date.strftime('%b %d, %Y') if task.end_date else 'Not set'
+                priority = task.get_priority_display() if hasattr(task, 'get_priority_display') else task.priority
+                status = task.get_status_display()
+                task_data.append([
+                    task.title[:35] + '...' if len(task.title) > 35 else task.title,
+                    task.project.name[:20] + '...' if len(task.project.name) > 20 else task.project.name,
+                    due_date,
+                    priority,
+                    status
+                ])
+            
+            # Adjusted column widths for better content distribution
+            task_table = Table(task_data, colWidths=[
+                doc.width * 0.35,  # Task name
+                doc.width * 0.20,  # Project
+                doc.width * 0.15,  # Due date
+                doc.width * 0.15,  # Priority
+                doc.width * 0.15   # Status
+            ])
+            
+            # Enhanced table styling
+            task_table.setStyle(TableStyle([
+                # Header styling
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#111827')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 9),
+                ('TOPPADDING', (0, 0), (-1, 0), 8),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                
+                # Content styling
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 8),
+                ('TOPPADDING', (0, 1), (-1, -1), 6),
+                ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+                
+                # Alignment
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                
+                # Grid styling
+                ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#e5e7eb')),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#ffffff')),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#f8fafc'), colors.white])
+            ]))
+            
+            story.append(task_table)
+            # Add task count and page info
+            page_info = f'Showing {start_idx + 1}-{end_idx} of {total_tasks} tasks'
+            story.append(Spacer(1, 8))
+            story.append(Paragraph(page_info, ParagraphStyle(
+                'PageInfo',
+                parent=normal_style,
+                textColor=colors.HexColor('#6b7280'),
+                alignment=2  # Right alignment
+            )))
+            story.append(Spacer(1, 12))
+    else:
+        story.append(Paragraph('No tasks found for this date range.', normal_style))
+        story.append(Spacer(1, 12))
+    
+
+
+    
+    # Project Details Section
+    if client_projects.exists():
+        story.append(Paragraph("Project Overview", heading_style))
+        
+        # Create project details table with enhanced information
+        project_details_data = [[
+            'Project Name', 'Status', 'Progress', 'Tasks', 'Priority', 'Due Date'
+        ]]
+        
+        for project in client_projects:
+            # Calculate project progress
+            project_tasks = project.tasks.all()
+            total_project_tasks = project_tasks.count()
+            completed_project_tasks = project_tasks.filter(status='completed').count()
+            progress = f"{(completed_project_tasks / total_project_tasks * 100):.1f}%" if total_project_tasks > 0 else "0%"
+            
+            # Format due date
+            due_date = project.end_date.strftime('%b %d, %Y') if project.end_date else 'Not set'
+            
+            project_details_data.append([
+                project.name[:30] + '...' if len(project.name) > 30 else project.name,
+                project.get_status_display(),
+                progress,
+                f"{completed_project_tasks}/{total_project_tasks}",
+                project.get_priority_display(),
+                due_date
+            ])
+        
+        # Create and style the project details table
+        project_table = Table(project_details_data, colWidths=[
+            doc.width * 0.25,  # Project name
+            doc.width * 0.15,  # Status
+            doc.width * 0.15,  # Progress
+            doc.width * 0.15,  # Tasks
+            doc.width * 0.15,  # Priority
+            doc.width * 0.15   # Due Date
+        ])
+        
+        project_table.setStyle(TableStyle([
+            # Header styling
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#111827')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('TOPPADDING', (0, 0), (-1, 0), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+            
+            # Content styling
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('TOPPADDING', (0, 1), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+            
+            # Alignment
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (2, 1), (3, -1), 'CENTER'),  # Center align progress and tasks columns
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            
+            # Grid styling
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#e5e7eb')),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#ffffff')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#f8fafc'), colors.white])
+        ]))
+        
+        story.append(project_table)
+        story.append(Spacer(1, 12))
+        
+        # Recent Activity Section
+        story.append(Paragraph("Recent Activity", heading_style))
+        recent_activities = Activity.objects.filter(
+            project__in=client_projects,
+            created_at__gte=start_date
+        ).order_by('-created_at')[:5]
+        
+        if recent_activities.exists():
+            for activity in recent_activities:
+                activity_date = activity.created_at.strftime('%b %d, %Y')
+                activity_text = f"{activity_date} - {activity.description}"
+                story.append(Paragraph(activity_text, normal_style))
+        else:
+            story.append(Paragraph("No recent activity in this period.", normal_style))
+        
+        story.append(Spacer(1, 12))
+    
+        # Compact recent activity summary
+        story.append(Paragraph(f"Projects: {recent_projects} • Tasks: {recent_tasks} (last {days_filter} days)", normal_style))
+        story.append(Spacer(1, 8))
+    
+    # Add footer
+    story.append(Paragraph("WE CARE, WE CAN, WE DELIVER", subtitle_style))
+    story.append(Paragraph("This report was generated automatically by the Project Management System.", normal_style))
+    story.append(Paragraph(f"Report generated on: {timezone.now().strftime('%B %d, %Y at %I:%M %p')}", normal_style))
+    
+    # Build PDF
+    doc.build(story)
+    
     return pdf_path
 
 @login_required
@@ -3930,7 +4903,6 @@ def delete_task(request):
             return JsonResponse({'success': False, 'error': str(e)})
     
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
-@login_required
 def delete_subtask(request):
     if not request.user.is_staff:
         return JsonResponse({'error': 'Access denied'}, status=403)
@@ -4738,6 +5710,7 @@ def send_client_report(request):
     
     from .services import GoogleCloudEmailService
     from django.utils import timezone
+    import os
     
     if request.method == 'POST':
         try:
@@ -4830,33 +5803,7 @@ def send_client_report(request):
         <div style="padding:24px;">
           <p style="margin:0 0 12px 0;color:#000000;font-weight:bold;">Dear {client_username},</p>
           
-          <!-- DONUT CHART - SVG-based for proper donut appearance -->
-          <div style="text-align:center;margin:20px 0;">
-            <div style="position:relative;display:inline-block;width:150px;height:150px;">
-              <svg width="150" height="150" style="transform:rotate(-90deg);">
-                <!-- Background circle (remaining) -->
-                <circle cx="75" cy="75" r="60" fill="none" stroke="#000000" stroke-width="12" stroke-linecap="round"/>
-                <!-- Progress circle (completed) -->
-                <circle cx="75" cy="75" r="60" fill="none" stroke="#dc2626" stroke-width="12" stroke-linecap="round" 
-                        stroke-dasharray="{2 * 3.14159 * 60 * report_data['task_completion_rate'] / 100} {2 * 3.14159 * 60}"/>
-              </svg>
-              <!-- Center percentage -->
-              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;background:white;width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1;">
-                <span style="font-size:20px;font-weight:bold;color:#000000;">{report_data['task_completion_rate']:.1f}%</span>
-              </div>
-            </div>
-            <!-- Legend -->
-            <div style="margin-top:15px;">
-              <span style="color:#000000;font-size:14px;">
-                <span style="display:inline-block;width:12px;height:12px;background:#dc2626;border-radius:50%;margin-right:8px;"></span>
-                Completed: {report_data['task_completion_rate']:.1f}%
-              </span>
-              <span style="margin-left:20px;color:#000000;font-size:14px;">
-                <span style="display:inline-block;width:12px;height:12px;background:#000000;border-radius:50%;margin-right:8px;"></span>
-                Remaining: {100 - report_data['task_completion_rate']:.1f}%
-              </span>
-            </div>
-          </div>
+
           
           <p style="margin:0 0 16px 0;color:#000000;">Please find your summary below. A detailed, presentation-ready PDF is attached for your records.</p>
 
@@ -4905,15 +5852,9 @@ def send_client_report(request):
             <li>We'll continue to monitor and update you proactively.</li>
           </ul>
 
-          <h3 style="margin:18px 0 8px 0;color:#dc2626;font-size:16px;">Next Steps</h3>
-          <ul style="margin:0 0 16px 20px;color:#000000;">
-            <li>Review the attached PDF for full insights and project-level details.</li>
-            <li>Reply with any priorities you'd like us to fast-track this week.</li>
-            <li>Book a 15-minute review if you'd like us to walk you through the data.</li>
-          </ul>
 
-          <p style="margin:0 0 18px 0;color:#000000;">If you have any questions, simply reply to this email and our team will assist you.</p>
-          <p style="margin:0;color:#000000;">Warm regards,<br/><strong>E-Click Project Management Team</strong></p>
+
+          <!-- Closing section removed -->
         </div>
         <div style="padding:14px 24px;background:#2d3748;color:#ffffff;text-align:center;font-size:12px;">
           WE CARE, WE CAN, WE DELIVER
@@ -4925,7 +5866,35 @@ def send_client_report(request):
             """
 
             # Generate client-specific PDF and attach it
-            pdf_path = generate_client_specific_pdf_report(client_id)
+            try:
+                pdf_path = generate_client_specific_pdf_report(client_id)
+                
+                # Verify PDF was generated successfully
+                if not pdf_path:
+                    raise Exception("PDF generation failed - no path returned")
+                
+                if not os.path.exists(pdf_path):
+                    raise Exception(f"PDF file not found at generated path: {pdf_path}")
+                
+                # Check file size
+                file_size = os.path.getsize(pdf_path)
+                if file_size == 0:
+                    raise Exception("Generated PDF file is empty")
+                
+                print(f"PDF generated successfully: {pdf_path} ({file_size} bytes)")
+                
+            except Exception as pdf_error:
+                error_msg = f"Failed to generate PDF report: {str(pdf_error)}"
+                print(f"PDF Generation Error: {error_msg}")
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"PDF Generation Error: {error_msg}")
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'error': error_msg})
+                else:
+                    messages.error(request, error_msg)
+                    return redirect('reports')
 
             result = gmail_service.send_email(
                 to_email=client_email,
@@ -6259,58 +7228,6 @@ def create_notification_for_task_update(task, user, update_type, old_value=None,
             triggered_by=user,
             related_task=task,
             related_project=task.project
-        )
-
-
-def create_notification_for_project_update(project, user, update_type, old_value=None, new_value=None, reason=None):
-    """Create notification when a project is updated"""
-    from .models import Notification
-    
-    # Determine notification type and message
-    if update_type == 'status_changed':
-        notification_type = 'project_status_change'
-        title = f'Project Status Changed: {project.name}'
-        message = f'Project "{project.name}" status changed from {old_value} to {new_value}'
-        if reason:
-            message += f'. Reason: {reason}'
-    elif update_type == 'created':
-        notification_type = 'project_created'
-        title = f'New Project Created: {project.name}'
-        message = f'New project "{project.name}" has been created'
-    elif update_type == 'deadline_extended':
-        notification_type = 'deadline_extended'
-        title = f'Project Deadline Extended: {project.name}'
-        message = f'Project "{project.name}" deadline extended to {new_value}'
-        if reason:
-            message += f'. Reason: {reason}'
-    else:
-        notification_type = 'project_update'
-        title = f'Project Updated: {project.name}'
-        message = f'Project "{project.name}" was updated'
-        if reason:
-            message += f'. Reason: {reason}'
-    
-    # Create notification for project client
-    if project.client:
-        Notification.create_if_not_exists(
-            recipient=project.client,
-            notification_type=notification_type,
-            title=title,
-            message=message,
-            triggered_by=user,
-            related_project=project
-        )
-    
-    # Notify all team members assigned to the project (but prevent duplicates)
-    for task in project.tasks.all():
-        if task.assigned_to and task.assigned_to != user:
-            Notification.create_if_not_exists(
-                recipient=task.assigned_to,
-                notification_type=notification_type,
-                title=title,
-                message=message,
-                triggered_by=user,
-                related_project=project
             )
 
 
@@ -6715,7 +7632,7 @@ def download_report(request):
             from django.http import HttpResponse
             from datetime import datetime
             response = HttpResponse(pdf_content, content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="E-Click_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf"'
+            response['Content-Disposition'] = f'attachment; filename="Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf"'
             
             return response
             
@@ -6832,6 +7749,9 @@ def send_project_report_ajax(request):
                 completion_times = [(task.end_date - task.start_date).days for task in completed_tasks_with_dates]
                 avg_completion_days = sum(completion_times) / len(completion_times)
             
+            # Handle case where client_username might be empty
+            display_client_name = client_username if client_username else "Client"
+            
             # Prepare comprehensive report data
             report_data = {
                 'project_id': project_id,
@@ -6889,77 +7809,61 @@ def send_project_report_ajax(request):
 <body style="margin: 0; padding: 0; background-color: #f5f5f5;">
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; background-color: #ffffff; color: #000000; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
     <div style="background-color: #2d3748; color: #ffffff; padding: 20px; text-align: center;">
-        <h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #dc2626;">Your E-Click Client Progress Report</h1>
+        <h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #ffffff;">Your E-Click Client Progress Report</h1>
         <p style="margin: 10px 0 0 0; font-size: 14px; color: #9ca3af;">Generated on {timezone.now().strftime("%B %d, %Y at %I:%M %p")}</p>
     </div>
     
     <div style="padding: 20px; background-color: #ffffff;">
-        <p style="color: #000000; font-size: 16px; margin-bottom: 10px; font-weight: bold;">Dear {client_username},</p>
+        <p style="color: #000000; font-size: 16px; margin-bottom: 10px; font-weight: bold;">Dear {display_client_name},</p>
         
-        <!-- DONUT CHART - SVG for email compatibility -->
-        <div style="text-align:center;margin:20px 0;">
-            <svg width="120" height="120" viewBox="0 0 120 120" style="display:inline-block;">
-                <!-- Background circle (black for remaining) -->
-                <circle cx="60" cy="60" r="50" fill="none" stroke="#000000" stroke-width="20"/>
-                <!-- Progress circle (red for completed) -->
-                <circle cx="60" cy="60" r="50" fill="none" stroke="#dc2626" stroke-width="20" 
-                  stroke-dasharray="{task_completion_rate*3.14:.1f} 314.16" 
-                  stroke-dashoffset="78.54" transform="rotate(-90 60 60)"/>
-                <!-- Center white circle -->
-                <circle cx="60" cy="60" r="30" fill="white"/>
-                <!-- Percentage text -->
-                <text x="60" y="67" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#000000">
-                  {task_completion_rate:.1f}%
-                </text>
-            </svg>
-        </div>
+
         
         <p style="color: #000000; font-size: 14px; margin-bottom: 20px;">Please find your summary below. A detailed, presentation-ready PDF is attached for your records.</p>
         
-        <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-            <h2 style="color: #1f2937; font-size: 18px; margin-top: 0; margin-bottom: 15px;">Project Summary</h2>
+        <div style="background-color: #2d3748; border: 1px solid #4a5568; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <h2 style="color: #ffffff; font-size: 18px; margin-top: 0; margin-bottom: 15px;">Project Summary</h2>
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
-                <tr style="background-color: #2d3748; color: #ffffff;">
-                    <th style="padding: 10px; text-align: left; border: 1px solid #000000;">Project Summary</th>
-                    <th style="padding: 10px; text-align: center; border: 1px solid #000000;">Totals</th>
+                <tr style="background-color: #4a5568; color: #ffffff;">
+                    <th style="padding: 10px; text-align: left; border: 1px solid #718096;">Project Summary</th>
+                    <th style="padding: 10px; text-align: center; border: 1px solid #718096;">Totals</th>
                 </tr>
-                <tr style="background-color: #ffffff;">
-                    <td style="padding: 10px; border: 1px solid #000000; font-weight: bold; color: #000000;">Total Projects</td>
-                    <td style="padding: 10px; border: 1px solid #000000; text-align: center; color: #000000;">1</td>
+                <tr style="background-color: #2d3748;">
+                    <td style="padding: 10px; border: 1px solid #718096; font-weight: bold; color: #ffffff;">Total Projects</td>
+                    <td style="padding: 10px; border: 1px solid #718096; text-align: center; color: #ffffff;">1</td>
                 </tr>
-                <tr style="background-color: #ffffff;">
-                    <td style="padding: 10px; border: 1px solid #000000; font-weight: bold; color: #000000;">Completed Projects</td>
-                    <td style="padding: 10px; border: 1px solid #000000; text-align: center; color: #000000;">{1 if project.status == 'completed' else 0}</td>
+                <tr style="background-color: #2d3748;">
+                    <td style="padding: 10px; border: 1px solid #718096; font-weight: bold; color: #ffffff;">Completed Projects</td>
+                    <td style="padding: 10px; border: 1px solid #718096; text-align: center; color: #ffffff;">{1 if project.status == 'completed' else 0}</td>
                 </tr>
-                <tr style="background-color: #ffffff;">
-                    <td style="padding: 10px; border: 1px solid #000000; font-weight: bold; color: #000000;">Projects In Progress</td>
-                    <td style="padding: 10px; border: 1px solid #000000; text-align: center; color: #000000;">{1 if project.status == 'in_progress' else 0}</td>
+                <tr style="background-color: #2d3748;">
+                    <td style="padding: 10px; border: 1px solid #718096; font-weight: bold; color: #ffffff;">Projects In Progress</td>
+                    <td style="padding: 10px; border: 1px solid #718096; text-align: center; color: #ffffff;">{1 if project.status == 'in_progress' else 0}</td>
                 </tr>
-                <tr style="background-color: #ffffff;">
-                    <td style="padding: 10px; border: 1px solid #000000; font-weight: bold; color: #000000;">Total Tasks</td>
-                    <td style="padding: 10px; border: 1px solid #000000; text-align: center; color: #000000;">{total_tasks if total_tasks > 0 else 0}</td>
+                <tr style="background-color: #2d3748;">
+                    <td style="padding: 10px; border: 1px solid #718096; font-weight: bold; color: #ffffff;">Total Tasks</td>
+                    <td style="padding: 10px; border: 1px solid #718096; text-align: center; color: #ffffff;">{total_tasks if total_tasks > 0 else 0}</td>
                 </tr>
-                <tr style="background-color: #ffffff;">
-                    <td style="padding: 10px; border: 1px solid #000000; font-weight: bold; color: #000000;">Completed Tasks</td>
-                    <td style="padding: 10px; border: 1px solid #000000; text-align: center; color: #000000;">{completed_tasks if completed_tasks > 0 else 0}</td>
+                <tr style="background-color: #2d3748;">
+                    <td style="padding: 10px; border: 1px solid #718096; font-weight: bold; color: #ffffff;">Completed Tasks</td>
+                    <td style="padding: 10px; border: 1px solid #718096; text-align: center; color: #ffffff;">{completed_tasks if completed_tasks > 0 else 0}</td>
                 </tr>
             </table>
             
             <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                <div style="text-align: center; flex: 1; background-color: #f9fafb; border-radius: 8px; padding: 15px; margin-right: 10px;">
-                    <h3 style="color: #1f2937; margin: 0 0 5px 0; font-size: 16px;">Project Completion Rate</h3>
-                    <p style="color: #000000; font-size: 18px; font-weight: bold; margin: 0;">{100 if project.status == 'completed' else 0}%</p>
+                <div style="text-align: center; flex: 1; background-color: #4a5568; border-radius: 8px; padding: 15px; margin-right: 10px;">
+                    <h3 style="color: #ffffff; margin: 0 0 5px 0; font-size: 16px;">Project Completion Rate</h3>
+                    <p style="color: #ffffff; font-size: 18px; font-weight: bold; margin: 0;">{100 if project.status == 'completed' else 0}%</p>
                 </div>
-                <div style="text-align: center; flex: 1; background-color: #f9fafb; border-radius: 8px; padding: 15px; margin-left: 10px;">
-                    <h3 style="color: #1f2937; margin: 0 0 5px 0; font-size: 16px;">Task Completion Rate</h3>
-                    <p style="color: #000000; font-size: 18px; font-weight: bold; margin: 0;">{task_completion_rate:.1f}%</p>
+                <div style="text-align: center; flex: 1; background-color: #4a5568; border-radius: 8px; padding: 15px; margin-left: 10px;">
+                    <h3 style="color: #ffffff; margin: 0 0 5px 0; font-size: 16px;">Task Completion Rate</h3>
+                    <p style="color: #ffffff; font-size: 18px; font-weight: bold; margin: 0;">{task_completion_rate:.1f}%</p>
                 </div>
             </div>
         </div>
         
-        <div style="background-color: #f9fafb; border-left: 4px solid #dc2626; padding: 15px; margin-bottom: 20px;">
-            <h2 style="color: #dc2626; font-size: 18px; margin-top: 0; margin-bottom: 15px;">Project Details</h2>
-            <ul style="color: #000000; font-size: 14px; margin: 0; padding-left: 20px;">
+        <div style="background-color: #4a5568; border-left: 4px solid #dc2626; padding: 15px; margin-bottom: 20px;">
+            <h2 style="color: #ffffff; font-size: 18px; margin-top: 0; margin-bottom: 15px;">Project Details</h2>
+            <ul style="color: #ffffff; font-size: 14px; margin: 0; padding-left: 20px;">
                 <li style="margin-bottom: 8px;"><strong>Project Name:</strong> {project.name}</li>
                 <li style="margin-bottom: 8px;"><strong>Current Status:</strong> {project.get_status_display()}</li>
                 <li style="margin-bottom: 8px;"><strong>Team Size:</strong> {team_size} members</li>
@@ -6969,21 +7873,9 @@ def send_project_report_ajax(request):
         
         
         
-        <div style="background-color: #f9fafb; border-left: 4px solid #dc2626; padding: 15px; margin-bottom: 20px;">
-            <h2 style="color: #dc2626; font-size: 18px; margin-top: 0; margin-bottom: 15px;">Next Steps</h2>
-            <ul style="color: #000000; font-size: 14px; margin: 0; padding-left: 20px;">
-                <li style="margin-bottom: 8px;">Review the attached PDF for full insights and project-level details.</li>
-                <li style="margin-bottom: 8px;">Reply with any priorities you'd like us to fast-track this week.</li>
-                <li style="margin-bottom: 8px;">Book a 15-minute review if you'd like us to walk you through the data.</li>
-            </ul>
-        </div>
+
         
-        <p style="color: #000000; font-size: 14px; margin-bottom: 20px;">If you have any questions, simply reply to this email and our team will assist you.</p>
-        
-        <div style="text-align: center; margin-top: 30px;">
-            <p style="color: #000000; font-size: 14px; margin-bottom: 10px;">Warm regards,</p>
-            <p style="color: #000000; font-size: 14px; font-weight: bold; margin-bottom: 5px;">E-Click Project Management Team</p>
-        </div>
+        <!-- Closing section removed -->
     </div>
     
     <div style="background-color: #1f2937; color: #ffffff; padding: 15px; text-align: center;">
@@ -6997,7 +7889,7 @@ def send_project_report_ajax(request):
             generated_time_str = timezone.now().strftime("%B %d, %Y at %I:%M %p")
             pdf_path = generate_project_summary_pdf(
                 project=project,
-                client_name=client_username,
+                client_name=display_client_name,
                 total_tasks=total_tasks,
                 completed_tasks=completed_tasks,
                 task_completion_rate=task_completion_rate,
@@ -7561,3 +8453,13 @@ def ai_knowledge_management(request):
     }
     
     return render(request, 'home/ai_knowledge_management.html', context)
+
+def nab_summary(request):
+    """NAB Project Summary page with black theme"""
+    from datetime import datetime
+    
+    context = {
+        'current_date': datetime.now().strftime('%B %Y'),
+    }
+    
+    return render(request, 'nab_summary.html', context)

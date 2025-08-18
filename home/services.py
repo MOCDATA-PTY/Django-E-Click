@@ -21,54 +21,52 @@ class GoogleCloudEmailService:
         self._initialize_service()
     
     def _initialize_service(self):
-        """Initialize the Gmail API service"""
+        """Initialize the Gmail API service for mocdatapty@gmail.com account"""
         try:
-            # Try to load OAuth2 credentials from file
+            # Load OAuth2 credentials from file
             credentials_path = os.path.join(os.path.dirname(__file__), 'credentials.json')
             
-            if os.path.exists(credentials_path):
-                # Use OAuth2 credentials
-                from google_auth_oauthlib.flow import InstalledAppFlow
-                from google.auth.transport.requests import Request
-                from googleapiclient.discovery import build
-                import pickle
-                
-                # Gmail API scopes
-                SCOPES = ['https://www.googleapis.com/auth/gmail.send']
-                
-                # Check if we have a token file
-                token_path = os.path.join(os.path.dirname(__file__), 'token.pickle')
-                
-                creds = None
-                if os.path.exists(token_path):
-                    with open(token_path, 'rb') as token:
-                        creds = pickle.load(token)
-                
-                # If there are no (valid) credentials available, let the user log in
-                if not creds or not creds.valid:
-                    if creds and creds.expired and creds.refresh_token:
-                        creds.refresh(Request())
-                    else:
-                        flow = InstalledAppFlow.from_client_secrets_file(
-                            credentials_path, SCOPES)
-                        creds = flow.run_local_server(port=55691, prompt='consent')
-                    
-                    # Save the credentials for the next run
-                    with open(token_path, 'wb') as token:
-                        pickle.dump(creds, token)
-                
-                self.service = build('gmail', 'v1', credentials=creds)
-                logger.info("Gmail service initialized with OAuth2 credentials")
-                
-            else:
-                # Fallback to API key (limited functionality)
-                from googleapiclient.discovery import build
-                
-                # Note: Gmail API requires OAuth2 for full functionality
-                # API key can be used for other Google Cloud services
+            if not os.path.exists(credentials_path):
+                logger.error("OAuth2 credentials.json file not found!")
+                logger.error("Please create credentials.json file with OAuth2 credentials for mocdatapty@gmail.com account")
                 self.service = None
-                logger.warning("No OAuth2 credentials found. Gmail API requires OAuth2 authentication.")
-                logger.info("Please create a credentials.json file with your OAuth2 credentials.")
+                return
+            
+            # Use OAuth2 credentials for mocdatapty@gmail.com
+            from google_auth_oauthlib.flow import InstalledAppFlow
+            from google.auth.transport.requests import Request
+            from googleapiclient.discovery import build
+            import pickle
+            
+            # Gmail API scopes
+            SCOPES = [
+                'https://www.googleapis.com/auth/gmail.send',
+                'https://www.googleapis.com/auth/gmail.readonly'
+            ]
+            
+            # Check if we have a token file
+            token_path = os.path.join(os.path.dirname(__file__), 'token.pickle')
+            
+            creds = None
+            if os.path.exists(token_path):
+                with open(token_path, 'rb') as token:
+                    creds = pickle.load(token)
+            
+            # If there are no (valid) credentials available, let the user log in
+            if not creds or not creds.valid:
+                if creds and creds.expired and creds.refresh_token:
+                    creds.refresh(Request())
+                else:
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        credentials_path, SCOPES)
+                    creds = flow.run_local_server(port=55691, prompt='consent')
+                
+                # Save the credentials for the next run
+                with open(token_path, 'wb') as token:
+                    pickle.dump(creds, token)
+            
+            self.service = build('gmail', 'v1', credentials=creds)
+            logger.info("Gmail service initialized with OAuth2 credentials for mocdatapty@gmail.com account")
             
         except Exception as e:
             logger.error(f"Error initializing Gmail service: {str(e)}")
@@ -76,7 +74,7 @@ class GoogleCloudEmailService:
     
     def send_email(self, to_email, subject, body, from_email=None, attachments=None):
         """
-        Send email using Google Cloud API
+        Send email using Google Cloud API with OAuth2 (NO SMTP FALLBACK)
         
         Args:
             to_email (str): Recipient email address
@@ -92,7 +90,7 @@ class GoogleCloudEmailService:
             if not self.service:
                 return {
                     'success': False,
-                    'error': 'Gmail service not initialized. Please set up proper OAuth2 credentials.'
+                    'error': 'OAuth2 Gmail service not initialized. Please set up proper OAuth2 credentials for mocdatapty@gmail.com account.'
                 }
             
             # Create message
@@ -109,6 +107,14 @@ class GoogleCloudEmailService:
                     user_info = self.service.users().getProfile(userId='me').execute()
                     oauth2_email = user_info.get('emailAddress', 'noreply@eclick.com')
                     message['from'] = oauth2_email
+                    logger.info(f"Using OAuth2 account email: {oauth2_email}")
+                except HttpError as e:
+                    if e.resp.status == 403:
+                        logger.error("Insufficient OAuth2 scopes. Need 'gmail.readonly' scope to read user profile.")
+                        logger.error("Please re-authenticate with updated scopes.")
+                    else:
+                        logger.error(f"Gmail API error getting user profile: {e}")
+                    message['from'] = 'noreply@eclick.com'  # Fallback
                 except Exception as e:
                     logger.warning(f"Could not get OAuth2 user email: {e}")
                     message['from'] = 'noreply@eclick.com'  # Fallback

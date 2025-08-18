@@ -36,6 +36,7 @@ urlpatterns = [
     path('send-report/', views.send_report, name='send_report'),
     path('send-complete-report/', views.send_complete_report, name='send_complete_report'),
     path('download-report/', views.download_report, name='download_report'),
+    path('comprehensive-system-report/', views.comprehensive_system_report, name='comprehensive_system_report'),
     path('admin-control/', views.admin_control, name='admin_control'),
     
     # Admin endpoints
@@ -89,4 +90,7 @@ urlpatterns = [
     path('ai/feedback/', views.ai_feedback, name='ai_feedback'),
     path('ai/stats/', views.ai_stats, name='ai_stats'),
     path('ai/knowledge/', views.ai_knowledge_management, name='ai_knowledge_management'),
+    
+    # NAB Summary
+    path('nab-summary/', views.nab_summary, name='nab_summary'),
 ]

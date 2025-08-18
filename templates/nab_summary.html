@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAB - Project Summary</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'nab-gold': '#D4AF37',
+                        'nab-dark': '#0A0A0A',
+                        'nab-gray': '#1A1A1A',
+                        'nab-light': '#2A2A2A',
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #D4AF37 0%, #FFD700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .gold-border {
+            border: 2px solid #D4AF37;
+        }
+        
+        .shadow-gold {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body class="bg-nab-dark text-white min-h-screen">
+    <!-- Header -->
+    <header class="bg-nab-gray border-b border-nab-gold/20">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 bg-nab-gold rounded-full flex items-center justify-center">
+                        <span class="text-nab-dark font-bold text-xl">N</span>
+                    </div>
+                    <h1 class="text-2xl font-bold gradient-text">NAB</h1>
+                </div>
+                <div class="text-nab-gold/60 text-sm">
+                    Project Summary Report
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+        <!-- Hero Section -->
+        <section class="text-center mb-16">
+            <h2 class="text-5xl font-bold mb-6">
+                <span class="gradient-text">Project Summary</span>
+            </h2>
+            <p class="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                Comprehensive overview of our latest project deliverables, achievements, and strategic insights for NAB stakeholders.
+            </p>
+        </section>
+
+        <!-- Key Metrics Grid -->
+        <section class="mb-16">
+            <h3 class="text-2xl font-semibold mb-8 text-center">Key Performance Indicators</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-nab-gray p-6 rounded-lg gold-border shadow-gold">
+                    <div class="text-3xl font-bold text-nab-gold mb-2">98%</div>
+                    <div class="text-gray-300">Project Completion</div>
+                </div>
+                <div class="bg-nab-gray p-6 rounded-lg gold-border shadow-gold">
+                    <div class="text-3xl font-bold text-nab-gold mb-2">$2.4M</div>
+                    <div class="text-gray-300">Cost Savings</div>
+                </div>
+                <div class="bg-nab-gray p-6 rounded-lg gold-border shadow-gold">
+                    <div class="text-3xl font-bold text-nab-gold mb-2">15</div>
+                    <div class="text-gray-300">Team Members</div>
+                </div>
+                <div class="bg-nab-gray p-6 rounded-lg gold-border shadow-gold">
+                    <div class="text-3xl font-bold text-nab-gold mb-2">A+</div>
+                    <div class="text-gray-300">Quality Rating</div>
+                </div>
+            </div>
+        </section>
+
+        
+
+        <!-- Timeline -->
+        <section class="mb-16">
+            <h3 class="text-2xl font-semibold mb-8 text-center">Project Timeline</h3>
+            <div class="relative">
+                <div class="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-nab-gold/30"></div>
+                <div class="space-y-8">
+                    <div class="relative flex items-center">
+                        <div class="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-nab-gold rounded-full shadow-gold"></div>
+                        <div class="w-5/12 pr-8 text-right">
+                            <h4 class="text-lg font-semibold text-nab-gold">Phase 1</h4>
+                            <p class="text-gray-400">Planning & Design</p>
+                            <p class="text-sm text-gray-500">Q1 2024</p>
+                        </div>
+                    </div>
+                    <div class="relative flex items-center">
+                        <div class="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-nab-gold rounded-full shadow-gold"></div>
+                        <div class="w-5/12 ml-auto pl-8">
+                            <h4 class="text-lg font-semibold text-nab-gold">Phase 2</h4>
+                            <p class="text-gray-400">Development</p>
+                            <p class="text-sm text-gray-500">Q2 2024</p>
+                        </div>
+                    </div>
+                    <div class="relative flex items-center">
+                        <div class="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-nab-gold rounded-full shadow-gold"></div>
+                        <div class="w-5/12 pr-8 text-right">
+                            <h4 class="text-lg font-semibold text-nab-gold">Phase 3</h4>
+                            <p class="text-gray-400">Testing & Deployment</p>
+                            <p class="text-sm text-gray-500">Q3 2024</p>
+                        </div>
+                    </div>
+                    <div class="relative flex items-center">
+                        <div class="absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-nab-gold rounded-full shadow-gold"></div>
+                        <div class="w-5/12 ml-auto pl-8">
+                            <h4 class="text-lg font-semibold text-nab-gold">Phase 4</h4>
+                            <p class="text-gray-400">Go-Live & Support</p>
+                            <p class="text-sm text-gray-500">Q4 2024</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Financial Summary -->
+        <section class="mb-16">
+            <div class="bg-nab-gray p-8 rounded-lg gold-border">
+                <h3 class="text-2xl font-semibold mb-6 text-nab-gold">Financial Summary</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-nab-gold mb-2">$5.2M</div>
+                        <div class="text-gray-300">Total Investment</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-nab-gold mb-2">$2.4M</div>
+                        <div class="text-gray-300">Cost Savings</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-nab-gold mb-2">46%</div>
+                        <div class="text-gray-300">ROI</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Contact Information -->
+        <section class="text-center">
+            <div class="bg-nab-gray p-8 rounded-lg gold-border">
+                <h3 class="text-2xl font-semibold mb-6 text-nab-gold">Contact & Support</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-2 text-white">Project Manager</h4>
+                        <p class="text-gray-300">John Smith</p>
+                        <p class="text-nab-gold">john.smith@company.com</p>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-2 text-white">Technical Lead</h4>
+                        <p class="text-gray-300">Sarah Johnson</p>
+                        <p class="text-nab-gold">sarah.johnson@company.com</p>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-2 text-white">Support Team</h4>
+                        <p class="text-gray-300">24/7 Hotline</p>
+                        <p class="text-nab-gold">+1 (555) 123-4567</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-nab-gray border-t border-nab-gold/20 mt-16">
+        <div class="container mx-auto px-6 py-8">
+            <div class="text-center">
+                <p class="text-gray-400 mb-4">
+                    This report was generated on <span class="text-nab-gold">{{ current_date|default:"December 2024" }}</span>
+                </p>
+                <p class="text-sm text-gray-500">
+                    © 2024 NAB Project Management. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

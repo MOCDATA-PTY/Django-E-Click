@@ -130,18 +130,41 @@
             </div>
         </div>
 
+
+
         <!-- Report Controls -->
         <div class="controls-section">
             <form class="controls-form">
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="dateFilter">Report Period</label>
-                                <select class="form-input" id="dateFilter">
-                                    <option value="30">Last 30 Days</option>
-                                    <option value="60">Last 60 Days</option>
-                                    <option value="90">Last 90 Days</option>
-                                    <option value="365">Last Year</option>
-                                </select>
+                                <div class="report-period-controls">
+                                    <button type="button" class="professional-btn btn-secondary" onclick="setReportPeriod(30)" id="period30Btn">
+                                        <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                        </svg>
+                                        30 Days
+                                    </button>
+                                    <button type="button" class="professional-btn btn-secondary" onclick="setReportPeriod(60)" id="period60Btn">
+                                        <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                        </svg>
+                                        60 Days
+                                    </button>
+                                    <button type="button" class="professional-btn btn-secondary" onclick="setReportPeriod(90)" id="period90Btn">
+                                        <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                        </svg>
+                                        90 Days
+                                    </button>
+                                    <button type="button" class="professional-btn btn-secondary" onclick="setReportPeriod(365)" id="period365Btn">
+                                        <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                        </svg>
+                                        1 Year
+                                    </button>
+                                </div>
+                                <input type="hidden" id="dateFilter" value="30">
                             </div>
                             <div class="form-group">
                                 <label>Bulk Actions</label>
@@ -1957,6 +1980,14 @@
 
     /* Responsive Design */
     @media (max-width: 768px) {
+        .report-period-controls {
+            gap: 0.5rem;
+        }
+
+        .report-period-controls .professional-btn {
+            padding: 0.625rem 1rem;
+            font-size: 0.75rem;
+        }
 
         .dashboard-header {
             padding: 1.5rem 0;
@@ -2436,7 +2467,15 @@
 
     /* Mobile (up to 599px) */
     @media (max-width: 599px) {
+        .report-period-controls {
+            flex-direction: column;
+            width: 100%;
+        }
 
+        .report-period-controls .professional-btn {
+            width: 100%;
+            justify-content: center;
+        }
         
         .bulk-actions {
             flex-direction: column;
@@ -2725,6 +2764,67 @@
         letter-spacing: -0.025em;
     }
 
+    /* Report Period Controls */
+    .report-period-controls {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .report-period-controls .professional-btn {
+        min-width: auto;
+        padding: 0.75rem 1.25rem;
+        font-size: 0.8rem;
+    }
+
+    .report-period-controls .professional-btn.active {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        color: white;
+        border-color: transparent;
+    }
+
+    .report-period-controls .professional-btn.active:hover {
+        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+        transform: translateY(-2px);
+    }
+
+    /* Dark mode adjustments for report period controls */
+    [data-theme="dark"] .report-period-controls .professional-btn {
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        color: #e5e7eb;
+        border-color: #6b7280;
+    }
+
+    [data-theme="dark"] .report-period-controls .professional-btn:hover {
+        background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+        border-color: #9ca3af;
+        transform: translateY(-1px);
+    }
+
+    [data-theme="dark"] .report-period-controls .professional-btn.active {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border-color: transparent;
+    }
+
+    [data-theme="dark"] .report-period-controls .professional-btn.active:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        transform: translateY(-2px);
+    }
+
+    /* Dark mode icon and text improvements */
+    [data-theme="dark"] .report-period-controls .professional-btn svg {
+        color: #e5e7eb;
+    }
+
+    [data-theme="dark"] .report-period-controls .professional-btn.active svg {
+        color: white;
+    }
+
+    [data-theme="dark"] .report-period-controls .professional-btn:hover svg {
+        color: #f9fafb;
+    }
+
     /* Professional Bulk Action Buttons */
     .professional-btn {
         display: inline-flex;
@@ -2875,6 +2975,107 @@
     [data-theme="dark"] .feature-item:hover {
         background: rgba(31, 41, 55, 0.9);
         border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    /* Comprehensive System Report Section */
+    .comprehensive-system-report-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .comprehensive-system-report-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.1);
+        z-index: 1;
+    }
+
+    .comprehensive-system-report-section .section-header {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .comprehensive-system-report-section h3 {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .comprehensive-system-report-section p {
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .comprehensive-report-actions {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .comprehensive-report-btn {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 1rem 2rem;
+        border-radius: var(--radius-medium);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .comprehensive-report-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        color: white;
+        text-decoration: none;
+    }
+
+    .comprehensive-report-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-medium);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .comprehensive-report-info .info-icon {
+        font-size: 1.2rem;
+    }
+
+    .comprehensive-report-info span:last-child {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Dark mode adjustments for comprehensive system report */
+    [data-theme="dark"] .comprehensive-system-report-section {
+        background: linear-gradient(135deg, #4c63d2 0%, #6b46c1 100%);
     }
 </style>
 
@@ -3277,6 +3478,26 @@
 
 
 
+    // Report Period Functions
+    function setReportPeriod(days) {
+        // Update hidden input value
+        document.getElementById('dateFilter').value = days;
+        
+        // Remove active class from all period buttons
+        document.querySelectorAll('.report-period-controls .professional-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        const activeButton = document.getElementById(`period${days}Btn`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
+        
+        console.log('Report period set to:', days + ' days');
+        updateDebug(`Report period changed to ${days} days`, 'info');
+    }
+
     // Initialize
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize checkbox event listeners
@@ -3285,13 +3506,8 @@
             checkbox.addEventListener('change', updateBulkActions);
         });
         
-        // Initialize date filter
-        const dateFilter = document.getElementById('dateFilter');
-        if (dateFilter) {
-            dateFilter.addEventListener('change', function() {
-                console.log('Filter changed to:', this.value + ' days');
-            });
-        }
+        // Initialize report period (default to 30 days)
+        setReportPeriod(30);
         
         updateDebug('Client reports interface initialized', 'info');
     });

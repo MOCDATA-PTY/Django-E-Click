@@ -29,25 +29,17 @@ CSRF_TRUSTED_ORIGINS = [
 # Login URL for @login_required decorator
 LOGIN_URL = '/login/'
 
-# Email Configuration - Now using OAuth2 instead of SMTP
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Commented out - using OAuth2
-# EMAIL_HOST = 'smtp.gmail.com'  # Commented out - using OAuth2
-# EMAIL_PORT = 587  # Commented out - using OAuth2
-# EMAIL_USE_TLS = True  # Commented out - using OAuth2
-# EMAIL_HOST_USER = 'ethansevenster621@gmail.com'  # Commented out - using OAuth2
-# EMAIL_HOST_PASSWORD = os.getenv('GMAIL_APP_PASSWORD', 'Deadpool2006')  # Commented out - using OAuth2
+# Email Configuration - Using OAuth2 for mocdatapty@gmail.com (NO SMTP FALLBACK)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Console backend for development
+DEFAULT_FROM_EMAIL = 'mocdatapty@gmail.com'  # Will be set by OAuth2 account
 
-# New OAuth2-based email configuration
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Fallback for development
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@eclick.com')  # Will be set by OAuth2 account
-
-# Google Cloud API Configuration
-GOOGLE_CLOUD_API_KEY = 'AIzaSyBAHeuA83Rl--GvorBIZlY8UOratOu-X2U'
-
-# Google OAuth 2.0 Configuration for Gmail
+# OAuth2 configuration for mocdatapty@gmail.com account
 GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID', '')
 GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET', '')
 GOOGLE_OAUTH2_REDIRECT_URI = os.getenv('GOOGLE_OAUTH2_REDIRECT_URI', 'http://localhost:55691')
+
+# Google Cloud API Configuration
+GOOGLE_CLOUD_API_KEY = 'AIzaSyBAHeuA83Rl--GvorBIZlY8UOratOu-X2U'
 
 # Gmail API Scopes
 GMAIL_SCOPES = [

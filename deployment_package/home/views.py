@@ -1911,12 +1911,7 @@ def generate_project_summary_pdf(project, client_name, total_tasks, completed_ta
     story.append(Paragraph(next_steps_text, body_style))
     story.append(Spacer(1, 6))
     
-    # EMAIL CLOSING
-    closing_text = """If you have any questions, simply reply to this email and our team will assist you.<br/><br/>
-Warm regards,<br/><br/>
-E-Click Project Management Team"""
-    story.append(Paragraph(closing_text, body_style))
-    story.append(Spacer(1, 8))
+    # EMAIL CLOSING section removed
     
     # FOOTER BANNER (exactly like image)
     footer_banner = Table([["WE CARE, WE CAN, WE DELIVER"]], colWidths=[6*inch])
@@ -2075,7 +2070,7 @@ def generate_project_specific_pdf_report(project_id, days_filter=30):
         spaceAfter=6,
         leftIndent=20,
         fontName='Helvetica',
-        textColor=colors.HexColor('#374151')  # Dark gray
+        textColor=colors.HexColor('#000000')  # Black text
     )
     
     # Company signature style
@@ -2635,7 +2630,7 @@ def generate_comprehensive_project_pdf_report(project_id, days_filter=30):
         parent=styles['Normal'],
         fontSize=10,
         spaceAfter=6,
-        textColor=colors.HexColor('#374151'),  # Dark gray
+        textColor=colors.HexColor('#000000'),  # Black text
         fontName='Helvetica'
     )
     
@@ -2890,7 +2885,7 @@ def generate_client_specific_pdf_report(client_id, days_filter=30):
         parent=styles['Normal'],
         fontSize=10,
         spaceAfter=6,
-        textColor=colors.HexColor('#374151'),  # Dark gray
+        textColor=colors.HexColor('#000000'),  # Black text
         fontName='Helvetica'
     )
     
@@ -3025,11 +3020,7 @@ def generate_client_specific_pdf_report(client_id, days_filter=30):
     )
     elements.append(Spacer(1, 8))
 
-    # Closing
-    elements.append(Paragraph('If you have any questions, simply reply to this email and our team will assist you.', normal_style))
-    elements.append(Paragraph('Warm regards,', normal_style))
-    elements.append(Paragraph('<b>E-Click Project Management Team</b>', normal_style))
-    elements.append(Spacer(1, 10))
+    # Closing section removed
 
     # Footer banner with rounded corners via a custom Flowable
     from reportlab.platypus import Flowable
@@ -4912,8 +4903,7 @@ def send_client_report(request):
             <li>Book a 15-minute review if you'd like us to walk you through the data.</li>
           </ul>
 
-          <p style="margin:0 0 18px 0;color:#000000;">If you have any questions, simply reply to this email and our team will assist you.</p>
-          <p style="margin:0;color:#000000;">Warm regards,<br/><strong>E-Click Project Management Team</strong></p>
+          <!-- Closing section removed -->
         </div>
         <div style="padding:14px 24px;background:#2d3748;color:#ffffff;text-align:center;font-size:12px;">
           WE CARE, WE CAN, WE DELIVER
@@ -6832,6 +6822,9 @@ def send_project_report_ajax(request):
                 completion_times = [(task.end_date - task.start_date).days for task in completed_tasks_with_dates]
                 avg_completion_days = sum(completion_times) / len(completion_times)
             
+            # Handle case where client_username might be empty
+            display_client_name = client_username if client_username else "Client"
+            
             # Prepare comprehensive report data
             report_data = {
                 'project_id': project_id,
@@ -6894,7 +6887,7 @@ def send_project_report_ajax(request):
     </div>
     
     <div style="padding: 20px; background-color: #ffffff;">
-        <p style="color: #000000; font-size: 16px; margin-bottom: 10px; font-weight: bold;">Dear {client_username},</p>
+        <p style="color: #000000; font-size: 16px; margin-bottom: 10px; font-weight: bold;">Dear {display_client_name},</p>
         
         <!-- DONUT CHART - SVG for email compatibility -->
         <div style="text-align:center;margin:20px 0;">
@@ -6978,12 +6971,7 @@ def send_project_report_ajax(request):
             </ul>
         </div>
         
-        <p style="color: #000000; font-size: 14px; margin-bottom: 20px;">If you have any questions, simply reply to this email and our team will assist you.</p>
-        
-        <div style="text-align: center; margin-top: 30px;">
-            <p style="color: #000000; font-size: 14px; margin-bottom: 10px;">Warm regards,</p>
-            <p style="color: #000000; font-size: 14px; font-weight: bold; margin-bottom: 5px;">E-Click Project Management Team</p>
-        </div>
+        <!-- Closing section removed -->
     </div>
     
     <div style="background-color: #1f2937; color: #ffffff; padding: 15px; text-align: center;">
@@ -6997,7 +6985,7 @@ def send_project_report_ajax(request):
             generated_time_str = timezone.now().strftime("%B %d, %Y at %I:%M %p")
             pdf_path = generate_project_summary_pdf(
                 project=project,
-                client_name=client_username,
+                client_name=display_client_name,
                 total_tasks=total_tasks,
                 completed_tasks=completed_tasks,
                 task_completion_rate=task_completion_rate,

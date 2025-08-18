@@ -59,3 +59,9 @@ backups/
 # Temporary files
 *.tmp
 *.temp
+
+# OAuth2 credentials (DO NOT COMMIT)
+credentials.json
+token.pickle
+home/credentials.json
+home/token.pickle

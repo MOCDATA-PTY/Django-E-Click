@@ -200,6 +200,10 @@
          Contact
          <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
        </a>
+       <a href="/nab-summary/" class="nav-link text-slate-600 dark:text-white hover:text-red-600 dark:hover:text-red-400 font-medium transition-all duration-300 relative group">
+         NAB Summary
+         <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+       </a>
        <!-- Dark Mode Toggle -->
       
      </div>
@@ -323,11 +327,18 @@
               </a>
               
               <a href="/login/" class="group bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-300 hover:transform hover:scale-105 flex items-center justify-center gap-3 hover:border-red-300 dark:hover:border-red-500">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 sm:w-5 sm:w-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 Sign In
+              </a>
+              
+              <a href="/nab-summary/" class="group bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:transform hover:scale-105 flex items-center justify-center gap-3">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                NAB Summary
               </a>
             
           </div>
@@ -906,23 +917,7 @@
 
 
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    
-    // Check for saved dark mode preference or default to light mode
-    if (localStorage.getItem('darkMode') === 'true' || 
-        (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-    }
-    
-    // Toggle dark mode
-    darkModeToggle.addEventListener('click', function() {
-        document.documentElement.classList.toggle('dark');
-        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-    });
-});
-</script>
+
 
 </body>
 </html>

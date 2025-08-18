@@ -6,8 +6,8 @@ from .models import Project, Task, SubTask, UserProfile, Client, ClientOTP, User
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ['name', 'client', 'status', 'start_date', 'end_date', 'created_at']
-    list_filter = ['status', 'created_at']
+    list_display = ['name', 'client', 'status', 'priority', 'start_date', 'end_date', 'created_at']
+    list_filter = ['status', 'priority', 'created_at']
     search_fields = ['name', 'client', 'client_email']
     filter_horizontal = ['assigned_users']
     date_hierarchy = 'created_at'

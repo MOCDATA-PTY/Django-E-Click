@@ -4,6 +4,96 @@
 {% block extra_css %}
 <!-- Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+/* Notification Styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-left: 4px solid #3b82f6;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.notification-success {
+    border-left-color: #10b981;
+}
+
+.notification-error {
+    border-left-color: #ef4444;
+}
+
+.notification-info {
+    border-left-color: #3b82f6;
+}
+
+.notification-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    gap: 12px;
+}
+
+.notification-content span {
+    flex: 1;
+    color: #1f2937;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.notification-close:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Loading spinner styles */
+.loading-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Button loading state */
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -68,7 +158,7 @@
     <!-- Projects Grid -->
     <div class="projects-container">
         {% for project in projects %}
-        <div class="project-card" data-status="{{ project.status }}" data-name="{{ project.name|lower }}" data-client="{{ project.client|lower }}">
+        <div class="project-card" data-status="{{ project.status }}" data-name="{{ project.name|lower }}" data-client="{{ project.client|lower }}" data-project-id="{{ project.id }}" data-client-email="{{ project.client_email|default:'' }}" data-client-username="{{ project.client_username|default:'' }}">
             <div class="project-header">
                 <div class="project-title">
                     <h3>{{ project.name }}</h3>
@@ -3291,7 +3381,112 @@
     }
 
     function sendProjectReport(projectId) {
-        window.location.href = `/projects/${projectId}/send-report/`;
+        // Get project information from the DOM
+        const projectCard = document.querySelector(`[data-project-id="${projectId}"]`);
+        if (!projectCard) {
+            alert('Project information not found. Please refresh the page and try again.');
+            return;
+        }
+        
+        const projectName = projectCard.dataset.name;
+        const clientEmail = projectCard.dataset.clientEmail;
+        const clientUsername = projectCard.dataset.clientUsername;
+        
+        if (!clientEmail) {
+            alert('This project does not have a client email associated with it. Please update the project information first.');
+            return;
+        }
+        
+        if (confirm(`Send a report for project "${projectName}" to ${clientEmail}?`)) {
+            // Get the button and add loading state
+            const button = event.target.closest('.btn');
+            const originalText = button.innerHTML;
+            button.innerHTML = `
+                <svg class="loading-spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                        <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                        <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                    </svg>
+                    Sending...
+            `;
+            button.disabled = true;
+            
+            // Prepare form data
+            const formData = new FormData();
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+            
+            if (!csrfToken) {
+                alert('Security token not found. Please refresh the page and try again.');
+                button.innerHTML = originalText;
+                button.disabled = false;
+                return;
+            }
+            
+            formData.append('csrfmiddlewaretoken', csrfToken.value);
+            formData.append('project_id', projectId);
+            formData.append('client_email', clientEmail);
+            formData.append('client_username', clientUsername || '');
+            
+            // Send the report via AJAX
+            fetch('{% url "send_project_report_ajax" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    showNotification('✅ ' + data.message, 'success');
+                } else {
+                    // Show error message
+                    showNotification('❌ ' + (data.error || 'Failed to send report'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending report:', error);
+                showNotification('❌ Error sending report: ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Restore button state
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        }
+    }
+    
+    function showNotification(message, type = 'info') {
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span>${message}</span>
+                <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        `;
+        
+        // Add to page
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
     }
 
     function sendClientOTP(projectId, clientUsername, clientEmail) {
