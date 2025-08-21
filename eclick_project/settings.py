@@ -110,7 +110,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Additional production settings
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
-SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+# Only set COOP header in production with HTTPS
+if not DEBUG:
+    SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 
 # Media files
 MEDIA_URL = '/media/'

@@ -39,41 +39,45 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
     
     <!-- Lazy load Tailwind CSS -->
-    <script>
-        // Load Tailwind CSS asynchronously
-        (function() {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://cdn.tailwindcss.com';
-            link.onload = function() {
-                // Initialize Tailwind config after loading
-                if (window.tailwind) {
-                    tailwind.config = {
-                        darkMode: 'class',
-                        theme: {
-                            extend: {
-                                colors: {
-                                    slate: {
-                                        50: '#f8fafc',
-                                        100: '#f1f5f9',
-                                        200: '#e2e8f0',
-                                        300: '#cbd5e1',
-                                        400: '#94a3b8',
-                                        500: '#64748b',
-                                        600: '#475569',
-                                        700: '#334155',
-                                        800: '#1e293b',
-                                        900: '#0f172a',
+    {% if debug %}
+        <script>
+            // Load Tailwind CSS asynchronously
+            (function() {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'https://cdn.tailwindcss.com';
+                link.onload = function() {
+                    // Initialize Tailwind config after loading
+                    if (window.tailwind) {
+                        tailwind.config = {
+                            darkMode: 'class',
+                            theme: {
+                                extend: {
+                                    colors: {
+                                        slate: {
+                                            50: '#f8fafc',
+                                            100: '#f1f5f9',
+                                            200: '#e2e8f0',
+                                            300: '#cbd5e1',
+                                            400: '#94a3b8',
+                                            500: '#64748b',
+                                            600: '#475569',
+                                            700: '#334155',
+                                            800: '#1e293b',
+                                            900: '#0f172a',
+                                        },
                                     },
                                 },
                             },
-                        },
-                    };
-                }
-            };
-            document.head.appendChild(link);
-        })();
-    </script>
+                        };
+                    }
+                };
+                document.head.appendChild(link);
+            })();
+        </script>
+    {% else %}
+        <link rel="stylesheet" href="{% static 'css/tailwind.min.css' %}">
+    {% endif %}
     <script>
         tailwind.config = {
             darkMode: 'class',

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en" class="">
 <head>
@@ -8,7 +9,11 @@
 
     
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    {% if debug %}
+        <script src="https://cdn.tailwindcss.com"></script>
+    {% else %}
+        <link rel="stylesheet" href="{% static 'css/tailwind.min.css' %}">
+    {% endif %}
     
     <!-- Tailwind Config -->
     <script>
