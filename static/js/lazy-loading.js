@@ -134,6 +134,10 @@
                 setTimeout(() => {
                     loadingScreen.classList.add('hidden');
                     document.body.classList.remove('loading');
+                    
+                    // Re-enable transitions after loading
+                    document.body.style.transition = '';
+                    document.documentElement.style.transition = '';
                 }, 500);
             }
             
