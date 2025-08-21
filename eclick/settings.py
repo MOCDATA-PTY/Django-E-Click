@@ -19,38 +19,30 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '167.88.43.168', '77.37.12
 # Login URL for @login_required decorator
 LOGIN_URL = '/login/'
 
-# Email Configuration - Now using OAuth2 instead of SMTP
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Commented out - using OAuth2
-# EMAIL_HOST = 'smtp.gmail.com'  # Commented out - using OAuth2
-# EMAIL_PORT = 587  # Commented out - using OAuth2
-# EMAIL_USE_TLS = True  # Commented out - using OAuth2
-# EMAIL_HOST_USER = 'ethansevenster621@gmail.com'  # Commented out - using OAuth2
-# EMAIL_HOST_PASSWORD = os.getenv('GMAIL_APP_PASSWORD', 'Deadpool2006')  # Commented out - using OAuth2
+# Email Configuration - DISABLED
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Console backend - no real emails
+DEFAULT_FROM_EMAIL = 'noreply@eclick.com'
 
-# New OAuth2-based email configuration
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Fallback for development
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@eclick.com')  # Will be set by OAuth2 account
+# Google Cloud API Configuration - DISABLED
+# GOOGLE_CLOUD_API_KEY = 'AIzaSyBAHeuA83Rl--GvorBIZlY8UOratOu-X2U'
 
-# Google Cloud API Configuration
-GOOGLE_CLOUD_API_KEY = 'AIzaSyBAHeuA83Rl--GvorBIZlY8UOratOu-X2U'
+# Google OAuth 2.0 Configuration for Gmail - DISABLED
+# GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID', '')
+# GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET', '')
+# GOOGLE_OAUTH2_REDIRECT_URI = os.getenv('GOOGLE_OAUTH2_REDIRECT_URI', 'http://localhost:55691')
 
-# Google OAuth 2.0 Configuration for Gmail
-GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID', '')
-GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET', '')
-GOOGLE_OAUTH2_REDIRECT_URI = os.getenv('GOOGLE_OAUTH2_REDIRECT_URI', 'http://localhost:55691')
+# Gmail API Scopes - DISABLED
+# GMAIL_SCOPES = [
+#     'https://www.googleapis.com/auth/gmail.send',
+#     'https://www.googleapis.com/auth/gmail.compose',
+#     'https://www.googleapis.com/auth/gmail.modify',
+#     'https://www.googleapis.com/auth/userinfo.email'
+# ]
 
-# Gmail API Scopes
-GMAIL_SCOPES = [
-    'https://www.googleapis.com/auth/gmail.send',
-    'https://www.googleapis.com/auth/gmail.compose',
-    'https://www.googleapis.com/auth/gmail.modify',
-    'https://www.googleapis.com/auth/userinfo.email'
-]
-
-# OAuth2 Settings
-OAUTH2_REDIRECT_URI = 'http://localhost:55691'
-OAUTH2_AUTHORIZATION_BASE_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
-OAUTH2_TOKEN_URL = 'https://oauth2.googleapis.com/token'
+# OAuth2 Settings - DISABLED
+# OAUTH2_REDIRECT_URI = 'http://localhost:55691'
+# OAUTH2_AUTHORIZATION_BASE_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
+# OAUTH2_TOKEN_URL = 'https://oauth2.googleapis.com/token'
 
 # Application definition
 INSTALLED_APPS = [

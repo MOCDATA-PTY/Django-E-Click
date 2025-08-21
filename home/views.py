@@ -599,10 +599,8 @@ def add_project(request):
                             from_email=None  # Will use OAuth2 account email
                         )
                         
-                        if email_result['success']:
-                            messages.success(request, f'Project "{name}" created successfully! OTP sent to {client_email} for client setup.')
-                        else:
-                            messages.warning(request, f'Project "{name}" created successfully, but OTP email failed: {email_result["error"]}')
+                        # Email service is disabled - just show success message
+                        messages.success(request, f'Project "{name}" created successfully! Email notifications are disabled.')
                 
                 # Create project (dates will be calculated from tasks)
                 project = Project.objects.create(
@@ -610,7 +608,8 @@ def add_project(request):
                     client=client,
                     client_username=client_username,
                     client_email=client_email,
-                    status=status
+                    status=status,
+                    priority='medium'  # Add default priority
                 )
                 
                 # Log project creation
