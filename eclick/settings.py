@@ -5,6 +5,12 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+# MySQL Database Configuration for Remote Hostinger Server
+# Database: E-click-Project-management
+# User: admin
+# Server: 77.37.121.135
+# Install: pip install mysqlclient
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -14,7 +20,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-your-secret-key-change-thi
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['167.88.43.168', 'localhost', '127.0.0.1', 'your-domain.com']
+ALLOWED_HOSTS = ['167.88.43.168', 'localhost', '127.0.0.1', 'your-domain.com', '77.37.121.135']
 
 # CSRF settings
 CSRF_TRUSTED_ORIGINS = [
@@ -24,6 +30,8 @@ CSRF_TRUSTED_ORIGINS = [
     'https://167.88.43.168',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'http://77.37.121.135',
+    'https://77.37.121.135',
 ]
 
 # Login URL for @login_required decorator
@@ -74,6 +82,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'home.middleware.DatabaseOptimizationMiddleware',  # Database optimization
+    'home.middleware.QueryLimitMiddleware',  # Query limiting
 ]
 
 ROOT_URLCONF = 'eclick.urls'
@@ -98,9 +108,46 @@ WSGI_APPLICATION = 'eclick.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'E-click-Project-management',
+        'USER': 'admin',
+        'PASSWORD': 'mk7z@Geg123',
+        'HOST': '77.37.121.135',
+        'PORT': '3306',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO'",
+            'autocommit': True,
+            'connect_timeout': 30,  # Reduced from 60 to 30 seconds
+            'read_timeout': 30,     # Reduced from 60 to 30 seconds
+            'write_timeout': 30,    # Reduced from 60 to 30 seconds
+            'sql_mode': 'STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO',
+            'charset': 'utf8mb4',
+            'use_unicode': True,
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO'",
+        },
+        'CONN_MAX_AGE': 300,  # Reduced from 600 to 5 minutes for better connection management
+        'CONN_HEALTH_CHECKS': True,  # Enable connection health checks
+        'ATOMIC_REQUESTS': False,  # Disable atomic requests for better performance
     }
+}
+
+# Production-ready caching configuration
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 300,  # 5 minutes
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,
+        }
+    }
+}
+
+# Database query optimization settings
+DB_OPTIMIZATION = {
+    'QUERY_TIMEOUT': 30,  # 30 seconds max query time
+    'MAX_QUERIES_PER_REQUEST': 50,  # Limit queries per request
 }
 
 AUTH_PASSWORD_VALIDATORS = [

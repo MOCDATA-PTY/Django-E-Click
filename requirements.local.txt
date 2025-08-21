@@ -1,0 +1,23 @@
+# Local Development Requirements for E-Click Project
+# MySQL Database Support
+
+# Core Django
+Django>=4.2.0
+python-dotenv>=1.0.0
+
+# Database - MySQL
+mysqlclient>=2.1.0
+# Alternative if mysqlclient fails to install:
+# PyMySQL>=1.0.0
+
+# Development tools
+django-debug-toolbar>=4.0.0
+django-extensions>=3.2.0
+
+# Other dependencies
+whitenoise>=6.0.0
+Pillow>=10.0.0
+
+# Note: If using PyMySQL, add this to your Django settings:
+# import pymysql
+# pymysql.install_as_MySQLdb()

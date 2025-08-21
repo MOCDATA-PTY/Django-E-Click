@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.db.models import Min, Max, Count, Q, Avg, F, ExpressionWrapper, fields
 from django.core.paginator import Paginator
 from django.db import transaction
+from django.core.cache import cache
 import json
 import os
 import shutil
@@ -25,6 +26,7 @@ import json
 from .ai_service import ai_service
 from .decorators import require_admin_access
 from .services import GoogleCloudEmailService
+from .db_utils import optimize_dashboard_queries, monitor_query_performance
 import uuid
 
 # Create email service instance - now using Gmail API with OAuth2
@@ -132,6 +134,7 @@ def login_view(request):
     return render(request, 'home/login.html')
 
 @login_required
+@monitor_query_performance
 def dashboard(request):
     from django.utils import timezone
     from datetime import timedelta
@@ -147,27 +150,38 @@ def dashboard(request):
     # Get current date for display
     current_date = timezone.now()
     
+    # Try to get cached dashboard data first
+    cache_key = f'dashboard_data_{request.user.id}_{request.user.is_staff}'
+    cached_context = cache.get(cache_key)
+    
+    if cached_context and not request.GET.get('refresh'):
+        return render(request, 'home/dashboard.html', cached_context)
+    
     if request.user.is_staff:
         # Admin/Staff Dashboard - Show all projects and statistics
-        # Calculate statistics
-        total_projects = Project.objects.count()
-        active_projects = Project.objects.filter(status='in_progress').count()
-        completed_projects = Project.objects.filter(status='completed').count()
+        # Use optimized queries with select_related
+        projects = Project.objects.all()
+        tasks = Task.objects.select_related('project')
+        
+        # Calculate statistics efficiently
+        total_projects = projects.count()
+        active_projects = projects.filter(status='in_progress').count()
+        completed_projects = projects.filter(status='completed').count()
         
         # Calculate new projects this week
         week_ago = current_date - timedelta(days=7)
-        new_projects = Project.objects.filter(created_at__gte=week_ago).count()
+        new_projects = projects.filter(created_at__gte=week_ago).count()
         
         # Calculate active percentage
         active_percentage = (active_projects / total_projects * 100) if total_projects > 0 else 0
         
         # Task statistics
-        total_tasks = Task.objects.count()
-        completed_tasks = Task.objects.filter(status='completed').count()
-        pending_tasks = Task.objects.filter(status__in=['not_started', 'in_progress']).count()
+        total_tasks = tasks.count()
+        completed_tasks = tasks.filter(status='completed').count()
+        pending_tasks = tasks.filter(status__in=['not_started', 'in_progress']).count()
         
         # Calculate completed tasks this week
-        completed_this_week = Task.objects.filter(
+        completed_this_week = tasks.filter(
             status='completed',
             updated_at__gte=week_ago
         ).count()
@@ -180,7 +194,7 @@ def dashboard(request):
         efficiency_rate = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
         
         # Calculate on-time delivery rate (simplified)
-        overdue_tasks = Task.objects.filter(
+        overdue_tasks = tasks.filter(
             end_date__lt=current_date.date(),
             status__in=['not_started', 'in_progress']
         ).count()
@@ -189,8 +203,8 @@ def dashboard(request):
         # Recent activities (simplified for now)
         recent_activities = []
         
-        # Add recent project activities
-        recent_projects = Project.objects.order_by('-updated_at')[:5]
+        # Add recent project activities with optimized queries
+        recent_projects = projects.order_by('-updated_at')[:5]
         for project in recent_projects:
             recent_activities.append({
                 'text': f'Project "{project.name}" was updated',
@@ -198,7 +212,7 @@ def dashboard(request):
             })
         
         # Add recent task activities
-        recent_tasks = Task.objects.order_by('-updated_at')[:5]
+        recent_tasks = tasks.order_by('-updated_at')[:5]
         for task in recent_tasks:
             recent_activities.append({
                 'text': f'Task "{task.title}" status changed to {task.status}',
@@ -228,16 +242,21 @@ def dashboard(request):
         
     else:
         # User Dashboard - Show only assigned projects and tasks
-        # Get user's assigned projects
-        assigned_projects = Project.objects.filter(assigned_users=request.user)
+        # Get user's assigned projects with optimized queries
+        assigned_projects = Project.objects.filter(
+            assigned_users=request.user
+        )
         
-        # Calculate user-specific statistics
+        # Calculate user-specific statistics efficiently
         total_assigned_projects = assigned_projects.count()
         active_assigned_projects = assigned_projects.filter(status='in_progress').count()
         completed_assigned_projects = assigned_projects.filter(status='completed').count()
         
-        # Get user's assigned tasks
-        assigned_tasks = Task.objects.filter(project__in=assigned_projects)
+        # Get user's assigned tasks with optimized queries
+        assigned_tasks = Task.objects.filter(
+            project__in=assigned_projects
+        ).select_related('project')
+        
         total_assigned_tasks = assigned_tasks.count()
         completed_assigned_tasks = assigned_tasks.filter(status='completed').count()
         pending_assigned_tasks = assigned_tasks.filter(status__in=['not_started', 'in_progress']).count()
@@ -317,6 +336,9 @@ def dashboard(request):
             'assigned_projects': assigned_projects.order_by('-updated_at')[:5],
             'is_admin_dashboard': False,
         }
+    
+    # Cache the context for 5 minutes to improve performance
+    cache.set(cache_key, context, 300)
     
     return render(request, 'home/dashboard.html', context)
 
@@ -781,7 +803,6 @@ def add_project(request):
     
     # If not POST or validation failed, redirect to projects page
     return redirect('projects_page')
-@login_required
 def edit_project(request, project_id):
     if not request.user.is_staff:
         messages.error(request, 'Access denied. Staff privileges required.')
@@ -4046,6 +4067,14 @@ def projects_page(request):
         page_url=request.path,
         request=request
     )
+    
+    # Try to get cached data first
+    cache_key = f'projects_page_{request.user.id}_{request.user.is_staff}'
+    cached_context = cache.get(cache_key)
+    
+    if cached_context and not request.GET.get('refresh'):
+        return render(request, 'home/projects_page.html', cached_context)
+    
     try:
         profile = request.user.profile
         can_create_projects = profile.can_create_projects or request.user.is_staff
@@ -4055,22 +4084,44 @@ def projects_page(request):
         can_create_projects = request.user.is_staff
         can_edit_projects = request.user.is_staff
         can_delete_projects = request.user.is_staff
+    
+    # Optimize database queries with select_related and prefetch_related
     if request.user.is_staff:
-        projects = Project.objects.all().order_by('-created_at')
-        all_users = User.objects.all().order_by('username')
+        # For staff users, load all projects but with optimization
+        projects = Project.objects.select_related(
+            'created_by', 'client'
+        ).prefetch_related(
+            'assigned_users', 'tasks'
+        ).order_by('-created_at')
+        
+        # Limit users to active ones only for better performance
+        all_users = User.objects.filter(is_active=True).order_by('username')
         existing_clients = Client.objects.filter(is_active=True).order_by('username')
     else:
-        projects = Project.objects.filter(assigned_users=request.user).order_by('-created_at')
+        # For regular users, only load their assigned projects
+        projects = Project.objects.filter(assigned_users=request.user).select_related(
+            'created_by', 'client'
+        ).prefetch_related(
+            'assigned_users', 'tasks'
+        ).order_by('-created_at')
+        
         all_users = User.objects.filter(id=request.user.id)
         existing_clients = Client.objects.filter(is_active=True).order_by('username')
-    return render(request, 'home/projects_page.html', {
+    
+    # Prepare context
+    context = {
         'projects': projects,
         'all_users': all_users,
         'existing_clients': existing_clients,
         'can_create_projects': can_create_projects,
         'can_edit_projects': can_edit_projects,
         'can_delete_projects': can_delete_projects,
-    })
+    }
+    
+    # Cache the context for 5 minutes to improve performance
+    cache.set(cache_key, context, 300)
+    
+    return render(request, 'home/projects_page.html', context)
 
 @login_required
 def get_project_users(request, project_id):

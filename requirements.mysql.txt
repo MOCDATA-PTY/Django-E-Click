@@ -1,0 +1,31 @@
+# Production Requirements for E-Click Project
+# Ubuntu/Debian Hostinger Server Deployment
+
+# Database
+mysqlclient>=2.1.0
+mysql-connector-python>=8.0.0  # Alternative connector for testing
+
+# Core Django
+Django>=4.2.0
+python-dotenv>=1.0.0
+
+# Production Server
+gunicorn>=21.0.0
+whitenoise>=6.0.0
+
+# Security & Performance
+django-cors-headers>=4.0.0
+django-csp>=3.7
+
+# Monitoring & Logging
+django-debug-toolbar>=4.0.0  # Only for development
+sentry-sdk>=1.30.0  # Error tracking
+
+# File Handling
+Pillow>=10.0.0  # Image processing
+python-magic>=0.4.27  # File type detection
+
+# Email & OAuth2
+google-auth>=2.20.0
+google-auth-oauthlib>=1.0.0
+google-auth-httplib2>=0.1.0

@@ -67,6 +67,33 @@
             <div class="section-header">
                 <h2>Project Timeline</h2>
             </div>
+            
+            <!-- Simple Legend underneath the header -->
+            <div class="legend-container" style="margin: 10px 0; padding: 10px; border: 1px solid #374151; border-radius: 4px; background: #1f2937;">
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: center; font-size: 12px; color: #d1d5db;">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <div style="width: 12px; height: 12px; background: #f59e0b; border: 1px solid #d97706; border-radius: 2px;"></div>
+                        <span>Planned/In Progress</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <div style="width: 12px; height: 12px; background: #f97316; border: 1px solid #ea580c; border-radius: 2px;"></div>
+                        <span>Guidance Required</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <div style="width: 12px; height: 12px; background: #22c55e; border: 1px solid #16a34a; border-radius: 2px;"></div>
+                        <span>Completed</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <div style="width: 12px; height: 12px; background: #ef4444; border: 1px solid #dc2626; border-radius: 2px;"></div>
+                        <span>Not Started</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <div style="width: 12px; height: 12px; background: #475569; border: 1px solid #374151; border-radius: 2px;"></div>
+                        <span>On Hold</span>
+                    </div>
+                </div>
+            </div>
+            
             <div class="section-content">
                 <div class="gantt-container">
                     <div id="ganttChart" class="gantt-chart">
@@ -808,6 +835,24 @@
         background: #d0d0d0;
     }
 
+    /* Progress bar styling */
+    .gantt-bar.summary-bar {
+        position: relative;
+        overflow: hidden;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .gantt-bar.summary-bar:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        transform: translateY(-1px);
+        transition: all 0.2s ease;
+    }
+
+
+
+
+
          /* Task name */
      .gantt-task-name {
          color: #6b7280;
@@ -854,10 +899,10 @@
 
                    /* Timeline rows */
       .gantt-timeline-row {
-          height: 24px;
+          height: 30px;
           border-bottom: 1px solid var(--gantt-border);
           display: flex;
-          position: relative;
+          position: relative !important;
           background: white;
           min-width: fit-content;
           z-index: 1;
@@ -885,7 +930,7 @@
          border-right: 1px solid var(--gantt-border);
          position: relative;
          flex-shrink: 0;
-         height: 24px; /* Match task row height exactly */
+         height: 30px; /* Match timeline row height exactly */
          overflow: hidden;
          box-sizing: border-box;
          background: transparent;
@@ -909,16 +954,14 @@
 
          /* Gantt bars */
      .gantt-bar {
-         position: absolute;
-         height: 100%;
-         top: 0;
-         border-radius: 0;
+         position: absolute !important;
+         height: 20px !important;
+         top: 5px !important;
+         border-radius: 3px;
          cursor: pointer;
          transition: all 0.2s ease;
-         z-index: 5;
+         z-index: 10 !important;
          box-sizing: border-box;
-         left: 0;
-         width: 100%;
          overflow: hidden;
          margin: 0;
          padding: 0;
@@ -970,8 +1013,8 @@
         transform: rotate(45deg) translateY(-1px);
     }
 
-         /* Status indicators on bars */
-     .gantt-bar::after {
+         /* Status indicators on bars - disabled for summary bars since we use custom text */
+     .gantt-bar:not(.summary-bar)::after {
          content: attr(data-status);
          position: absolute;
          top: 50%;
@@ -1237,13 +1280,19 @@ async function loadGanttData() {
         const response = await fetch('/dashboard/gantt-data/');
         const data = await response.json();
         console.log('Gantt data response:', data);
-                 if (data.success) {
-             ganttData = data.projects;
-             console.log('Projects loaded:', ganttData.length);
-             updateDebugInfo('Data loaded successfully', getTotalTasks());
-             updateProjectStats();
-             renderGanttChart();
-         } else {
+                         if (data.success) {
+            ganttData = data.projects;
+            console.log('Projects loaded:', ganttData.length);
+            
+            // Automatically expand all projects when data loads
+            ganttData.forEach(project => {
+                expandedProjects.add(project.id);
+            });
+            
+            updateDebugInfo('Data loaded successfully', getTotalTasks());
+            updateProjectStats();
+            renderGanttChart();
+        } else {
             console.error('Failed to load Gantt data:', data.error);
             updateDebugInfo('API failed: ' + data.error);
             showErrorMessage('Failed to load project data: ' + data.error);
@@ -1439,6 +1488,8 @@ function renderGanttChart() {
     console.log('Creating MS Project style Gantt chart with', ganttData.length, 'projects');
     container.innerHTML = '';
     
+
+    
     // Create main gantt structure
     const ganttDiv = document.createElement('div');
     ganttDiv.className = 'gantt-chart';
@@ -1451,7 +1502,8 @@ function renderGanttChart() {
     const timelinePanel = createTimelinePanel();
     ganttDiv.appendChild(timelinePanel);
     
-         container.appendChild(ganttDiv);
+    container.appendChild(ganttDiv);
+     
      console.log('MS Project style Gantt chart rendered successfully');
      
      // Update project statistics after rendering
@@ -1650,10 +1702,25 @@ function getVisibleCount() {
      
      // Add a single spanning gantt bar if item has dates
      if (item.start_date && item.end_date) {
+         console.log(`Creating spanning bar for ${type}: ${item.name || item.title}`);
          const spanningBar = createSpanningGanttBar(item, type, headers);
          if (spanningBar) {
+             console.log(`Adding bar to row:`, spanningBar);
+             console.log(`Bar styles:`, {
+                 position: spanningBar.style.position,
+                 left: spanningBar.style.left,
+                 width: spanningBar.style.width,
+                 height: spanningBar.style.height,
+                 top: spanningBar.style.top,
+                 zIndex: spanningBar.style.zIndex,
+                 background: spanningBar.style.background
+             });
              row.appendChild(spanningBar);
+         } else {
+             console.log(`No bar created for ${type}: ${item.name || item.title}`);
          }
+     } else {
+         console.log(`No dates for ${type}: ${item.name || item.title} - start: ${item.start_date}, end: ${item.end_date}`);
      }
      
      return row;
@@ -1704,15 +1771,18 @@ function createSpanningGanttBar(item, type, headers) {
      bar.style.position = 'absolute';
      bar.style.left = `${startPosition}px`;
      bar.style.width = `${width}px`;
-     bar.style.height = '100%';
-     bar.style.top = '0';
-     bar.style.zIndex = '5';
+     bar.style.height = '20px';
+     bar.style.top = '5px';
+     bar.style.zIndex = '10';
      
               // Calculate progress and apply progress-based colors
      let progress = 0;
+     console.log(`Calculating progress for ${type}: ${item.name || item.title}`);
+     
      if (type === 'summary') {
          // For projects, calculate progress from tasks
          progress = calculateProjectProgress(item);
+         console.log(`Project progress calculated: ${progress}%`);
      } else if (type === 'task') {
          // For tasks, calculate progress from subtasks
          if (item.subtasks && item.subtasks.length > 0) {
@@ -1728,38 +1798,164 @@ function createSpanningGanttBar(item, type, headers) {
          progress = item.status === 'completed' ? 100 : 0;
      }
      
-     // Apply progress-based colors
-     if (progress > 0) {
-         // Green for completed, light grey for uncompleted
-         bar.style.background = `linear-gradient(90deg, #10b981 ${progress}%, #9ca3af ${progress}%)`;
-         
-         // Add data attribute for progress tracking
-         bar.setAttribute('data-progress', progress);
-         
-         // Add glow effect for completed items
-         if (progress >= 100) {
-             bar.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.5)';
-         }
+     // Create progress-based visual representation
+     console.log(`Creating bar for ${type}: ${item.name || item.title} - Progress: ${progress}%`);
+     
+     if (type === 'summary') {
+         // For projects, show progress bar with green filling
+         createProgressBar(bar, progress, item, type);
      } else {
-         // No progress - use light grey
-         bar.style.background = '#9ca3af';
-         bar.removeAttribute('data-progress');
+         // For tasks and subtasks, use status-based colors
+         const status = item.status || 'pending';
+         let statusColors = { background: '#9ca3af', border: '2px solid #6b7280' }; // default gray
+         
+         // Define status-based colors
+         if (status === 'completed' || status === 'completed_review_pending' || status === 'completed_data_discrepancy_addressing') {
+             statusColors = { background: '#22c55e', border: '2px solid #16a34a' }; // green
+         } else if (status === 'in_progress' || status === 'in_progress_guidance_required') {
+             statusColors = { background: '#f59e0b', border: '2px solid #d97706' }; // yellow
+         } else if (status === 'planned') {
+             statusColors = { background: '#f59e0b', border: '2px solid #d97706' }; // yellow
+         } else if (status === 'not_started') {
+             statusColors = { background: '#ef4444', border: '2px solid #dc2626' }; // red
+         } else if (status === 'on_hold') {
+             statusColors = { background: '#475569', border: '2px solid #374151' }; // gray
+         } else if (status === 'cancelled') {
+             statusColors = { background: '#9ca3af', border: '2px solid #6b7280' }; // light gray
+         }
+         
+         // Apply the status colors
+         bar.style.background = statusColors.background;
+         bar.style.border = statusColors.border;
+     }
+     
+     // Add data attribute for progress tracking
+     bar.setAttribute('data-progress', progress);
+     
+     // Add glow effect for completed items
+     if (progress >= 100) {
+         bar.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.5)';
      }
      
      // Add status classes for additional styling
-     const status = item.status || 'pending';
-     if (status === 'completed') {
+     const itemStatus = item.status || 'pending';
+     if (itemStatus === 'completed') {
          bar.classList.add('completed');
-     } else if (status === 'in_progress') {
+     } else if (itemStatus === 'in_progress') {
          bar.classList.add('in-progress');
-     } else if (status === 'pending') {
+     } else if (itemStatus === 'pending') {
          bar.classList.add('pending');
-     } else if (status === 'planned') {
+     } else if (itemStatus === 'planned') {
          bar.classList.add('planned');
      }
 
      // Add status text on the bar (centered)
-     const statusText = status.replace('_', ' ').toUpperCase();
+     const statusText = itemStatus.replace('_', ' ').toUpperCase();
+     bar.setAttribute('data-status', statusText);
+     
+     // Add enhanced tooltip
+     bar.addEventListener('mouseenter', (e) => showEnhancedTooltip(e, item, type));
+     bar.addEventListener('mouseleave', hideTooltip);
+     
+     console.log(`Bar created for ${type}: ${item.name || item.title} - Progress: ${progress}%`);
+     
+     return bar;
+}
+
+// Create progress bar for projects showing completion percentage
+function createProgressBar(bar, progress, item, type) {
+    console.log(`Creating progress bar for ${type}: ${item.name || item.title} - Progress: ${progress}%`);
+    
+    // Validate parameters
+    if (!bar || !item) {
+        console.error('Invalid parameters passed to createProgressBar:', { bar, item, type });
+        return;
+    }
+    
+    // Ensure progress is a valid number
+    progress = Math.max(0, Math.min(100, progress || 0));
+    
+    // Set base styling for the progress bar - make it all green
+    bar.style.background = '#22c55e'; // Green for completed portion
+    bar.style.border = '2px solid #16a34a';
+    bar.style.position = 'relative';
+    bar.style.overflow = 'hidden';
+    
+    // Create the yellow overlay for remaining portion (covers the green)
+    const remainingOverlay = document.createElement('div');
+    remainingOverlay.style.position = 'absolute';
+    remainingOverlay.style.left = `${progress}%`;
+    remainingOverlay.style.top = '0';
+    remainingOverlay.style.height = '100%';
+    remainingOverlay.style.width = `${100 - progress}%`;
+    remainingOverlay.style.background = '#f59e0b'; // Yellow for remaining portion
+    remainingOverlay.style.borderLeft = '2px solid #d97706';
+    remainingOverlay.style.zIndex = '6';
+    
+    // Add smooth transition effect
+    remainingOverlay.style.transition = 'width 0.3s ease-in-out';
+    
+    // Create completed section text (green part)
+    const completedText = document.createElement('div');
+    completedText.style.position = 'absolute';
+    completedText.style.left = '0';
+    completedText.style.top = '50%';
+    completedText.style.transform = 'translateY(-50%)';
+    completedText.style.color = '#ffffff';
+    completedText.style.fontSize = '7px';
+    completedText.style.fontWeight = 'bold';
+    completedText.style.textShadow = '1px 1px 1px rgba(0,0,0,0.8)';
+    completedText.style.zIndex = '8';
+    completedText.style.textAlign = 'center';
+    completedText.style.width = `${progress}%`;
+    completedText.style.overflow = 'hidden';
+    completedText.innerHTML = `${progress}% COMPLETED`;
+    
+    // Create in progress section text (yellow part)
+    const inProgressText = document.createElement('div');
+    inProgressText.style.position = 'absolute';
+    inProgressText.style.left = `${progress}%`;
+    inProgressText.style.top = '50%';
+    inProgressText.style.transform = 'translateY(-50%)';
+    inProgressText.style.color = '#ffffff';
+    inProgressText.style.fontSize = '7px';
+    inProgressText.style.fontWeight = 'bold';
+    inProgressText.style.textShadow = '1px 1px 1px rgba(0,0,0,0.8)';
+    inProgressText.style.zIndex = '8';
+    inProgressText.style.textAlign = 'center';
+    inProgressText.style.width = `${100 - progress}%`;
+    inProgressText.style.overflow = 'hidden';
+    inProgressText.innerHTML = `${100 - progress}% IN PROGRESS`;
+    
+    // Append the progress elements
+    bar.appendChild(remainingOverlay);
+    bar.appendChild(completedText);
+    bar.appendChild(inProgressText);
+    
+    // Add hover effect to show more details
+    bar.addEventListener('mouseenter', () => {
+        completedText.style.fontSize = '8px';
+        inProgressText.style.fontSize = '8px';
+    });
+    
+    bar.addEventListener('mouseleave', () => {
+        completedText.style.fontSize = '7px';
+        inProgressText.style.fontSize = '7px';
+    });
+     // Add status classes for additional styling
+     const itemStatus = item.status || 'pending';
+     if (itemStatus === 'completed') {
+         bar.classList.add('completed');
+     } else if (itemStatus === 'in_progress') {
+         bar.classList.add('in-progress');
+     } else if (itemStatus === 'pending') {
+         bar.classList.add('pending');
+     } else if (itemStatus === 'planned') {
+         bar.classList.add('planned');
+     }
+
+     // Add status text on the bar (centered)
+     const statusText = itemStatus.replace('_', ' ').toUpperCase();
      bar.setAttribute('data-status', statusText);
      
      console.log(`${type} bar created: ${item.name || item.title} - Progress: ${progress}%`);
@@ -1773,32 +1969,43 @@ function createSpanningGanttBar(item, type, headers) {
 
 // Calculate project progress based on completed tasks
 function calculateProjectProgress(project) {
+    console.log(`Calculating progress for project: ${project.name || project.title}`);
+    console.log(`Project tasks:`, project.tasks);
+    
     let totalTasks = 0;
     let completedTasks = 0;
     
     if (project.tasks && project.tasks.length > 0) {
         project.tasks.forEach(task => {
             totalTasks++;
-            if (task.status === 'completed') {
+            console.log(`Task: ${task.title} - Status: ${task.status}`);
+            
+            // Count completed tasks
+            if (task.status === 'completed' || 
+                task.status === 'completed_review_pending' || 
+                task.status === 'completed_data_discrepancy_addressing') {
                 completedTasks++;
+                console.log(`Completed task: ${task.title}`);
             }
             
+            // Count subtasks
             if (task.subtasks && task.subtasks.length > 0) {
                 task.subtasks.forEach(subtask => {
                     totalTasks++;
+                    console.log(`Subtask: ${subtask.title} - Status: ${subtask.status}`);
                     if (subtask.status === 'completed') {
                         completedTasks++;
+                        console.log(`Completed subtask: ${subtask.title}`);
                     }
                 });
             }
         });
     }
     
-    if (totalTasks > 0) {
-        return Math.round((completedTasks / totalTasks) * 100);
-    }
+    const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    console.log(`Project progress: ${completedTasks}/${totalTasks} = ${progress}%`);
     
-    return 0;
+    return progress;
 }
 
 // Get the earliest start date from all tasks
@@ -1915,6 +2122,8 @@ function toggleProjectExpansion(projectId) {
     }
     renderGanttChart();
 }
+
+
 
  // Show enhanced tooltip
  function showEnhancedTooltip(event, item, type) {
@@ -2082,21 +2291,117 @@ function listenForThemeChanges() {
     }, 100);
 }
 
+// Create Gantt chart legend
+function createGanttLegend() {
+    const legend = document.createElement('div');
+    legend.className = 'gantt-legend';
+    legend.style.cssText = `
+        margin-top: 20px;
+        padding: 15px;
+        background: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: center;
+        justify-content: center;
+        font-family: inherit;
+    `;
+    
+    // Legend title
+    const title = document.createElement('h3');
+    title.textContent = 'Project Status Legend';
+    title.style.cssText = `
+        width: 100%;
+        text-align: center;
+        margin: 0 0 15px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #f9fafb;
+    `;
+    legend.appendChild(title);
+    
+    // Legend items
+    const legendItems = [
+        { color: '#f59e0b', label: 'Planned / In Progress', description: 'Projects that are planned or currently being worked on' },
+        { color: '#f97316', label: 'Guidance Required', description: 'Projects needing guidance or feedback' },
+        { color: '#22c55e', label: 'Completed', description: 'Fully completed projects' },
+        { color: '#86efac', label: 'Almost Done (99%)', description: 'Projects pending review or addressing discrepancies' },
+        { color: '#ef4444', label: 'Not Started', description: 'Projects that haven\'t started yet' },
+        { color: '#475569', label: 'On Hold', description: 'Projects temporarily suspended' },
+        { color: '#9ca3af', label: 'Cancelled', description: 'Cancelled or blocked projects' }
+    ];
+    
+    legendItems.forEach(item => {
+        const legendItem = document.createElement('div');
+        legendItem.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #374151;
+            border: 1px solid #4b5563;
+            border-radius: 6px;
+            min-width: 200px;
+        `;
+        
+        // Color indicator
+        const colorBox = document.createElement('div');
+        colorBox.style.cssText = `
+            width: 16px;
+            height: 16px;
+            background: ${item.color};
+            border: 2px solid ${item.color === '#f59e0b' ? '#d97706' : 
+                               item.color === '#f97316' ? '#ea580c' : 
+                               item.color === '#22c55e' ? '#16a34a' : 
+                               item.color === '#86efac' ? '#4ade80' : 
+                               item.color === '#ef4444' ? '#dc2626' : 
+                               item.color === '#475569' ? '#374151' : '#6b7280'};
+            border-radius: 4px;
+            flex-shrink: 0;
+        `;
+        
+        // Label and description
+        const textContainer = document.createElement('div');
+        textContainer.style.cssText = `
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        `;
+        
+        const label = document.createElement('span');
+        label.textContent = item.label;
+        label.style.cssText = `
+            font-weight: 600;
+            color: #f9fafb;
+            font-size: 14px;
+        `;
+        
+        const description = document.createElement('span');
+        description.textContent = item.description;
+        description.style.cssText = `
+            color: #d1d5db;
+            font-size: 12px;
+            margin-top: 2px;
+        `;
+        
+        textContainer.appendChild(label);
+        textContainer.appendChild(description);
+        
+        legendItem.appendChild(colorBox);
+        legendItem.appendChild(textContainer);
+        legend.appendChild(legendItem);
+    });
+    
+    return legend;
+}
+
 // Initialize Gantt chart when page loads
 document.addEventListener('DOMContentLoaded', () => {
     initializeTheme();
     listenForThemeChanges();
     loadGanttData();
-    
-    // Set all projects as expanded by default
-    setTimeout(() => {
-        if (ganttData.length > 0) {
-            ganttData.forEach(project => {
-                expandedProjects.add(project.id);
-            });
-            renderGanttChart();
-        }
-    }, 1000); // Wait for data to load
     
     // Handle window resize for responsive y-axis
     window.addEventListener('resize', () => {

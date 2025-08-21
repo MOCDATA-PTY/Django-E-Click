@@ -157,6 +157,18 @@
 
     <!-- Projects Grid -->
     <div class="projects-container">
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="loading-indicator" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Loading projects...</p>
+        </div>
+        
+        <!-- Database Connection Status -->
+        <div id="connection-status" class="connection-status" style="display: none;">
+            <div class="status-icon"></div>
+            <span class="status-text"></span>
+        </div>
+        
         {% for project in projects %}
         <div class="project-card" data-status="{{ project.status }}" data-name="{{ project.name|lower }}" data-client="{{ project.client|lower }}" data-project-id="{{ project.id }}" data-client-email="{{ project.client_email|default:'' }}" data-client-username="{{ project.client_username|default:'' }}">
             <div class="project-header">
@@ -697,6 +709,68 @@
         --shadow-lg: var(--shadow-medium);
         --radius: var(--radius-small);
         --radius-lg: var(--radius-medium);
+    }
+
+    /* Loading and Connection Status Styles */
+    .loading-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+        color: var(--text-secondary);
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid var(--border-light);
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .connection-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        margin: 1rem 0;
+        border-radius: var(--radius);
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .connection-status.success {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .connection-status.warning {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--warning);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .connection-status.error {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .status-icon {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: currentColor;
     }
 
     /* Base Styles */
@@ -2824,116 +2898,44 @@
         const form = document.getElementById('addTaskForm');
         const formData = new FormData(form);
         
-        // Create task item
-        const taskItem = document.createElement('div');
-        taskItem.className = 'task-item';
-        taskItem.innerHTML = `
-            <div class="task-header">
-                <div class="task-info">
-                    <h4>${formData.get('title')}</h4>
-                    <span class="task-status ${formData.get('status')}">${getStatusDisplay(formData.get('status'))}</span>
-                    <span class="task-development-status">${getDevelopmentStatusDisplay(formData.get('development_status'))}</span>
-                </div>
-                <div class="task-actions">
-                    <button type="button" class="btn btn-sm btn-info" onclick="toggleEditTask(${taskCounter})">Edit</button>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteTask(${taskCounter})">Delete</button>
-                </div>
-            </div>
-            
-            <!-- Task Edit Form (Hidden by default) -->
-            <div class="task-edit-form" id="task-edit-${taskCounter}" style="display: none;">
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="task_title_${taskCounter}">Task Title *</label>
-                        <input type="text" id="task_title_${taskCounter}" name="task_title_${taskCounter}" value="${formData.get('title')}" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="task_description_${taskCounter}">Description</label>
-                        <textarea id="task_description_${taskCounter}" name="task_description_${taskCounter}" rows="3">${formData.get('description')}</textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="task_status_${taskCounter}">Status *</label>
-                        <select id="task_status_${taskCounter}" name="task_status_${taskCounter}" required>
-                            <option value="not_started" ${formData.get('status') === 'not_started' ? 'selected' : ''}>Not Started</option>
-                            <option value="in_progress" ${formData.get('status') === 'in_progress' ? 'selected' : ''}>In Progress</option>
-                            <option value="completed" ${formData.get('status') === 'completed' ? 'selected' : ''}>Completed</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="task_development_status_${taskCounter}">Development Status *</label>
-                        <select id="task_development_status_${taskCounter}" name="task_development_status_${taskCounter}" required>
-                            <option value="original_quoted" ${formData.get('development_status') === 'original_quoted' ? 'selected' : ''}>Original/Quoted Development</option>
-                            <option value="new_development" ${formData.get('development_status') === 'new_development' ? 'selected' : ''}>New Development</option>
-                            <option value="new_development_qms" ${formData.get('development_status') === 'new_development_qms' ? 'selected' : ''}>New Development – QMS must be involved</option>
-                            <option value="new_development_qms_change" ${formData.get('development_status') === 'new_development_qms_change' ? 'selected' : ''}>New Development – QMS Change</option>
-                            <option value="new_quoted_development" ${formData.get('development_status') === 'new_quoted_development' ? 'selected' : ''}>New Development/Quoted Development</option>
-                            <option value="ongoing_development" ${formData.get('development_status') === 'ongoing_development' ? 'selected' : ''}>Ongoing Development</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="task_start_${taskCounter}">Start Date</label>
-                            <input type="date" id="task_start_${taskCounter}" name="task_start_${taskCounter}" value="${formData.get('start_date')}" onchange="validateTaskDates(${taskCounter})">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="task_end_${taskCounter}">End Date</label>
-                            <input type="date" id="task_end_${taskCounter}" name="task_end_${taskCounter}" value="${formData.get('end_date')}" onchange="validateTaskDates(${taskCounter})">
-                        </div>
-                    </div>
-                    
-                    <div class="date-validation-warning" id="task-date-validation-${taskCounter}" style="display: none;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                            <line x1="12" y1="9" x2="12" y2="13"></line>
-                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                        </svg>
-                        <span>Warning: End date cannot be before start date.</span>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="task_assigned_to_${taskCounter}">Assigned To</label>
-                        <select id="task_assigned_to_${taskCounter}" name="task_assigned_to_${taskCounter}" multiple>
-                            <!-- User options will be populated dynamically -->
-                        </select>
-                        <small>Hold Ctrl/Cmd to select multiple users</small>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeEditTask(${taskCounter})">Cancel</button>
-                        <button type="button" class="btn btn-primary" onclick="saveTaskEdit(${taskCounter})">Save Task</button>
-                    </div>
-                </form>
-            </div>
-            
-            <!-- Subtasks Section -->
-            <div class="subtasks-section">
-                <div class="subtasks-header">
-                    <h5>Subtasks:</h5>
-                    <button type="button" class="btn btn-xs btn-success" onclick="openAddSubtaskModal(${taskCounter})">+ Add Subtask</button>
-                </div>
-                <div class="subtasks-list" id="subtasks-${taskCounter}">
-                    <!-- Subtasks will be added here -->
-                </div>
-            </div>
-        `;
+        console.log('Submitting task form with data:', {
+            title: formData.get('title'),
+            status: formData.get('status'),
+            priority: formData.get('priority'),
+            development_status: formData.get('development_status'),
+            assigned_users: formData.getAll('assigned_users')
+        });
         
-        document.getElementById('project-tasks').appendChild(taskItem);
-        
-        // Populate user options for the newly created task
-        const userSelect = document.getElementById(`task_assigned_to_${taskCounter - 1}`);
-        if (userSelect) {
-            populateUserOptions(userSelect);
-        }
-        
-        taskCounter++;
-        updateSummary();
-        closeAddTaskModal();
+        fetch('{% url "add_task" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Task creation response:', data);
+            if (data.success) {
+                // Close the modal
+                closeAddTaskModal();
+                
+                // Clear the form
+                form.reset();
+                
+                // Show success message
+                showMessage('Task created successfully!', 'success');
+                
+                // Add the new task to the page without reloading
+                addTaskToPage(data.task_id, formData);
+            } else {
+                showMessage('Error creating task: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Error creating task. Please try again.', 'error');
+        });
     }
 
     // Add subtask from modal
@@ -3571,5 +3573,185 @@
     };
 
     // Theme will be handled by the global theme toggle in settings
+
+    // Database connection monitoring and loading states
+    function showLoadingIndicator() {
+        const loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'flex';
+        }
+    }
+
+    function hideLoadingIndicator() {
+        const loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+    }
+
+    function showConnectionStatus(status, message) {
+        const connectionStatus = document.getElementById('connection-status');
+        if (connectionStatus) {
+            connectionStatus.className = `connection-status ${status}`;
+            connectionStatus.querySelector('.status-text').textContent = message;
+            connectionStatus.style.display = 'flex';
+            
+            // Auto-hide success messages after 5 seconds
+            if (status === 'success') {
+                setTimeout(() => {
+                    connectionStatus.style.display = 'none';
+                }, 5000);
+            }
+        }
+    }
+
+    function checkDatabaseConnection() {
+        showLoadingIndicator();
+        
+        // Simple connection test by trying to fetch a small amount of data
+        fetch('{% url "projects_page" %}?refresh=true', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                showConnectionStatus('success', 'Database connection: Excellent');
+                hideLoadingIndicator();
+            } else {
+                showConnectionStatus('warning', 'Database connection: Slow response');
+                hideLoadingIndicator();
+            }
+        })
+        .catch(error => {
+            console.error('Connection error:', error);
+            showConnectionStatus('error', 'Database connection: Connection failed');
+            hideLoadingIndicator();
+        });
+    }
+
+    // Check connection on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show loading indicator initially
+        showLoadingIndicator();
+        
+        // Check connection status
+        setTimeout(() => {
+            checkDatabaseConnection();
+        }, 100);
+    });
+
+    // Add task to page function
+    function addTaskToPage(taskId, formData) {
+        // Get the existing tasks container
+        const existingTasks = document.querySelector('.existing-tasks');
+        
+        if (!existingTasks) {
+            console.error('Could not find .existing-tasks container');
+            return;
+        }
+        
+        // Create new task HTML
+        const taskHtml = `
+            <div class="task-item" data-task-id="${taskId}">
+                <div class="task-header">
+                    <div class="task-info">
+                        <h4>${formData.get('title')}</h4>
+                        <span class="task-status ${formData.get('status')}">${getStatusDisplay(formData.get('status'))}</span>
+                        <span class="task-priority ${formData.get('priority')}">${getPriorityDisplay(formData.get('priority'))}</span>
+                        <span class="task-development-status">${getDevelopmentStatusDisplay(formData.get('development_status'))}</span>
+                    </div>
+                    <div class="task-actions">
+                        <button type="button" class="btn btn-sm btn-info" onclick="toggleEditTask(${taskId})">Edit</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteTask(${taskId})">Delete</button>
+                    </div>
+                </div>
+                
+                <div class="task-description">
+                    <p>${formData.get('description') || ''}</p>
+                </div>
+                
+                <div class="task-details">
+                    <span class="task-dates">
+                        ${formData.get('start_date') && formData.get('end_date') ? 
+                            `${formatDate(formData.get('start_date'))} - ${formatDate(formData.get('end_date'))}` : 
+                            'No dates set'}
+                    </span>
+                    ${formData.getAll('assigned_users') && formData.getAll('assigned_users').length > 0 ?
+                        `<span class="task-assigned">Assigned: ${getUserDisplay(formData.getAll('assigned_users'))}</span>` :
+                        ''}
+                </div>
+                
+                <div class="subtasks-section">
+                    <div class="subtasks-header">
+                        <h5>Subtasks:</h5>
+                        <button type="button" class="btn btn-xs btn-success" onclick="openAddSubtaskModal(${taskId})">+ Add Subtask</button>
+                    </div>
+                    <div class="subtasks-list" style="display: none;">
+                        <!-- Subtasks will be added here -->
+                    </div>
+                    <p class="no-subtasks">No subtasks yet. Add one to get started.</p>
+                </div>
+            </div>
+        `;
+        
+        // Insert the new task at the beginning
+        existingTasks.insertAdjacentHTML('afterbegin', taskHtml);
+        
+        // Remove the "no tasks" message if it exists
+        const noTasks = existingTasks.querySelector('.no-tasks');
+        if (noTasks) {
+            noTasks.remove();
+        }
+        
+        console.log('Task added to page successfully:', taskId);
+    }
+
+    // Helper functions for task display
+    function getPriorityDisplay(priority) {
+        const priorityMap = {
+            'low': 'Low',
+            'medium': 'Medium',
+            'high': 'High',
+            'urgent': 'Urgent'
+        };
+        return priorityMap[priority] || priority;
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString();
+    }
+
+    function getUserDisplay(userIds) {
+        // This would need to be implemented based on your user data structure
+        return userIds.join(', ');
+    }
+
+    // Show message function
+    function showMessage(message, type) {
+        // Create message element
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message message-${type}`;
+        messageDiv.textContent = message;
+        
+        // Insert at the top of the page
+        const header = document.querySelector('.header');
+        if (header) {
+            header.parentNode.insertBefore(messageDiv, header);
+        } else {
+            // Fallback: add to body
+            document.body.insertBefore(messageDiv, document.body.firstChild);
+        }
+        
+        // Remove after 5 seconds
+        setTimeout(() => {
+            if (messageDiv.parentElement) {
+                messageDiv.remove();
+            }
+        }, 5000);
+    }
 </script>
 {% endblock %}

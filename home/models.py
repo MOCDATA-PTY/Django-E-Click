@@ -4,6 +4,40 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 import random
 import string
+import os
+
+
+def user_profile_picture_path(instance, filename):
+    """Custom upload path for user profile pictures: users/admin/profile.jpg or admin/adminname/profile.jpg"""
+    # Check if user is admin/staff
+    if instance.user.is_staff or instance.user.is_superuser:
+        base_folder = 'admin'
+    else:
+        base_folder = 'users'
+    
+    # Ensure the folder exists
+    user_folder = os.path.join(settings.MEDIA_ROOT, base_folder, instance.user.username)
+    os.makedirs(user_folder, exist_ok=True)
+    
+    return f'{base_folder}/{instance.user.username}/{filename}'
+
+
+def client_profile_picture_path(instance, filename):
+    """Custom upload path for client profile pictures: clients/clientname/profile.jpg"""
+    # Ensure the folder exists
+    client_folder = os.path.join(settings.MEDIA_ROOT, 'clients', instance.username)
+    os.makedirs(client_folder, exist_ok=True)
+    
+    return f'clients/{instance.username}/{filename}'
+
+
+def admin_profile_picture_path(instance, filename):
+    """Custom upload path for admin profile pictures: admin/adminname/profile.jpg"""
+    # Ensure the folder exists
+    admin_folder = os.path.join(settings.MEDIA_ROOT, 'admin', instance.user.username)
+    os.makedirs(admin_folder, exist_ok=True)
+    
+    return f'admin/{instance.user.username}/{filename}'
 
 
 class Project(models.Model):
@@ -187,7 +221,7 @@ class SubTaskComment(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to=user_profile_picture_path, blank=True, null=True)
     bio = models.TextField(max_length=500, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     address = models.TextField(blank=True)
@@ -315,7 +349,7 @@ class Client(models.Model):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128, blank=True)
-    profile_picture = models.ImageField(upload_to='client_profile_pictures/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to=client_profile_picture_path, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     has_changed_password = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -1592,3 +1626,178 @@ class AILearningMetrics(models.Model):
     
     def __str__(self):
         return f"AI Metrics - {self.total_conversations} conversations"
+
+
+# ============================================================================
+# SIGNALS FOR AUTOMATIC FOLDER CREATION
+# ============================================================================
+
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from django.conf import settings
+
+
+def create_user_folders(user, is_admin=False):
+    """Create profile picture folders for a user"""
+    try:
+        # Determine the base folder based on user type
+        if is_admin or user.is_staff or user.is_superuser:
+            base_folder = 'admin'
+        else:
+            base_folder = 'users'
+        
+        # Create the user's folder
+        user_folder = os.path.join(settings.MEDIA_ROOT, base_folder, user.username)
+        if not os.path.exists(user_folder):
+            os.makedirs(user_folder, exist_ok=True)
+            print(f"📁 Created folder: {base_folder}/{user.username}/")
+        
+        return user_folder
+    except Exception as e:
+        print(f"❌ Error creating folder for {user.username}: {e}")
+        return None
+
+
+def create_client_folders(client):
+    """Create profile picture folders for a client"""
+    try:
+        # Create the client's folder
+        client_folder = os.path.join(settings.MEDIA_ROOT, 'clients', client.username)
+        if not os.path.exists(client_folder):
+            os.makedirs(client_folder, exist_ok=True)
+            print(f"📁 Created folder: clients/{client.username}/")
+        
+        return client_folder
+    except Exception as e:
+        print(f"❌ Error creating folder for client {client.username}: {e}")
+        return None
+
+
+@receiver(post_save, sender=User)
+def create_user_profile_and_folders(sender, instance, created, **kwargs):
+    """Create UserProfile and folders when a User is created"""
+    if created:
+        # Create UserProfile
+        UserProfile.objects.get_or_create(user=instance)
+        
+        # Create folders
+        is_admin = instance.is_staff or instance.is_superuser
+        create_user_folders(instance, is_admin)
+        
+        print(f"✅ Created profile and folders for user: {instance.username}")
+
+
+@receiver(post_save, sender=User)
+def update_user_folders_on_status_change(sender, instance, **kwargs):
+    """Update user folders when admin status changes"""
+    if not kwargs.get('created', False):  # Only for updates, not creation
+        try:
+            # Check if admin status changed
+            old_instance = User.objects.get(pk=instance.pk)
+            if old_instance.is_staff != instance.is_staff or old_instance.is_superuser != instance.is_superuser:
+                # Admin status changed, reorganize folders
+                old_is_admin = old_instance.is_staff or old_instance.is_superuser
+                new_is_admin = instance.is_staff or instance.is_superuser
+                
+                if old_is_admin != new_is_admin:
+                    # Create new folder structure
+                    create_user_folders(instance, new_is_admin)
+                    print(f"🔄 Updated folder structure for {instance.username} (admin: {new_is_admin})")
+        except User.DoesNotExist:
+            pass  # User was just created
+
+
+@receiver(post_save, sender=Client)
+def create_client_folders_on_creation(sender, instance, created, **kwargs):
+    """Create folders when a Client is created"""
+    if created:
+        create_client_folders(instance)
+        print(f"✅ Created folders for client: {instance.username}")
+
+
+@receiver(post_save, sender=UserProfile)
+def ensure_user_folders_exist(sender, instance, created, **kwargs):
+    """Ensure user folders exist when UserProfile is created/updated"""
+    if created or instance.profile_picture:
+        # Ensure folders exist
+        is_admin = instance.user.is_staff or instance.user.is_superuser
+        create_user_folders(instance.user, is_admin)
+
+
+@receiver(post_delete, sender=User)
+def cleanup_user_folders(sender, instance, **kwargs):
+    """Clean up user folders when User is deleted"""
+    try:
+        # Determine folder path
+        if instance.is_staff or instance.is_superuser:
+            folder_path = os.path.join(settings.MEDIA_ROOT, 'admin', instance.username)
+        else:
+            folder_path = os.path.join(settings.MEDIA_ROOT, 'users', instance.username)
+        
+        # Remove folder if it exists and is empty
+        if os.path.exists(folder_path):
+            if not os.listdir(folder_path):  # Empty folder
+                os.rmdir(folder_path)
+                print(f"🗑️ Removed empty folder: {folder_path}")
+            else:
+                print(f"⚠️ Folder not empty, keeping: {folder_path}")
+    except Exception as e:
+        print(f"❌ Error cleaning up folders for {instance.username}: {e}")
+
+
+@receiver(post_delete, sender=Client)
+def cleanup_client_folders(sender, instance, **kwargs):
+    """Clean up client folders when Client is deleted"""
+    try:
+        folder_path = os.path.join(settings.MEDIA_ROOT, 'clients', instance.username)
+        
+        # Remove folder if it exists and is empty
+        if os.path.exists(folder_path):
+            if not os.listdir(folder_path):  # Empty folder
+                os.rmdir(folder_path)
+                print(f"🗑️ Removed empty folder: {folder_path}")
+            else:
+                print(f"⚠️ Folder not empty, keeping: {folder_path}")
+    except Exception as e:
+        print(f"❌ Error cleaning up folders for client {instance.username}: {e}")
+
+
+# ============================================================================
+# UTILITY FUNCTIONS FOR FOLDER MANAGEMENT
+# ============================================================================
+
+def ensure_all_user_folders_exist():
+    """Ensure all existing users have their folders created"""
+    print("🔍 Checking and creating user folders...")
+    
+    # Create folders for all existing users
+    for user in User.objects.all():
+        is_admin = user.is_staff or user.is_superuser
+        create_user_folders(user, is_admin)
+    
+    # Create folders for all existing clients
+    for client in Client.objects.all():
+        create_client_folders(client)
+    
+    print("✅ All user folders checked and created!")
+
+
+def cleanup_empty_folders():
+    """Remove empty profile picture folders"""
+    print("🧹 Cleaning up empty folders...")
+    
+    base_folders = ['admin', 'users', 'clients']
+    
+    for base_folder in base_folders:
+        base_path = os.path.join(settings.MEDIA_ROOT, base_folder)
+        if os.path.exists(base_path):
+            for user_folder in os.listdir(base_path):
+                user_folder_path = os.path.join(base_path, user_folder)
+                if os.path.isdir(user_folder_path) and not os.listdir(user_folder_path):
+                    try:
+                        os.rmdir(user_folder_path)
+                        print(f"🗑️ Removed empty folder: {base_folder}/{user_folder}/")
+                    except Exception as e:
+                        print(f"❌ Error removing {user_folder_path}: {e}")
+    
+    print("✅ Empty folder cleanup completed!")

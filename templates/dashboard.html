@@ -173,8 +173,8 @@
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 20px rgba(16, 185, 129, 0.3);
   }
 
-  /* Special styling for completed projects */
-  .gantt-bar[data-progress="100"] {
+  /* Special styling for completed projects - but status colors take precedence */
+  .gantt-bar[data-progress="100"]:not([data-status]) {
     background: #10b981 !important;
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
   }
@@ -830,23 +830,38 @@
                         </div>
                     </div>
 
-                    <!-- Legend -->
-                    <div class="mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-400">
-                        <div class="flex items-center gap-2">
-                            <div class="w-3 h-3 bg-blue-500 rounded"></div>
-                            <span>Project Timeline</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-3 h-3 bg-green-400 rounded"></div>
-                            <span>Weekly Tasks</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-3 h-3 bg-red-400 rounded"></div>
-                            <span>Overdue</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-3 h-3 bg-yellow-400 rounded"></div>
-                            <span>In Progress</span>
+                    <!-- Project Status Legend -->
+                    <div class="mt-4 p-4 bg-slate-800 rounded-lg border border-slate-700">
+                        <h3 class="text-sm font-semibold text-white mb-3 text-center">Project Status Legend</h3>
+                        <div class="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-300">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full border border-yellow-600"></div>
+                                <span>Planned / In Progress</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-orange-500 rounded-full border border-orange-600"></div>
+                                <span>Guidance Required</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-green-500 rounded-full border border-green-600"></div>
+                                <span>Completed</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-green-300 rounded-full border border-green-400"></div>
+                                <span>Almost Done (99%)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-red-500 rounded-full border border-red-600"></div>
+                                <span>Not Started</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-gray-600 rounded-full border border-gray-700"></div>
+                                <span>On Hold</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-gray-400 rounded-full border border-gray-500"></div>
+                                <span>Cancelled</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -877,6 +892,10 @@
 
     <script>
         // Dashboard State
+        // Force cache refresh - this will help ensure the updated code is loaded
+        console.log('🔄 CACHE BUSTING: Dashboard JavaScript loaded at:', new Date().toISOString());
+        console.log('🚀 NEW CODE VERSION: getStatusBarColors function is ready!');
+        
         let dashboardData = {
             projects: [],
             activities: [],
@@ -1329,6 +1348,7 @@
             const startDate = project.start_date || project.startDate || null;
             const endDate = project.end_date || project.endDate || null;
             const status = project.status || 'planning';
+            console.log('🔍 Project status for', project.name, ':', status);
             const weeks = project.weeks || project.weekly_tasks || [];
             
             // Calculate progress based on completed tasks vs total tasks
@@ -1511,16 +1531,17 @@
                     bar.style.width = Math.max(widthPercent * timelineWidth, 20) + 'px';
                     
                     // Determine week status based on task completion
-                    let weekStatus = 'not-started';
+                    let weekStatus = 'planned'; // Default to planned instead of not-started
                     if (tasks === 0) {
                         weekStatus = 'on-hold';
                     } else if (completed === tasks && tasks > 0) {
                         weekStatus = 'completed';
                     } else if (completed > 0) {
-                        weekStatus = 'in-progress';
+                        weekStatus = 'in_progress'; // Use underscore to match Project model
                     }
                     
                     // Use status-based colors for week bars
+                    console.log('📅 Week status determined:', weekStatus, 'tasks:', tasks, 'completed:', completed);
                     const statusColors = getStatusBarColors(weekStatus);
                     bar.style.background = statusColors.background;
                     bar.style.border = statusColors.border;
@@ -1550,15 +1571,22 @@
                     // Project bar
                     const status = timeline.dataset.status;
                     const progress = parseInt(timeline.dataset.progress) || 0;
+                    console.log('🎯 Creating project bar with status:', status, 'progress:', progress);
                     
                     bar.style.height = '20px';
                     bar.style.left = (startPercent * timelineWidth) + 'px';
                     bar.style.width = Math.max(widthPercent * timelineWidth, 40) + 'px';
                     
                     // Use status-based colors for the main bar
+                    console.log('🎯 About to call getStatusBarColors with status:', status);
                     const statusColors = getStatusBarColors(status);
+                    console.log('🎨 Got statusColors:', statusColors);
                     bar.style.background = statusColors.background;
                     bar.style.border = statusColors.border;
+                    // Force the styles with !important to override any CSS conflicts
+                    bar.setAttribute('style', `background: ${statusColors.background} !important; border: ${statusColors.border} !important; height: 20px; position: absolute; border-radius: 6px; transition: all 0.3s ease, background 0.8s ease; cursor: pointer; top: 8px; overflow: hidden; left: ${startPercent * timelineWidth}px; width: ${Math.max(widthPercent * timelineWidth, 40)}px;`);
+                    console.log('🎨 Applied colors to project bar:', status, 'background:', statusColors.background, 'border:', statusColors.border);
+                    console.log('🎨 Bar element style after setting:', bar.style.background, bar.style.border);
                     
                     // Add status data attributes for styling
                     bar.setAttribute('data-status', status);
@@ -2236,30 +2264,51 @@
         }
 
         function getStatusBarColors(status) {
+            // Debug logging to see what statuses are being passed
+            console.log('🎨 getStatusBarColors called with status:', status);
+            
+            // Force cache refresh - this will help ensure the updated code is loaded
+            console.log('🔄 CACHE BUSTING: getStatusBarColors function loaded at:', new Date().toISOString());
+            
             const colors = {
+                // Project model statuses (exact matches)
+                'planned': { background: '#f59e0b', border: '2px solid #d97706' },              // yellow-500 with yellow-600 border (for planned projects)
+                'in_progress': { background: '#f59e0b', border: '2px solid #d97706' },          // yellow-500 with yellow-600 border
+                'in_progress_guidance_required': { background: '#f97316', border: '2px solid #ea580c' }, // orange-500 with orange-600 border
+                'completed': { background: '#22c55e', border: '2px solid #16a34a' },            // green-500 with green-600 border
+                'completed_review_pending': { background: '#86efac', border: '2px solid #4ade80' }, // light green-300 with green-400 border (99% done)
+                'completed_data_discrepancy_addressing': { background: '#86efac', border: '2px solid #4ade80' }, // light green-300 with green-400 border (99% done)
+                
+                // Task model statuses (with hyphens for compatibility)
                 'not-started': { background: '#ef4444', border: '2px solid #dc2626' },           // red-500 with red-600 border
                 'not_started': { background: '#ef4444', border: '2px solid #dc2626' },           // red-500 with red-600 border
                 'in-progress': { background: '#f59e0b', border: '2px solid #d97706' },          // yellow-500 with yellow-600 border
-                'in_progress': { background: '#f59e0b', border: '2px solid #d97706' },          // yellow-500 with yellow-600 border
                 'in-progress-guidance-required': { background: '#f97316', border: '2px solid #ea580c' }, // orange-500 with orange-600 border
-                'in_progress_guidance_required': { background: '#f97316', border: '2px solid #ea580c' }, // orange-500 with orange-600 border
                 'waiting-feedback': { background: '#f97316', border: '2px solid #ea580c' },      // orange-500 with orange-600 border
                 'waiting_feedback': { background: '#f97316', border: '2px solid #ea580c' },      // orange-500 with orange-600 border
-                'completed': { background: '#22c55e', border: '2px solid #16a34a' },            // green-500 with green-600 border
-                'completed-review-pending': { background: '#22c55e', border: '2px solid #16a34a' }, // green-500 with green-600 border
-                'completed_review_pending': { background: '#22c55e', border: '2px solid #16a34a' }, // green-500 with green-600 border
-                'reviewing-completed': { background: '#22c55e', border: '2px solid #16a34a' },  // green-500 with green-600 border
-                'reviewing_completed': { background: '#22c55e', border: '2px solid #16a34a' },  // green-500 with green-600 border
-                'completed-data-discrepancy-addressing': { background: '#22c55e', border: '2px solid #16a34a' }, // green-500 with green-600 border
-                'completed_data_discrepancy_addressing': { background: '#22c55e', border: '2px solid #16a34a' }, // green-500 with green-600 border
+                'completed-review-pending': { background: '#86efac', border: '2px solid #4ade80' }, // light green-300 with green-400 border (99% done)
+                'reviewing-completed': { background: '#86efac', border: '2px solid #4ade80' },  // light green-300 with green-400 border (99% done)
+                'reviewing_completed': { background: '#86efac', border: '2px solid #4ade80' },  // light green-300 with green-400 border (99% done)
+                'completed-data-discrepancy-addressing': { background: '#86efac', border: '2px solid #4ade80' }, // light green-300 with green-400 border (99% done)
                 'on-hold': { background: '#475569', border: '2px solid #374151' },               // gray-600 with gray-700 border
                 'on_hold': { background: '#475569', border: '2px solid #374151' },               // gray-600 with gray-700 border
                 'cancelled': { background: '#9ca3af', border: '2px solid #6b7280' },            // gray-400 with gray-500 border
                 'planning': { background: '#f59e0b', border: '2px solid #d97706' },             // yellow-500 with yellow-600 border
                 'blocked': { background: '#ef4444', border: '2px solid #dc2626' }               // red-500 with red-600 border
             };
-            return colors[status] || { background: '#9ca3af', border: '2px solid #6b7280' }; // default gray
+            
+            const result = colors[status] || { background: '#9ca3af', border: '2px solid #6b7280' }; // default gray
+            console.log('🎨 Color result for status', status, ':', result);
+            console.log('🎨 NEW FUNCTION VERSION: This should show yellow for planned, orange for guidance required, etc.');
+            return result;
         }
+        
+        // Test the function immediately to ensure it's working
+        console.log('🧪 TESTING getStatusBarColors function:');
+        console.log('planned ->', getStatusBarColors('planned'));
+        console.log('in_progress ->', getStatusBarColors('in_progress'));
+        console.log('completed ->', getStatusBarColors('completed'));
+        console.log('unknown ->', getStatusBarColors('unknown'));
 
         function getPriorityIcon(priority) {
             const icons = {
