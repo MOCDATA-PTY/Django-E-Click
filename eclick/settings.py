@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 ROOT_URLCONF = 'eclick.urls'
@@ -143,5 +144,30 @@ STATICFILES_DIRS = [
 # Media files (User uploaded content)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Security Headers Configuration
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+
+# Cross-Origin Headers for Development
+if DEBUG:
+    # For development, use less restrictive COOP settings
+    SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
+else:
+    # For production, use strict COOP settings
+    SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+
+# Additional Security Headers
+SECURE_HSTS_SECONDS = 31536000  # 1 year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Content Security Policy (CSP) - Basic configuration
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com")
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com")
+CSP_IMG_SRC = ("'self'", "data:", "https:")
+CSP_FONT_SRC = ("'self'", "https:")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
