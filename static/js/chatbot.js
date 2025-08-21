@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initChatbot() {
+    console.log('Initializing chatbot...');
     const chatbotButton = document.getElementById('chatbot-button');
     const chatbotWindow = document.getElementById('chatbot-window');
     const chatbotClose = document.getElementById('chatbot-close');
@@ -13,7 +14,19 @@ function initChatbot() {
     const chatbotMessages = document.getElementById('chatbot-messages');
     const initialTimestamp = document.getElementById('initial-timestamp');
     
-    if (!chatbotButton || !chatbotWindow) return;
+    console.log('Chatbot elements found:', {
+        button: !!chatbotButton,
+        window: !!chatbotWindow,
+        close: !!chatbotClose,
+        form: !!chatbotForm,
+        input: !!chatbotInput,
+        messages: !!chatbotMessages
+    });
+    
+    if (!chatbotButton || !chatbotWindow) {
+        console.error('Required chatbot elements not found');
+        return;
+    }
     
     let isOpen = false;
     let messages = [];
@@ -58,23 +71,31 @@ function initChatbot() {
     
     // Toggle chatbot
     function toggleChatbot() {
+        console.log('Toggling chatbot, current state:', isOpen);
         isOpen = !isOpen;
         
         if (isOpen) {
-            chatbotWindow.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
-            chatbotWindow.classList.add('opacity-100', 'scale-100');
-            chatbotButton.classList.remove('scale-100');
-            chatbotButton.classList.add('scale-0');
+            console.log('Opening chatbot...');
+            chatbotWindow.classList.add('chatbot-open');
+            chatbotWindow.style.opacity = '1';
+            chatbotWindow.style.visibility = 'visible';
+            chatbotWindow.style.transform = 'scale(1) translateY(0)';
+            chatbotWindow.style.pointerEvents = 'auto';
+            chatbotButton.style.transform = 'scale(0)';
+            chatbotButton.style.opacity = '0';
             
             // Focus input
             setTimeout(() => {
                 if (chatbotInput) chatbotInput.focus();
             }, 300);
         } else {
-            chatbotWindow.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-            chatbotWindow.classList.remove('opacity-100', 'scale-100');
-            chatbotButton.classList.remove('scale-0');
-            chatbotButton.classList.add('scale-100');
+            chatbotWindow.classList.remove('chatbot-open');
+            chatbotWindow.style.opacity = '0';
+            chatbotWindow.style.visibility = 'hidden';
+            chatbotWindow.style.transform = 'scale(0.8) translateY(20px)';
+            chatbotWindow.style.pointerEvents = 'none';
+            chatbotButton.style.transform = 'scale(1)';
+            chatbotButton.style.opacity = '1';
         }
     }
     
@@ -126,11 +147,9 @@ function initChatbot() {
             normalizedInput.includes('switch to dark') ||
             normalizedInput.includes('make it dark')) {
           
-          // Properly set theme with localStorage
+          // Set theme with localStorage and apply it
           localStorage.setItem('theme', 'dark');
-          if (window.applyTheme) {
-              window.applyTheme('dark');
-          }
+          document.documentElement.classList.add('dark');
           return 'Switching to dark mode! 🌙 Enjoy the darker interface.';
         }
 
@@ -141,11 +160,9 @@ function initChatbot() {
             normalizedInput.includes('switch to light') ||
             normalizedInput.includes('make it light')) {
           
-          // Properly set theme with localStorage  
+          // Set theme with localStorage and apply it
           localStorage.setItem('theme', 'light');
-          if (window.applyTheme) {
-              window.applyTheme('light');
-          }
+          document.documentElement.classList.remove('dark');
           return 'Switching to light mode! ☀️ Enjoy the brighter interface.';
         }
 

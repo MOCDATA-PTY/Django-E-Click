@@ -172,10 +172,8 @@ body.dark {
 }
 
 .login-section {
-    position: relative;
     padding: 0 1rem;
     background: #ffffff;
-    overflow: hidden;
     transition: background-color 0.3s ease;
     min-height: 100vh;
 }
@@ -184,35 +182,9 @@ body.dark {
     background: #0f172a;
 }
 
-.animated-bg {
-    position: absolute;
-    inset: 0;
-    opacity: 0.05;
-    pointer-events: none;
-}
-
-.dark .animated-bg {
-    opacity: 0.1;
-}
-
-.animated-bg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.2));
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    position: relative;
-    z-index: 10;
 }
 
 .login-container {
@@ -240,10 +212,6 @@ body.dark {
     transform: translateY(0);
 }
 
-.logo-wrapper {
-    position: relative;
-}
-
 .logo-wrapper img {
     height: 80px;
     width: auto;
@@ -254,12 +222,20 @@ body.dark {
     transform: scale(1.05);
 }
 
-.logo-glow {
-    position: absolute;
-    inset: -8px;
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(59, 130, 246, 0.2));
-    border-radius: 12px;
-    filter: blur(20px);
+.logo-light {
+    display: block;
+}
+
+.logo-dark {
+    display: none;
+}
+
+.dark .logo-light {
+    display: none;
+}
+
+.dark .logo-dark {
+    display: block;
 }
 
 /* Header */

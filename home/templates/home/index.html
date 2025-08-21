@@ -6,21 +6,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home - E-click Technologies</title>
     
-    <!-- Tailwind CSS -->
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="E-click Technologies - Innovative software solutions for businesses. Custom development, database solutions, and cloud infrastructure.">
+    <meta name="keywords" content="software development, custom solutions, database, cloud infrastructure, business technology">
+    <meta name="author" content="E-click Technologies">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="E-click Technologies - Innovative Software Solutions">
+    <meta property="og:description" content="Custom software development, database solutions, and cloud infrastructure for modern businesses.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://eclick-technologies.com">
+    <meta property="og:image" content="/static/images/E%20Click%20Logo%20(1).png">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="/static/images/E%20Click%20Logo%20(1).png" as="image">
+    <link rel="preload" href="/static/images/E%20Click%20Logo%20(2).png" as="image">
+    
+    <!-- DNS Prefetch for External Resources -->
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    
+    <!-- Tailwind CSS (CDN - for development only) -->
+    <!-- Note: For production, install Tailwind as a PostCSS plugin or use the CLI -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Dark Mode Detection Script - Prevents Flash of Incorrect Theme -->
     <script>
         // Immediately detect and apply dark mode to prevent flash
         (function() {
-            const darkMode = localStorage.getItem('darkMode');
+            const theme = localStorage.getItem('theme');
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             
-            if (darkMode === 'true' || (darkMode === null && prefersDark)) {
+            if (theme === 'dark' || (theme === null && prefersDark)) {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
             }
+            
+            // Content is always visible - no theme transition needed
         })();
     </script>
     
@@ -46,14 +70,109 @@
     
     <!-- Prevent Flash of Incorrect Theme -->
     <style>
-        /* Hide content until theme is applied */
+        /* Performance optimizations */
+        * {
+            box-sizing: border-box;
+        }
+        
+        /* Optimize paint and layout operations */
+        .optimize-gpu {
+            transform: translateZ(0);
+            will-change: transform;
+        }
+        
+        /* Content is always visible - no theme transition hiding */
+        body {
+            opacity: 1 !important;
+        }
+        
+        /* Remove any theme transition effects */
         .theme-transition {
-            opacity: 0;
-            transition: opacity 0.1s ease-in-out;
+            opacity: 1 !important;
+            transition: none !important;
         }
         
         .theme-applied {
-            opacity: 1;
+            opacity: 1 !important;
+        }
+        
+        /* Force all content to be visible */
+        * {
+            opacity: 1 !important;
+        }
+        
+        /* Override any reveal animations */
+        .reveal-element,
+        .section-reveal,
+        .stagger-item {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+        
+        /* Chatbot specific styles */
+        #chatbot-window {
+            z-index: 9999 !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            transform-origin: bottom right !important;
+            min-height: 32rem !important;
+            max-height: 32rem !important;
+            overflow: hidden !important;
+            width: 20rem !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transform: scale(0.8) translateY(20px) !important;
+            pointer-events: none !important;
+        }
+        
+        #chatbot-messages {
+            max-height: 20rem !important;
+            overflow-y: auto !important;
+            scrollbar-width: thin !important;
+            scrollbar-color: rgba(156, 163, 175, 0.5) transparent !important;
+        }
+        
+        #chatbot-messages::-webkit-scrollbar {
+            width: 4px !important;
+        }
+        
+        #chatbot-messages::-webkit-scrollbar-track {
+            background: transparent !important;
+        }
+        
+        #chatbot-messages::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.5) !important;
+            border-radius: 2px !important;
+        }
+        
+        #chatbot-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7) !important;
+        }
+        
+        /* Chatbot open state */
+        #chatbot-window.chatbot-open {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: scale(1) translateY(0) !important;
+            pointer-events: auto !important;
+        }
+        
+        #chatbot-button {
+            z-index: 9999 !important;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+        
+        #chatbot-messages {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        #chatbot-messages p {
+            word-break: break-word;
+        }
+        
+        #chatbot-messages ul {
+            word-break: break-word;
         }
         
         /* Ensure smooth transitions after theme is applied */
@@ -66,38 +185,80 @@
             scroll-behavior: smooth;
         }
         
-        /* Enhanced section transitions */
+        /* Enhanced section transitions with GPU acceleration */
         section {
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateZ(0);
         }
         
         /* Smooth navigation link transitions */
         .nav-link {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
         }
         
         /* Enhanced hover effects for navigation */
         .nav-link:hover {
-            transform: translateY(-2px);
+            transform: translateY(-2px) translateZ(0);
         }
         
         /* Smooth section reveal animations */
         .section-reveal {
-            opacity: 0;
-            transform: translateY(30px);
+            opacity: 1 !important;
+            transform: translateY(0) translateZ(0) !important;
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, opacity;
         }
         
         .section-reveal.revealed {
-            opacity: 1;
-            transform: translateY(0);
+            opacity: 1 !important;
+            transform: translateY(0) translateZ(0) !important;
         }
         
         /* Staggered animation delays for child elements */
         .section-reveal .stagger-item {
-            opacity: 0;
-            transform: translateY(20px);
+            opacity: 1 !important;
+            transform: translateY(0) translateZ(0) !important;
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, opacity;
+        }
+        
+        /* Optimize image loading */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Lazy loading placeholder */
+        .lazy-placeholder {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        /* Optimize animations for reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Optimize for mobile performance */
+        @media (max-width: 768px) {
+            .section-reveal {
+                transition-duration: 0.4s;
+            }
+            
+            .nav-link:hover {
+                transform: none;
+            }
         }
         
         .section-reveal.revealed .stagger-item {
@@ -135,7 +296,7 @@
     <meta name="twitter:description" content="Revolutionary Software Solutions">
     <meta name="twitter:image" content="/static/images/E%20Click%20Logo%20(1).png">
 </head>
-<body class="transition-colors duration-300 theme-transition">
+<body class="transition-colors duration-300" style="font-display: swap;">
     <!-- Navigation -->
     
     
@@ -144,39 +305,17 @@
         
 <!-- Hero Section -->
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>E-Click Technologies</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          animation: {
-            pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-          }
-        }
-      }
-    }
-  </script>
-</head>
-<body class="antialiased">
-
 <!-- Navigation -->
 <nav class="fixed w-full z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg h-16" id="navbar">
  <div class="container mx-auto px-4 sm:px-6 lg:px-8 h-full">
    <div class="flex justify-between items-center h-full">
      <!-- Logo -->
-     <a href="#home" class="flex items-center gap-2 lg:gap-3 group">
-       <div class="relative">
-         <img src="/static/images/E%20Click%20Logo%20(1).png" alt="E-Click Logo" class="h-10 w-auto transition-transform duration-300 group-hover:scale-105 dark:hidden">
-         <img src="/static/images/E%20Click%20Logo%20(2).png" alt="E-Click Logo" class="h-10 w-auto transition-transform duration-300 group-hover:scale-105 hidden dark:block">
-       </div>
-     </a>
+         <a href="#home" class="flex items-center gap-2 lg:gap-3 group">
+      <div class="relative">
+        <img src="/static/images/E%20Click%20Logo%20(1).png" alt="E-Click Logo" class="h-10 w-auto transition-transform duration-300 group-hover:scale-105 dark:hidden" loading="eager" fetchpriority="high">
+        <img src="/static/images/E%20Click%20Logo%20(2).png" alt="E-Click Logo" class="h-10 w-auto transition-transform duration-300 group-hover:scale-105 hidden dark:block" loading="eager" fetchpriority="high">
+      </div>
+    </a>
      
      <!-- Desktop Navigation -->
      <div class="flex items-center gap-8">
@@ -235,8 +374,8 @@
           <!-- Company Logo -->
           <div class="flex items-center justify-center lg:justify-start reveal-element opacity-0 translate-y-10 transition-all duration-700">
             <div class="relative">
-              <img src="/static/images/E%20Click%20Logo%20(1).png" alt="E-Click Logo" class="h-24 w-auto lg:h-32 transition-transform duration-300 hover:scale-105 dark:hidden">
-              <img src="/static/images/E%20Click%20Logo%20(2).png" alt="E-Click Logo" class="h-24 w-auto lg:h-32 transition-transform duration-300 hover:scale-105 hidden dark:block">
+              <img src="/static/images/E%20Click%20Logo%20(1).png" alt="E-Click Logo" class="h-24 w-auto lg:h-32 transition-transform duration-300 hover:scale-105 dark:hidden" loading="eager" fetchpriority="high">
+              <img src="/static/images/E%20Click%20Logo%20(2).png" alt="E-Click Logo" class="h-24 w-auto lg:h-32 transition-transform duration-300 hover:scale-105 hidden dark:block" loading="eager" fetchpriority="high">
               <div class="absolute -inset-2 bg-gradient-to-r from-red-500/20 to-blue-500/20 rounded-xl blur-lg"></div>
             </div>
           </div>
@@ -761,24 +900,7 @@
   });
 </script>
 
-</body>
-</html>
-
 <!-- Services Section -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Services Section</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class'
-        }
-    </script>
-</head>
-<body class="bg-gray-50 dark:bg-gray-900">
 
 <section id="services" class="section-reveal py-20 bg-white dark:bg-gray-800 transition-colors duration-300">
     <div class="container mx-auto px-6">
@@ -916,55 +1038,17 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.classList.add('dark');
     }
     
-    // Toggle dark mode
-    darkModeToggle.addEventListener('click', function() {
-        document.documentElement.classList.toggle('dark');
-        localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
-    });
+    // Toggle dark mode (only if element exists)
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+    }
 });
 </script>
 
-</body>
-</html>
-
-<!-- Solutions Section -->  
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solutions Section</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    animation: {
-                        'fade-in': 'fadeIn 0.6s ease-out',
-                        'slide-up': 'slideUp 0.6s ease-out',
-                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite alternate',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' }
-                        },
-                        slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' }
-                        },
-                        pulseGlow: {
-                            '0%': { boxShadow: '0 0 5px rgba(239, 68, 68, 0.3)' },
-                            '100%': { boxShadow: '0 0 20px rgba(239, 68, 68, 0.6)' }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-</head>
-<body class="bg-gray-100 dark:bg-slate-800">
+<!-- Solutions Section -->
 
 <section id="solutions" class="section-reveal section-padding relative bg-white dark:bg-slate-900 transition-colors duration-300">
     <div class="container mx-auto px-4">
@@ -1381,6 +1465,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (darkModeToggle) {
         darkModeToggle.addEventListener('click', function() {
             document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
         });
     }
 });
@@ -1397,16 +1482,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 }
 
-.reveal-element {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
-.reveal-element.revealed {
-    opacity: 1;
-    transform: translateY(0);
-}
+        .reveal-element {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .reveal-element.revealed {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
 
 .tab-trigger.active {
     color: #dc2626;
@@ -1510,9 +1595,6 @@ button:focus {
 }
 </style>
 
-</body>
-</html>
-
 <!-- Clients Section -->
 
 
@@ -1562,6 +1644,7 @@ button:focus {
                         alt="FSA logo"
                         class="company-logo absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ease-in-out opacity-0"
                         loading="lazy"
+                        decoding="async"
                         style="image-rendering: crisp-edges; max-width: 85%; max-height: 85%; margin: auto;"
                         onload="this.style.opacity='1'; this.parentElement.querySelector('.company-fallback').style.display='none';"
                         onerror="this.style.display='none';"
@@ -1589,6 +1672,7 @@ button:focus {
                         alt="NAB logo"
                         class="company-logo absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ease-in-out opacity-0"
                         loading="lazy"
+                        decoding="async"
                         style="image-rendering: crisp-edges; max-width: 85%; max-height: 85%; margin: auto;"
                         onload="this.style.opacity='1'; this.parentElement.querySelector('.company-fallback').style.display='none';"
                         onerror="this.style.display='none';"
@@ -1616,6 +1700,7 @@ button:focus {
                         alt="Prokon logo"
                         class="company-logo absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ease-in-out opacity-0"
                         loading="lazy"
+                        decoding="async"
                         style="image-rendering: crisp-edges; max-width: 85%; max-height: 85%; margin: auto;"
                         onload="this.style.opacity='1'; this.parentElement.querySelector('.company-fallback').style.display='none';"
                         onerror="this.style.display='none';"
@@ -2128,24 +2213,68 @@ button:focus {
 </section>
 
     </main>
+
+    <!-- Chatbot Component -->
+    <div class="fixed bottom-4 right-4 z-50">
+        <button id="chatbot-button" class="bg-red-600 hover:bg-red-700 text-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+        </button>
+        
+        <div id="chatbot-window" class="absolute bottom-16 right-0 w-80 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 transition-all duration-300 z-50 transform origin-bottom-right">
+            <div class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-t-lg">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <div>
+                            <h3 class="font-semibold text-lg">E-Click Assistant</h3>
+                            <p class="text-sm opacity-90">Online • Ready to help!</p>
+                        </div>
+                    </div>
+                    <button id="chatbot-close" class="text-white hover:text-gray-200 transition-colors p-1 rounded-full hover:bg-white hover:bg-opacity-10">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="chatbot-messages" class="p-4 space-y-3 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+                <div class="flex justify-start">
+                    <div class="max-w-[85%] rounded-lg p-3 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 shadow-sm">
+                        <p class="text-sm leading-relaxed">👋 Hi there! I'm your E-Click Assistant. I can help you with:</p>
+                        <ul class="text-sm mt-2 space-y-1">
+                            <li>• Switching between light/dark mode</li>
+                            <li>• Information about our services</li>
+                            <li>• Contact details</li>
+                            <li>• General questions</li>
+                        </ul>
+                        <p class="text-xs mt-3 opacity-70">💡 <strong>Try saying "light mode" or "dark mode" to change the theme!</strong></p>
+                        <p class="text-xs mt-1 opacity-50" id="initial-timestamp"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="chatbot-form" class="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                <div class="flex gap-2">
+                    <input 
+                        id="chatbot-input" 
+                        type="text" 
+                        placeholder="Type your message..." 
+                        class="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:focus:ring-red-400 dark:focus:border-red-400 transition-colors"
+                    >
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
     
     <!-- Footer -->
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Footer Section</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class'
-        }
-    </script>
-</head>
-<body class="bg-gray-50 dark:bg-gray-900">
-
-<!-- Footer -->
 <footer class="bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 transition-colors duration-300">
     <div class="container mx-auto px-6">
         <!-- Main Footer Content -->
@@ -2280,453 +2409,198 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.classList.add('dark');
     }
     
-    // Toggle dark mode
-    darkModeToggle.addEventListener('click', function() {
-        document.documentElement.classList.toggle('dark');
-    });
+    // Toggle dark mode (only if element exists)
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+    }
 });
 </script>
 
-</body>
-</html>
-    
     <!-- Scroll to Top Button -->
     <button
-    id="scroll-to-top-btn"
-    class="fixed bottom-5 right-24 bg-red-600 hover:bg-red-700 text-white w-12 h-12 p-3 rounded-full shadow-md transition-opacity duration-300 z-40 opacity-0 pointer-events-none flex items-center justify-center"
-    aria-label="Scroll to top"
->
-    &uarr;
-</button>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const scrollToTopButton = document.getElementById('scroll-to-top-btn');
-    const bottomThreshold = 100; // Show button after scrolling 100 pixels from bottom
-
-    // Show/hide button on scroll
-    window.addEventListener('scroll', function() {
-        // Check if the user is near the bottom of the page
-        const isAtBottom = (window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - bottomThreshold;
-
-        if (isAtBottom) {
-            scrollToTopButton.classList.add('opacity-100');
-            scrollToTopButton.classList.remove('opacity-0', 'pointer-events-none');
-        } else {
-            scrollToTopButton.classList.add('opacity-0', 'pointer-events-none');
-            scrollToTopButton.classList.remove('opacity-100');
-        }
-    });
-
-    // Scroll to top on button click
-    scrollToTopButton.addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth' // Smooth scroll animation
-        });
-    });
-});
-</script> 
-    
-    <!-- Chatbot -->
-    
-
-<!-- Chatbot Component -->
-<div id="chatbot-container" class="relative">
-    <!-- Chat button -->
-    <button
-        id="chatbot-button"
-        class="fixed bottom-20 sm:bottom-24 md:bottom-28 right-20 sm:right-24 md:right-28 z-50 animate-float"
-        aria-label="Open chat"
+        id="scroll-to-top-btn"
+        class="fixed bottom-5 right-20 bg-red-600 hover:bg-red-700 text-white w-12 h-12 p-3 rounded-full shadow-md transition-opacity duration-300 z-40 hidden flex items-center justify-center"
+        aria-label="Scroll to top"
+        style="display: none;"
     >
-        <div class="p-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg flex items-center justify-center">
-            <img src="/static/images/GIU%20AMA%20255-07.jpg" alt="Robot Icon" class="w-[96px] h-[96px] sm:w-[115px] sm:h-[115px]"/>
-        </div>
+        &uarr;
     </button>
 
-    <!-- Speech Bubble -->
-    <div
-        id="chatbot-bubble"
-        class="fixed z-40 p-2 sm:p-3 bg-white dark:bg-gray-700 rounded-xl shadow-md text-slate-700 dark:text-slate-200 text-xs sm:text-sm pointer-events-none opacity-100 transition-opacity duration-300"
-        style="bottom: calc(var(--button-bottom, 112px) + 80px); left: calc(var(--button-left, 112px) + 80px);"
-    >
-        How can I help you?
-    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const scrollToTopButton = document.getElementById('scroll-to-top-btn');
 
-    <!-- Chat window -->
-    <div
-        id="chatbot-window"
-        class="fixed bottom-5 right-5 w-80 sm:w-96 h-[500px] max-h-[80vh] bg-white dark:bg-gray-900 rounded-lg shadow-xl flex flex-col z-50 transition-all duration-300 opacity-0 scale-95 pointer-events-none"
-    >
-        <!-- Header -->
-        <div class="bg-red-600 dark:bg-accent text-white p-4 flex justify-between items-center flex-shrink-0">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center">
-                    <!-- Small robot icon for header -->
-                    <svg class="w-5 h-5 text-red-600 dark:text-accent" fill="currentColor" viewBox="0 0 20 20">
-                        <rect x="6" y="4" width="8" height="6" rx="1"/>
-                        <circle cx="8.5" cy="6.5" r="0.8" fill="white"/>
-                        <circle cx="11.5" cy="6.5" r="0.8" fill="white"/>
-                        <rect x="8.5" y="8.5" width="3" height="0.8" rx="0.4" fill="white"/>
-                        <rect x="9.7" y="2" width="0.6" height="2" rx="0.3"/>
-                        <circle cx="10" cy="1.5" r="0.8"/>
-                        <rect x="7" y="10" width="6" height="6" rx="0.5"/>
-                        <rect x="4" y="11" width="3" height="1.5" rx="0.5"/>
-                        <rect x="13" y="11" width="3" height="1.5" rx="0.5"/>
-                        <rect x="8" y="16" width="1.5" height="2.5" rx="0.3"/>
-                        <rect x="10.5" y="16" width="1.5" height="2.5" rx="0.3"/>
-                    </svg>
-                </div>
-                <h3 class="font-semibold">E-click Support</h3>
-            </div>
-            <div class="flex items-center gap-2">
-                <button
-                    id="chatbot-close"
-                    class="text-white hover:text-red-200"
-                    aria-label="Close chat"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
+        // Show/hide button on scroll
+        window.addEventListener('scroll', function() {
+            const scrollPosition = window.pageYOffset;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            
+            // Show button when user has scrolled at least 50% of the page height or 800px, whichever is greater
+            const scrollThreshold = Math.max(documentHeight * 0.5, 800);
+            
+            if (scrollPosition > scrollThreshold) {
+                scrollToTopButton.style.display = 'flex';
+                scrollToTopButton.classList.remove('hidden');
+            } else {
+                scrollToTopButton.style.display = 'none';
+                scrollToTopButton.classList.add('hidden');
+            }
+        });
 
-        <!-- Messages -->
-        <div id="chatbot-messages" class="flex-1 overflow-y-auto p-3 bg-gray-50 dark:bg-gray-800 flex-grow">
-            <div class="mb-2 flex justify-start">
-                <div class="max-w-[80%] rounded-lg p-2.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100">
-                    <p class="text-sm leading-snug">Hello! I'm your E-click assistant. Would you like to use light mode or dark mode?</p>
-                    <p class="text-xs mt-0.5 opacity-70" id="initial-timestamp"></p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Input area -->
-        <form id="chatbot-form" class="border-t border-gray-200 dark:border-gray-700 p-3 flex-shrink-0 flex">
-            <input
-                id="chatbot-input"
-                type="text"
-                placeholder="Type your message..."
-                class="flex-1 bg-white dark:bg-gray-700 border border-red-200 dark:border-gray-600 text-gray-800 dark:text-white placeholder-gray-400 rounded-l-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-red-500 dark:focus:ring-accent"
-            />
-            <button
-                type="submit"
-                class="bg-red-600 hover:bg-red-700 dark:bg-accent hover:dark:bg-accent-dark text-white px-4 py-2 rounded-r-md transition-colors"
-                disabled
-            >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                </svg>
-            </button>
-        </form>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const chatbotButton = document.getElementById('chatbot-button');
-    const chatbotWindow = document.getElementById('chatbot-window');
-    const chatbotCloseButton = document.getElementById('chatbot-close');
-    const chatbotForm = document.getElementById('chatbot-form');
-    const chatbotInput = document.getElementById('chatbot-input');
-    const chatbotMessages = document.getElementById('chatbot-messages');
-    const sendButton = chatbotForm.querySelector('button[type="submit"]');
-    const initialTimestamp = document.getElementById('initial-timestamp');
-    const chatbotBubble = document.getElementById('chatbot-bubble');
-
-    // Function to format timestamp
-    function formatTimestamp(date) {
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const formattedHours = hours % 12 || 12;
-        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-        return `${formattedHours}:${formattedMinutes} ${ampm}`;
-    }
-
-    // Set initial message timestamp
-    if (initialTimestamp) {
-        initialTimestamp.textContent = formatTimestamp(new Date());
-    }
-
-    // Function to update bubble position based on button position
-    function updateBubblePosition() {
-        const chatbotContainerRect = document.getElementById('chatbot-container').getBoundingClientRect();
-        const buttonRect = chatbotButton.getBoundingClientRect();
-        const bubbleRect = chatbotBubble.getBoundingClientRect();
-        
-        // Adjust these offsets as needed to fine-tune bubble position relative to the robot
-        const offsetX = -bubbleRect.width + 20; // Increased distance from left edge of robot (20px gap)
-        const verticalOffsetFromButtonTop = 0; // Align bottom of bubble with top of robot
-        
-        // Calculate bubble position relative to the viewport
-        // Position bubble's right edge relative to the button's left edge
-        const bubbleLeft = buttonRect.left + offsetX;
-        // Position bubble's bottom edge relative to the button's top edge
-        const bubbleBottom = window.innerHeight - (buttonRect.top + verticalOffsetFromButtonTop);
-
-        // Apply position using style properties
-         chatbotBubble.style.left = `${bubbleLeft}px`;
-         chatbotBubble.style.bottom = `${bubbleBottom}px`;
-
-        // Also adjust visibility/opacity if needed based on button visibility
-        if (chatbotButton.style.display === 'none' || chatbotButton.classList.contains('opacity-0')) {
-             chatbotBubble.classList.add('opacity-0', 'pointer-events-none');
-        } else {
-             chatbotBubble.classList.remove('opacity-0', 'pointer-events-none');
-        }
-
-    }
-
-    // Initial bubble positioning and update on window resize/scroll
-    updateBubblePosition();
-    window.addEventListener('resize', updateBubblePosition);
-    // May need more event listeners if the button's position changes without resize/scroll
-
-
-    // Function to open the chatbot window
-    function openChat() {
-        chatbotWindow.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
-        chatbotWindow.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
-        // Hide the chatbot button by making it invisible and not interactable
-        chatbotButton.classList.add('opacity-0', 'pointer-events-none');
-        chatbotBubble.classList.add('opacity-0', 'pointer-events-none'); // Hide bubble when chat opens
-    }
-
-    // Function to close the chatbot window
-    function closeChat() {
-        chatbotWindow.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
-        chatbotWindow.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-        // Show the chatbot button by making it visible and interactable
-        chatbotButton.classList.remove('opacity-0', 'pointer-events-none');
-        chatbotBubble.classList.remove('opacity-0', 'pointer-events-none'); // Show bubble when chat closes
-        updateBubblePosition(); // Update bubble position when showing again
-    }
-
-    // Event listeners
-    chatbotButton.addEventListener('click', openChat);
-    chatbotCloseButton.addEventListener('click', closeChat);
-
-    // Enable send button when input is not empty
-    chatbotInput.addEventListener('input', function() {
-        sendButton.disabled = chatbotInput.value.trim() === '';
+        // Scroll to top on button click
+        scrollToTopButton.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth' // Smooth scroll animation
+            });
+        });
     });
+    </script>
 
-    // Function to add a message to the chat window
-    function addChatMessage(message, isUser = false) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `mb-2 flex ${isUser ? 'justify-end' : 'justify-start'}`;
-        const timestamp = formatTimestamp(new Date());
-        messageDiv.innerHTML = `
-            <div class="max-w-[80%] rounded-lg p-2.5 ${isUser ? 'bg-red-500 text-white' : 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-100'}">
-                <p class="text-sm leading-snug">${message}</p>
-                <p class="text-xs mt-0.5 opacity-70 ${isUser ? 'text-red-100' : 'text-gray-600 dark:text-gray-300'}">${timestamp}</p>
-            </div>
-        `;
-        chatbotMessages.appendChild(messageDiv);
-        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
-    }
-
-    // Function to handle user input for theme switching
-    function handleThemeInput(input) {
-        const normalizedInput = input.toLowerCase().trim();
-
-        if (normalizedInput.includes('dark') ||
-            normalizedInput.includes('night') ||
-            normalizedInput.includes('dark mode') ||
-            normalizedInput.includes('i want dark') ||
-            normalizedInput.includes('switch to dark') ||
-            normalizedInput.includes('make it dark')) {
-          
-          // Properly set theme with localStorage
-          localStorage.setItem('theme', 'dark');
-          window.applyTheme('dark');
-          addChatMessage('Switching to dark mode! 🌙 Enjoy the darker interface.');
-          return;
-        }
-
-        if (normalizedInput.includes('light') ||
-            normalizedInput.includes('day') ||
-            normalizedInput.includes('light mode') ||
-            normalizedInput.includes('i want light') ||
-            normalizedInput.includes('switch to light') ||
-            normalizedInput.includes('make it light')) {
-          
-          // Properly set theme with localStorage  
-          localStorage.setItem('theme', 'light');
-          window.applyTheme('light');
-          addChatMessage('Switching to light mode! ☀️ Enjoy the brighter interface.');
-          return;
-        }
-
-        addChatMessage('I\'m not sure what theme you want. Please try saying something like "I want dark mode" or "Switch to light mode".');
-    }
-
-    // Handle form submission
-    chatbotForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const userMessage = chatbotInput.value.trim();
-        if (userMessage) {
-            addChatMessage(userMessage, true);
-            handleThemeInput(userMessage);
-            chatbotInput.value = '';
-            sendButton.disabled = true;
-        }
-    });
-
-    // Add an event listener to reposition the bubble when the button's animation frame updates
-    // This is a bit hacky, but needed because the button's position changes due to the animation
-    let animationFrameId;
-    function animateBubblePosition() {
-        updateBubblePosition();
-        animationFrameId = requestAnimationFrame(animateBubblePosition);
-    }
-    
-    // Start observing the button's animation
-    // We need a way to observe the transform change due to animation. MutationObserver isn't ideal for transforms.
-    // requestAnimationFrame is the most reliable way to track the animated position.
-    animateBubblePosition();
-
-    // Stop the animation frame loop when the window is closed or navigated away
-    window.addEventListener('beforeunload', function() {
-        cancelAnimationFrame(animationFrameId);
-    });
-
-});
-
-// Theme Toggle JavaScript - Final Fixed Version  
-document.addEventListener('DOMContentLoaded', function () {     
-    initThemeToggle(); 
-});  
-
-function initThemeToggle() {     
-    const themeToggle = document.getElementById('theme-toggle');     
-    const mobileThemeToggle = document.getElementById('mobile-theme-toggle');      
-
-    // Use localStorage or system preference     
-    let currentTheme = localStorage.getItem('theme') ||         
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');      
-
-    applyTheme(currentTheme);      
-
-    function applyTheme(theme) {         
-        if (theme === 'dark') {             
-            document.documentElement.classList.add('dark');         
-        } else {             
-            document.documentElement.classList.remove('dark');         
-        }          
-
-        // Desktop icons         
-        const sunIcon = document.getElementById('sun-icon');         
-        const moonIcon = document.getElementById('moon-icon');          
-
-        if (sunIcon && moonIcon) {             
-            sunIcon.classList.toggle('opacity-100', theme === 'dark');             
-            sunIcon.classList.toggle('opacity-0', theme !== 'dark');             
-            moonIcon.classList.toggle('opacity-0', theme === 'dark');             
-            moonIcon.classList.toggle('opacity-100', theme !== 'dark');         
-        }          
-
-        // Mobile icons         
-        if (mobileThemeToggle) {             
-            const mobileSunIcon = mobileThemeToggle.querySelector('svg:first-child');             
-            const mobileMoonIcon = mobileThemeToggle.querySelector('svg:last-child');              
-
-            if (mobileSunIcon && mobileMoonIcon) {                 
-                mobileSunIcon.classList.toggle('hidden', theme !== 'dark');                 
-                mobileSunIcon.classList.toggle('block', theme === 'dark');                 
-                mobileMoonIcon.classList.toggle('hidden', theme === 'dark');                 
-                mobileMoonIcon.classList.toggle('block', theme !== 'dark');             
-            }         
-        }     
-    }      
-
-    function toggleTheme() {         
-        currentTheme = currentTheme === 'dark' ? 'light' : 'dark';         
-        localStorage.setItem('theme', currentTheme);         
-        applyTheme(currentTheme);     
-    }      
-
-    if (themeToggle) themeToggle.addEventListener('click', toggleTheme);     
-    if (mobileThemeToggle) mobileThemeToggle.addEventListener('click', toggleTheme);      
-
-    // Listen for system preference change if no saved theme     
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');     
-    mediaQuery.addEventListener('change', (e) => {         
-        if (!localStorage.getItem('theme')) {             
-            const systemTheme = e.matches ? 'dark' : 'light';             
-            currentTheme = systemTheme;             
-            applyTheme(systemTheme);         
-        }     
-    });      
-
-    // Expose applyTheme globally so chatbot can use it     
-    window.applyTheme = applyTheme; 
-}
-</script>
-
-<style>
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-5px);
-    }
-}
-
-.animate-float {
-    animation: float 3s ease-in-out infinite;
-}
-
-/* Remove all transitions from the button except the float animation */
-#chatbot-button {
-    transition-property: opacity, transform; /* Allow opacity and transform transitions */
-    transition-duration: 300ms; /* Match chat window transition */
-    transition-timing-function: ease-in-out; /* Smooth timing */
-}
-
-#chatbot-button:hover {
-    transform: none !important; /* Still prevent hover transform */
-}
-
-/* Simple tail for the speech bubble */
-#chatbot-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -7px; /* Position at the bottom edge of the bubble */
-    right: 15px; /* Adjust horizontally to point towards the robot */
-    width: 0;
-    height: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-top: 7px solid #fff; /* Tail color matches bubble background, points down */
-    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1)); /* Optional shadow for the tail */
-}
-
-/* Dark mode tail color */
-.dark #chatbot-bubble::after {
-     border-top-color: #374151; /* Dark mode tail color */
-}
-</style>
-    
     <!-- JavaScript -->
     <script src="/static/js/main.js"></script>
     <script src="/static/js/theme.js"></script>
     <script src="/static/js/chatbot.js"></script>
     
-    <!-- Remove theme transition class to show content -->
+    <!-- Test chatbot loading -->
     <script>
-        // Remove the theme-transition class to show content smoothly
+        console.log('Chatbot.js should be loaded now');
+        if (typeof initChatbot === 'function') {
+            console.log('initChatbot function is available');
+        } else {
+            console.log('initChatbot function not found - using backup chatbot');
+        }
+    </script>
+    
+    <!-- Chatbot Enhancement -->
+    <script>
+        // Ensure chatbot works properly with the main chatbot.js
         document.addEventListener('DOMContentLoaded', function() {
-            // Small delay to ensure theme is fully applied
-            setTimeout(function() {
-                document.body.classList.remove('theme-transition');
-                document.body.classList.add('theme-applied');
-            }, 50);
+            console.log('Chatbot enhancement script loaded');
+            
+            // Wait a bit for the main chatbot.js to initialize
+            setTimeout(() => {
+                const chatbotButton = document.getElementById('chatbot-button');
+                const chatbotWindow = document.getElementById('chatbot-window');
+                
+                if (chatbotButton && chatbotWindow) {
+                    console.log('Chatbot elements found, ensuring proper functionality');
+                    
+                    // Remove any conflicting styles that might prevent expansion
+                    chatbotWindow.style.removeProperty('visibility');
+                    chatbotWindow.style.removeProperty('display');
+                    
+                    // Ensure the chatbot can be opened
+                    chatbotButton.addEventListener('click', function(e) {
+                        console.log('Chatbot button clicked');
+                        // Let the main chatbot.js handle the toggle
+                    });
+                }
+            }, 100);
         });
     </script>
+    
+    <!-- Performance Optimization Scripts -->
+    <script>
+        // Content is always visible - no theme transition needed
+        
+        // Lazy loading for images with Intersection Observer
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lazy load images
+            const lazyImages = document.querySelectorAll('img[loading="lazy"]');
+            
+            if ('IntersectionObserver' in window) {
+                const imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            img.src = img.src; // Trigger load
+                            img.classList.remove('lazy');
+                            imageObserver.unobserve(img);
+                        }
+                    });
+                }, {
+                    rootMargin: '50px 0px',
+                    threshold: 0.01
+                });
+                
+                lazyImages.forEach(img => imageObserver.observe(img));
+            }
+            
+            // Preload critical images
+            const criticalImages = [
+                '/static/images/E%20Click%20Logo%20(1).png',
+                '/static/images/E%20Click%20Logo%20(2).png'
+            ];
+            
+            criticalImages.forEach(src => {
+                const link = document.createElement('link');
+                link.rel = 'preload';
+                link.as = 'image';
+                link.href = src;
+                document.head.appendChild(link);
+            });
+            
+            // Optimize scroll performance
+            let ticking = false;
+            
+            function updateScroll() {
+                // Update scroll-based animations here
+                ticking = false;
+            }
+            
+            function requestTick() {
+                if (!ticking) {
+                    requestAnimationFrame(updateScroll);
+                    ticking = true;
+                }
+            }
+            
+            window.addEventListener('scroll', requestTick, { passive: true });
+            
+            // Service Worker registration for caching
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/static/sw.js')
+                        .then(registration => {
+                            // Service worker registered successfully
+                        })
+                        .catch(registrationError => {
+                            // Service worker registration failed silently
+                        });
+                });
+            }
+        });
+        
+        // Performance monitoring (silent - no console logs)
+        window.addEventListener('load', function() {
+            // Monitor Core Web Vitals silently
+            if ('PerformanceObserver' in window) {
+                const observer = new PerformanceObserver((list) => {
+                    for (const entry of list.getEntries()) {
+                        // Store metrics for potential use but don't log to console
+                        if (entry.entryType === 'largest-contentful-paint') {
+                            window.lcp = entry.startTime;
+                        }
+                        if (entry.entryType === 'first-input') {
+                            window.fid = entry.processingStart - entry.startTime;
+                        }
+                        if (entry.entryType === 'layout-shift') {
+                            window.cls = entry.value;
+                        }
+                    }
+                });
+                
+                observer.observe({ entryTypes: ['largest-contentful-paint', 'first-input', 'layout-shift'] });
+            }
+        });
+    </script>
+    
+    <!-- Content is always visible - no theme transition needed -->
     
     <!-- Smooth Section Transitions and Reveal Animations -->
     <script>
@@ -2795,37 +2669,9 @@ function initThemeToggle() {
                 });
             });
             
-            // Smooth scroll to top functionality
-            const scrollToTopBtn = document.createElement('button');
-            scrollToTopBtn.innerHTML = `
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
-                </svg>
-            `;
-            scrollToTopBtn.className = 'fixed bottom-8 right-8 z-50 p-3 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg transition-all duration-300 opacity-0 pointer-events-none hover:scale-110';
-            scrollToTopBtn.id = 'scrollToTop';
-            document.body.appendChild(scrollToTopBtn);
-            
-            // Show/hide scroll to top button
-            window.addEventListener('scroll', function() {
-                if (window.pageYOffset > 300) {
-                    scrollToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
-                    scrollToTopBtn.classList.add('opacity-100');
-                } else {
-                    scrollToTopBtn.classList.add('opacity-0', 'pointer-events-none');
-                    scrollToTopBtn.classList.remove('opacity-100');
-                }
-            });
-            
-            // Scroll to top functionality
-            scrollToTopBtn.addEventListener('click', function() {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
+            // Scroll to top functionality is handled by the existing HTML button
         });
     </script>
-    
+
 </body>
 </html>
