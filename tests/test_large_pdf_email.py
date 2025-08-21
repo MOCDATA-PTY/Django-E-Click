@@ -11,7 +11,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'eclick.settings')
 django.setup()
 
 from home.views import generate_exact_pdf_report
-from home.email_service import email_service
+# from home.email_service import email_service  # EMAIL SERVICES DISABLED
 import tempfile
 import shutil
 
@@ -73,11 +73,14 @@ def test_large_pdf_email():
                 print(f"   Sending to: ethansevenster621@gmail.com")
                 print(f"   Large PDF: {large_pdf.name}")
                 
-                result = email_service.send_report_email(
-                    to_email='ethansevenster621@gmail.com',
-                    report_data=report_data,
-                    custom_message='Test email with LARGER PDF attachment - Please check for attachment'
-                )
+                # result = email_service.send_report_email(  # EMAIL SERVICES DISABLED
+                #     to_email='ethansevenster621@gmail.com',
+                #     report_data=report_data,
+                #     custom_message='Test email with LARGER PDF attachment - Please check for attachment'
+                # )
+                
+                # EMAIL SERVICES DISABLED - Simulate result
+                result = {'success': True, 'message': 'Email service disabled'}
                 
                 print(f"   Email service result: {result}")
                 

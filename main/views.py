@@ -7,7 +7,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.backends import ModelBackend
 from django.contrib import messages
-from django.core.mail import send_mail
+# from django.core.mail import send_mail  # EMAIL SERVICES DISABLED
 from django.template.loader import render_to_string
 from django.conf import settings
 from .models import User, Project, Activity, Task, ProjectWeek, WeeklyTask, TaskUpdate, SystemLog, UserPermission
@@ -1868,14 +1868,17 @@ def send_project_report_email(request, project_id):
             The Project Management Team
             """
             
-            # Send email with PDF attachment
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[recipient_email],
-                fail_silently=False,
-            )
+            # Send email with PDF attachment - EMAIL SERVICES DISABLED
+            # send_mail(  # EMAIL SERVICES DISABLED
+            #     subject=subject,
+            #     message=message,
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     recipient_list=[recipient_email],
+            #     fail_silently=False,
+            # )
+            
+            # EMAIL SERVICES DISABLED - Log instead
+            print(f"EMAIL DISABLED: Would have sent report to {recipient_email}")
             
             # Clean up the temporary file
             os.remove(filename)
@@ -1930,13 +1933,16 @@ def contact_project_owner(request, project_id):
             - Progress: {project.progress}%
             """
             
-            send_mail(
-                subject=f'Project Inquiry: {subject}',
-                message=email_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[project.created_by.email],
-                fail_silently=False,
-            )
+            # send_mail(  # EMAIL SERVICES DISABLED
+            #     subject=f'Project Inquiry: {subject}',
+            #     message=email_message,
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     recipient_list=[project.created_by.email],
+            #     fail_silently=False,
+            # )
+            
+            # EMAIL SERVICES DISABLED - Log instead
+            print(f"EMAIL DISABLED: Would have sent inquiry to {project.created_by.email}")
             
             # Log the contact
             SystemLog.log_action(
@@ -1991,14 +1997,17 @@ def send_client_email_ajax(request):
             The Project Management Team
             """
             
-            # Send email with PDF attachment
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[client_email],
-                fail_silently=False,
-            )
+            # Send email with PDF attachment - EMAIL SERVICES DISABLED
+            # send_mail(  # EMAIL SERVICES DISABLED
+            #     subject=subject,
+            #     message=message,
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     recipient_list=[client_email],
+            #     fail_silently=False,
+            # )
+            
+            # EMAIL SERVICES DISABLED - Log instead
+            print(f"EMAIL DISABLED: Would have sent report to {client_email}")
             
             # Clean up the temporary file
             os.remove(filename)

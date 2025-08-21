@@ -37,30 +37,30 @@ CSRF_TRUSTED_ORIGINS = [
 # Login URL for @login_required decorator
 LOGIN_URL = '/login/'
 
-# Email Configuration - Using OAuth2 for mocdatapty@gmail.com (NO SMTP FALLBACK)
+# Email Configuration - EMAIL SERVICES DISABLED
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Console backend for development
 DEFAULT_FROM_EMAIL = 'mocdatapty@gmail.com'  # Will be set by OAuth2 account
 
-# OAuth2 configuration for mocdatapty@gmail.com account
-GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID', '')
-GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET', '')
-GOOGLE_OAUTH2_REDIRECT_URI = os.getenv('GOOGLE_OAUTH2_REDIRECT_URI', 'http://localhost:55691')
+# OAuth2 configuration for mocdatapty@gmail.com account - EMAIL SERVICES DISABLED
+# GOOGLE_OAUTH2_CLIENT_ID = os.getenv('GOOGLE_OAUTH2_CLIENT_ID', '')
+# GOOGLE_OAUTH2_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH2_CLIENT_SECRET', '')
+# GOOGLE_OAUTH2_REDIRECT_URI = os.getenv('GOOGLE_OAUTH2_REDIRECT_URI', 'http://localhost:55691')
 
-# Google Cloud API Configuration
-GOOGLE_CLOUD_API_KEY = 'AIzaSyBAHeuA83Rl--GvorBIZlY8UOratOu-X2U'
+# Google Cloud API Configuration - EMAIL SERVICES DISABLED
+# GOOGLE_CLOUD_API_KEY = 'AIzaSyBAHeuA83Rl--GvorBIZlY8UOratOu-X2U'
 
-# Gmail API Scopes
-GMAIL_SCOPES = [
-    'https://www.googleapis.com/auth/gmail.send',
-    'https://www.googleapis.com/auth/gmail.compose',
-    'https://www.googleapis.com/auth/gmail.modify',
-    'https://www.googleapis.com/auth/userinfo.email'
-]
+# Gmail API Scopes - EMAIL SERVICES DISABLED
+# GMAIL_SCOPES = [
+#     'https://www.googleapis.com/auth/gmail.send',
+#     'https://www.googleapis.com/auth/gmail.compose',
+#     'https://www.googleapis.com/auth/gmail.modify',
+#     'https://www.googleapis.com/auth/userinfo.email'
+# ]
 
-# OAuth2 Settings
-OAUTH2_REDIRECT_URI = 'http://localhost:55691'
-OAUTH2_AUTHORIZATION_BASE_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
-OAUTH2_TOKEN_URL = 'https://oauth2.googleapis.com/token'
+# OAuth2 Settings - EMAIL SERVICES DISABLED
+# OAUTH2_REDIRECT_URI = 'http://localhost:55691'
+# OAUTH2_AUTHORIZATION_BASE_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
+# OAUTH2_TOKEN_URL = 'https://oauth2.googleapis.com/token'
 
 # Application definition
 INSTALLED_APPS = [

@@ -5,7 +5,7 @@ import multiprocessing
 import os
 
 # Server socket
-bind = "unix:/var/www/eclick/eclick.sock"
+bind = "unix:/var/www/Django-E-Click/Django-E-Click/eclick.sock"
 backlog = 2048
 
 # Worker processes
@@ -17,8 +17,8 @@ max_requests_jitter = 50
 preload_app = True
 
 # Logging
-accesslog = "/var/log/eclick/access.log"
-errorlog = "/var/log/eclick/error.log"
+accesslog = "/var/www/Django-E-Click/Django-E-Click/logs/access.log"
+errorlog = "/var/www/Django-E-Click/Django-E-Click/logs/error.log"
 loglevel = "info"
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 

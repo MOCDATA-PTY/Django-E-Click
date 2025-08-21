@@ -16,7 +16,7 @@ sys.path.append(str(BASE_DIR))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'eclick.settings')
 django.setup()
 
-from home.services import GoogleCloudEmailService
+# from home.services import GoogleCloudEmailService  # EMAIL SERVICES DISABLED
 
 def test_oauth2_email():
     """Test sending an email using OAuth2"""
@@ -24,7 +24,7 @@ def test_oauth2_email():
         print("🧪 Testing OAuth2 email sending...")
         
         # Initialize the Gmail service
-        service = GoogleCloudEmailService()
+        # service = GoogleCloudEmailService()  # EMAIL SERVICES DISABLED
         
         if not service.service:
             print("❌ Gmail service not initialized")

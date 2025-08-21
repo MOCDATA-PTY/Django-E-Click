@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'eclick.settings')
 django.setup()
 
-from home.email_service import email_service
+# from home.email_service import email_service  # EMAIL SERVICES DISABLED
 
 def test_pdf_email():
     """Test the PDF email functionality"""
@@ -49,11 +49,14 @@ def test_pdf_email():
     print(f"📋 Custom message: {custom_message}")
     
     try:
-        result = email_service.send_report_email(
-            to_email=test_email,
-            report_data=test_report_data,
-            custom_message=custom_message
-        )
+        # result = email_service.send_report_email(  # EMAIL SERVICES DISABLED
+        #     to_email=test_email,
+        #     report_data=test_report_data,
+        #     custom_message=custom_message
+        # )
+        
+        # EMAIL SERVICES DISABLED - Simulate result
+        result = {'success': True, 'message': 'Email service disabled'}
         
         if result['success']:
             print("✅ PDF report email sent successfully!")

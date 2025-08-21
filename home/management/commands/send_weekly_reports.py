@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.conf import settings
 from home.models import Client, Project, Task
-from home.email_service import email_service
+# from home.email_service import email_service  # EMAIL SERVICES DISABLED
 from datetime import timedelta
 import logging
 
@@ -69,13 +69,16 @@ class Command(BaseCommand):
                     self.stdout.write(f'  Tasks: {report_data["total_tasks"]}')
                     continue
                 
-                # Send the report
-                result = email_service.send_weekly_client_report(
-                    client_email=client.email,
-                    client_username=client.username,
-                    report_data=report_data,
-                    site_url=settings.SITE_URL if hasattr(settings, 'SITE_URL') else None
-                )
+                # Send the report - EMAIL SERVICES DISABLED
+                # result = email_service.send_weekly_client_report(  # EMAIL SERVICES DISABLED
+                #     client_email=client.email,
+                #     client_username=client.username,
+                #     report_data=report_data,
+                #     site_url=settings.SITE_URL if hasattr(settings, 'SITE_URL') else None
+                # )
+                
+                # EMAIL SERVICES DISABLED - Simulate successful result
+                result = {'success': True, 'message': 'Report generation completed (email service disabled)'}
                 
                 if result['success']:
                     self.stdout.write(

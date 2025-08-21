@@ -10,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'eclick.settings')
 django.setup()
 
-from home.email_service import email_service
+# from home.email_service import email_service  # EMAIL SERVICES DISABLED
 
 def test_email_content():
     """Test email content generation"""
@@ -38,32 +38,35 @@ def test_email_content():
             'days_filter': 30,
         }
         
-        print("1. Testing HTML email body generation...")
-        html_body = email_service._create_report_html(report_data, "Test custom message")
-        print(f"   HTML body length: {len(html_body)} characters")
-        print(f"   Contains HTML tags: {'<html>' in html_body}")
-        print(f"   Contains div tags: {'<div>' in html_body}")
+        print("1. Testing HTML email body generation... - EMAIL SERVICES DISABLED")
+        # html_body = email_service._create_report_html(report_data, "Test custom message")  # EMAIL SERVICES DISABLED
+        # print(f"   HTML body length: {len(html_body)} characters")
+        # print(f"   Contains HTML tags: {'<html>' in html_body}")
+        # print(f"   Contains div tags: {'<div>' in html_body}")
         
         # Show first 500 characters
-        print(f"   First 500 chars: {html_body[:500]}...")
+        # print(f"   First 500 chars: {html_body[:500]}...")
         
-        print("\n2. Testing plain text email body generation...")
-        text_body = email_service._create_email_body(report_data, "Test custom message")
-        print(f"   Text body length: {len(text_body)} characters")
-        print(f"   First 300 chars: {text_body[:300]}...")
+        print("\n2. Testing plain text email body generation... - EMAIL SERVICES DISABLED")
+        # text_body = email_service._create_email_body(report_data, "Test custom message")  # EMAIL SERVICES DISABLED
+        # print(f"   Text body length: {len(text_body)} characters")
+        # print(f"   First 300 chars: {text_body[:300]}...")
         
-        print("\n3. Testing email sending with explicit HTML...")
+        print("\n3. Testing email sending with explicit HTML... - EMAIL SERVICES DISABLED")
         
-        # Test sending with HTML content
-        result = email_service.send_email(
-            to_email='ethansevenster621@gmail.com',
-            subject='Test Email with PDF - HTML Content',
-            body=html_body,
-            from_email='reports@eclick.com',
-            attachments=None  # No attachment for this test
-        )
+        # Test sending with HTML content - EMAIL SERVICES DISABLED
+        # result = email_service.send_email(  # EMAIL SERVICES DISABLED
+        #     to_email='ethansevenster621@gmail.com',
+        #     subject='Test Email with PDF - HTML Content',
+        #     body=html_body,
+        #     from_email='reports@eclick.com',
+        #     attachments=None  # No attachment for this test
+        # )
         
-        print(f"   Email result: {result}")
+        # print(f"   Email result: {result}")
+        
+        # EMAIL SERVICES DISABLED - Show message
+        print("   Email services are currently disabled")
         
     except Exception as e:
         print(f"❌ Error during testing: {str(e)}")

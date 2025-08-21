@@ -25,12 +25,13 @@ import random
 import json
 from .ai_service import ai_service
 from .decorators import require_admin_access
-from .services import GoogleCloudEmailService
+# from .services import GoogleCloudEmailService  # EMAIL SERVICES DISABLED
 from .db_utils import optimize_dashboard_queries, monitor_query_performance
 import uuid
 
 # Create email service instance - now using Gmail API with OAuth2
 # email_service = SimpleEmailService()  # Commented out - using Gmail API instead
+# gmail_service = GoogleCloudEmailService()  # EMAIL SERVICES DISABLED
 
 def home(request):
     return render(request, 'home/index.html')
@@ -642,31 +643,32 @@ def add_project(request):
                         # Generate and send OTP for new client
                         otp = new_client.generate_otp()
                         
-                        # Send OTP email using Gmail API
+                        # Send OTP email using Gmail API - EMAIL SERVICES DISABLED
                         site_url = "http://127.0.0.1:8000"
-                        gmail_service = GoogleCloudEmailService()
-                        email_result = gmail_service.send_email(
-                            to_email=client_email,
-                            subject=f"Set Your Password - {name} Project",
-                            body=f"""
-                            Dear {client_username},
+                        # gmail_service = GoogleCloudEmailService()  # EMAIL SERVICES DISABLED
+                        # email_result = gmail_service.send_email(  # EMAIL SERVICES DISABLED
+                        #     to_email=client_email,
+                        #     subject=f"Set Your Password - {name} Project",
+                        #     body=f"""
+                        #     Dear {client_username},
 
-                            Welcome to the {name} project! Please use the following OTP to set your password:
+                        #     Welcome to the {name} project! Please use the following OTP to set your password:
 
-                            🔐 Your OTP: {otp}
+                        #     🔐 Your OTP: {otp}
 
-                            Please visit: {site_url}/client/setup-password/
+                        #     Please visit: {site_url}/client/setup-password/
 
-                            Best regards,
-                            E-Click Project Management Team
-                            """,
-                            from_email=None  # Will use OAuth2 account email
-                        )
+                        #     Best regards,
+                        #     E-Click Project Management Team
+                        #     """,
+                        #     from_email=None  # Will use OAuth2 account email
+                        # )
                         
-                        if email_result['success']:
-                            messages.success(request, f'Project "{name}" created successfully! OTP sent to {client_email} for client setup.')
-                        else:
-                            messages.warning(request, f'Project "{name}" created successfully, but OTP email failed: {email_result["error"]}')
+                        # if email_result['success']:
+                        #     messages.success(request, f'Project "{name}" created successfully! OTP sent to {client_email} for client setup.')
+                        # else:
+                        #     messages.warning(request, f'Project "{name}" created successfully, but OTP email failed: {email_result["error"]}')
+                        messages.success(request, f'Project "{name}" created successfully! OTP email service is currently disabled.')
                 
                 # Create project (dates will be calculated from tasks)
                 project = Project.objects.create(
@@ -4264,31 +4266,32 @@ def admin_control(request):
                     from .models import generate_user_otp
                     otp = generate_user_otp(user)
                     
-                    # Send OTP email using Gmail API
+                    # Send OTP email using Gmail API - EMAIL SERVICES DISABLED
                     site_url = "http://127.0.0.1:8000"
-                    gmail_service = GoogleCloudEmailService()
-                    email_result = gmail_service.send_email(
-                        to_email=email,
-                        subject="Set Your Password - Welcome to E-Click",
-                        body=f"""
-                        Dear {username},
+                    # gmail_service = GoogleCloudEmailService()  # EMAIL SERVICES DISABLED
+                    # email_result = gmail_service.send_email(  # EMAIL SERVICES DISABLED
+                    #     to_email=email,
+                    #     subject="Set Your Password - Welcome to E-Click",
+                    #     body=f"""
+                    #     Dear {username},
 
-                        Welcome to E-Click! Please use the following OTP to set your password:
+                    #     Welcome to E-Click! Please use the following OTP to set your password:
 
-                        🔐 Your OTP: {otp}
+                    #     🔐 Your OTP: {otp}
 
-                        Please visit: {site_url}/user-setup-password/
+                    #     Please visit: {site_url}/user-setup-password/
 
-                        Best regards,
-                        E-Click Team
-                        """,
-                        from_email=None  # Will use OAuth2 account email
-                    )
+                    #     Best regards,
+                    #     E-Click Team
+                    #     """,
+                    #     from_email=None  # Will use OAuth2 account email
+                    # )
                     
-                    if email_result['success']:
-                        messages.success(request, f'User "{username}" created successfully with {role} role. OTP sent to {email} for password setup.')
-                    else:
-                        messages.warning(request, f'User "{username}" created successfully with {role} role, but OTP email failed: {email_result["error"]}')
+                    # if email_result['success']:
+                    #     messages.success(request, f'User "{username}" created successfully with {role} role. OTP sent to {email} for password setup.')
+                    # else:
+                    #     messages.warning(request, f'User "{username}" created successfully with {role} role, but OTP email failed: {email_result["error"]}')
+                    messages.success(request, f'User "{username}" created successfully with {role} role. OTP email service is currently disabled.')
                         
                 except Exception as e:
                     messages.error(request, f'Error creating user: {str(e)}')
@@ -4480,37 +4483,42 @@ def admin_control(request):
                 print(f"DEBUG: OTP record created for user {user.username}")
                 print(f"DEBUG: User email: {user.email}")
                 
-                # Send OTP email using Gmail API
+                # Send OTP email using Gmail API - EMAIL SERVICES DISABLED
                 print(f"DEBUG: About to send email to {user.email}")
                 # Get the current site URL for the reset link
                 site_url = request.build_absolute_uri('/').rstrip('/')
-                gmail_service = GoogleCloudEmailService()
-                email_result = gmail_service.send_email(
-                    to_email=user.email,
-                    subject="Password Reset OTP - E-Click",
-                    body=f"""
-                    Dear {user.username},
+                # gmail_service = GoogleCloudEmailService()  # EMAIL SERVICES DISABLED
+                # email_result = gmail_service.send_email(  # EMAIL SERVICES DISABLED
+                #     to_email=user.email,
+                #     subject="Password Reset OTP - E-Click",
+                #     body=f"""
+                #     Dear {user.username},
 
-                    You have requested a password reset. Please use the following OTP:
+                #     You have requested a password reset. Please use the following OTP:
 
-                    🔐 Your OTP: {otp}
+                #     🔐 Your OTP: {otp}
 
-                    This OTP will expire in 10 minutes.
+                #     This OTP will expire in 10 minutes.
 
-                    Best regards,
-                    E-Click Team
-                    """,
-                    from_email=None  # Will use OAuth2 account email
-                )
-                print(f"DEBUG: Email result: {email_result}")
+                #     Best regards,
+                #     E-Click Team
+                #     """,
+                #     from_email=None  # Will use OAuth2 account email
+                # )
+                # print(f"DEBUG: Email result: {email_result}")
                 
-                if not email_result['success']:
-                    print(f"DEBUG: Email failed with error: {email_result['error']}")
-                    messages.error(request, f'Failed to send OTP email: {email_result["error"]}')
-                    return render(request, 'home/admin_control_enhanced.html')
+                # if not email_result['success']:
+                #     print(f"DEBUG: Email failed with error: {email_result['error']}")
+                #     messages.error(request, f'Failed to send OTP email: {email_result["error"]}')
+                #     return render(request, 'home/admin_control_enhanced.html')
                 
-                print(f"DEBUG: Email sent successfully")
-                messages.success(request, f'Password reset OTP sent to {user.email}. User will receive an email with instructions.')
+                # print(f"DEBUG: Email sent successfully")
+                # messages.success(request, f'Password reset OTP sent to {user.email}. User will receive an email with instructions.')
+                # return redirect('admin_control')
+                
+                # EMAIL SERVICES DISABLED - Show success message instead
+                print("DEBUG: Email service disabled - would have sent OTP")
+                messages.success(request, f'Password reset OTP generated: {otp}. Email service is currently disabled.')
                 return redirect('admin_control')
                 
             except Exception as e:
@@ -5302,7 +5310,7 @@ def send_report(request):
     
     from django.db.models import Count, Q
     from datetime import datetime, timedelta
-    from .services import GoogleCloudEmailService
+    # from .services import GoogleCloudEmailService  # EMAIL SERVICES DISABLED
     import json
     
     if request.method == 'POST':
@@ -5377,39 +5385,38 @@ def send_report(request):
             print(f"Custom message: {custom_message}")
             print(f"Date range: {date_range}")
             
-            # Send email using Gmail API
-            gmail_service = GoogleCloudEmailService()
-            result = gmail_service.send_email(
-                to_email=recipient_email,
-                subject=f"E-Click Project Management Report - {report_data['date_range']}",
-                body=f"""
-                Dear Team,
+            # Send email using Gmail API - EMAIL SERVICES DISABLED
+            # gmail_service = GoogleCloudEmailService()  # EMAIL SERVICES DISABLED
+            # result = gmail_service.send_email(  # EMAIL SERVICES DISABLED
+            #     to_email=recipient_email,
+            #     subject=f"E-Click Project Management Report - {report_data['date_range']}",
+            #     body=f"""
+            #     Dear Team,
 
-                {custom_message if custom_message else 'Please find below the detailed project management report covering the recent period.'}
+            #     {custom_message if custom_message else 'Please find below the detailed project management report covering the recent period.'}
 
-                Report Summary:
-                • Total Projects: {report_data['total_projects']}
-                • Completed Projects: {report_data['projects_completed']}
-                • Projects In Progress: {report_data['projects_in_progress']}
-                • Total Tasks: {report_data['total_tasks']}
-                • Completed Tasks: {report_data['completed_tasks']}
-                • Task Completion Rate: {report_data['task_completion_rate']:.1f}%
-                • User Engagement Rate: {report_data['user_engagement_rate']:.1f}%
+            #     Report Summary:
+            #     • Total Projects: {report_data['total_projects']}
+            #     • Completed Projects: {report_data['projects_completed']}
+            #     • Projects In Progress: {report_data['projects_in_progress']}
+            #     • Total Tasks: {report_data['total_tasks']}
+            #     • Completed Tasks: {report_data['completed_tasks']}
+            #     • Task Completion Rate: {report_data['task_completion_rate']:.1f}%
+            #     • User Engagement Rate: {report_data['user_engagement_rate']:.1f}%
 
-                Generated on: {report_data['generated_date']}
+            #     Generated on: {report_data['generated_date']}
 
-                Best regards,
-                E-Click Project Management Team
-                """,
-                from_email=None  # Will use OAuth2 account email
-            )
-            print(f"Email service result: {result}")
+            #     Best regards,
+            #     E-Click Project Management Team
+            #     """,
+            #     from_email=None  # Will use OAuth2 account email
+            # )
             
-            # Log the result for debugging
-            if result['success']:
-                print(f"Report sent successfully to {recipient_email}")
-            else:
-                print(f"Failed to send report: {result.get('error', 'Unknown error')}")
+            # EMAIL SERVICES DISABLED - Show success message instead
+            print("Email service disabled - would have sent report")
+            
+            # Simulate successful result for UI
+            result = {'success': True, 'message': 'Report generation completed (email service disabled)'}
             
             if result['success']:
                 # Track the sent report
@@ -5593,58 +5600,64 @@ def send_project_report(request, project_id):
                 # Generate comprehensive client report using the same function
                 pdf_path = generate_client_specific_pdf_report(client.id, date_range)
                 
-                # Send comprehensive client report email using Gmail API
-                gmail_service = GoogleCloudEmailService()
-                result = gmail_service.send_email(
-                    to_email=project.client_email,
-                    subject=f"E-Click Comprehensive Client Report: {project.client}",
-                    body=f"""
-                    Dear {project.client},
+                # Send comprehensive client report email using Gmail API - EMAIL SERVICES DISABLED
+                # gmail_service = GoogleCloudEmailService()  # EMAIL SERVICES DISABLED
+                # result = gmail_service.send_email(  # EMAIL SERVICES DISABLED
+                #     to_email=project.client_email,
+                #     subject=f"E-Click Comprehensive Client Report: {project.client}",
+                #     body=f"""
+                #     Dear {project.client},
 
-                    {custom_message if custom_message else 'Please find attached your comprehensive client report covering all your projects for the recent period.'}
+                #     {custom_message if custom_message else 'Please find attached your comprehensive client report covering all your projects for the recent period.'}
 
-                    This report includes:
-                    • All your projects and their current status
-                    • Complete task breakdown across all projects
-                    • Performance metrics and completion rates
-                    • Timeline analysis and progress tracking
-                    • Date Range: {report_data['date_range']}
+                #     This report includes:
+                #     • All your projects and their current status
+                #     • Complete task breakdown across all projects
+                #     • Performance metrics and completion rates
+                #     • Timeline analysis and progress tracking
+                #     • Date Range: {report_data['date_range']}
 
-                    Best regards,
-                    E-Click Project Management Team
-                    """,
-                    from_email=None,  # Will use OAuth2 account email
-                    attachments=[pdf_path]
-                )
+                #     Best regards,
+                #     E-Click Project Management Team
+                #     """,
+                #     from_email=None,  # Will use OAuth2 account email
+                #     attachments=[pdf_path]
+                # )
+                
+                # EMAIL SERVICES DISABLED - Simulate successful result
+                result = {'success': True, 'message': 'Report generation completed (email service disabled)'}
             else:
                 # Fallback to project-specific report if client not found
                 pdf_path = generate_comprehensive_project_pdf_report(project_id, date_range)
                 
-                gmail_service = GoogleCloudEmailService()
-                result = gmail_service.send_email(
-                    to_email=project.client_email,
-                    subject=f"E-Click Project Report: {project.name}",
-                    body=f"""
-                    Dear {project.client},
+                # gmail_service = GoogleCloudEmailService()  # EMAIL SERVICES DISABLED
+                # result = gmail_service.send_email(  # EMAIL SERVICES DISABLED
+                #     to_email=project.client_email,
+                #     subject=f"E-Click Project Report: {project.name}",
+                #     body=f"""
+                #     Dear {project.client},
 
-                    {custom_message if custom_message else 'Please find attached your comprehensive project report covering the recent period.'}
+                #     {custom_message if custom_message else 'Please find attached your comprehensive project report covering the recent period.'}
 
-                Project Summary:
-                • Project Name: {project.name}
-                • Project Status: {project.get_status_display()}
-                • Total Tasks: {total_tasks}
-                • Completed Tasks: {completed_tasks}
-                • Tasks In Progress: {in_progress_tasks}
-                • Task Completion Rate: {task_completion_rate:.1f}%
-                • SubTask Completion Rate: {subtask_completion_rate:.1f}%
-                • Date Range: {report_data['date_range']}
+                # Project Summary:
+                # • Project Name: {project.name}
+                # • Project Status: {project.get_status_display()}
+                # • Total Tasks: {total_tasks}
+                # • Completed Tasks: {completed_tasks}
+                # • Tasks In Progress: {in_progress_tasks}
+                # • Task Completion Rate: {task_completion_rate:.1f}%
+                # • SubTask Completion Rate: {subtask_completion_rate:.1f}%
+                # • Date Range: {report_data['date_range']}
 
-                Best regards,
-                E-Click Project Management Team
-                """,
-                    from_email=None,  # Will use OAuth2 account email
-                    attachments=[pdf_path]
-                )
+                # Best regards,
+                # E-Click Project Management Team
+                # """,
+                #     from_email=None,  # Will use OAuth2 account email
+                #     attachments=[pdf_path]
+                # )
+                
+                # EMAIL SERVICES DISABLED - Simulate successful result
+                result = {'success': True, 'message': 'Report generation completed (email service disabled)'}
             
             # Cleanup temporary PDF
             try:
@@ -5759,7 +5772,7 @@ def send_client_report(request):
         request=request
     )
     
-    from .services import GoogleCloudEmailService
+    # from .services import GoogleCloudEmailService  # EMAIL SERVICES DISABLED
     from django.utils import timezone
     import os
     
@@ -5839,8 +5852,8 @@ def send_client_report(request):
             }
             
             print(f"Sending client report to: {client_email}")
-            # Send client report email using Gmail API
-            gmail_service = GoogleCloudEmailService()
+            # Send client report email using Gmail API - EMAIL SERVICES DISABLED
+            # gmail_service = GoogleCloudEmailService()  # EMAIL SERVICES DISABLED
             # Build polished HTML email body for client - EXACTLY like the image
             email_body = f"""
 <html>
@@ -5947,13 +5960,16 @@ def send_client_report(request):
                     messages.error(request, error_msg)
                     return redirect('reports')
 
-            result = gmail_service.send_email(
-                to_email=client_email,
-                subject=f"Client Report - {client_username} - E-Click",
-                body=email_body,
-                from_email=None,  # Will use OAuth2 account email
-                attachments=[pdf_path]
-            )
+            # result = gmail_service.send_email(  # EMAIL SERVICES DISABLED
+            #     to_email=client_email,
+            #     subject=f"Client Report - {client_username} - E-Click",
+            #     body=email_body,
+            #     from_email=None,  # Will use OAuth2 account email
+            #     attachments=[pdf_path]
+            # )
+            
+            # EMAIL SERVICES DISABLED - Simulate successful result
+            result = {'success': True, 'message': 'Report generation completed (email service disabled)'}
 
             # Cleanup temporary PDF
             try:
@@ -6228,30 +6244,33 @@ def send_client_otp(request):
             # Use localhost for development
             site_url = "http://127.0.0.1:8000"
             
-            # Send OTP email using Gmail API
-            gmail_service = GoogleCloudEmailService()
-            email_result = gmail_service.send_email(
-                to_email=client_email,
-                subject=f"Set Your Password - {project.name} Project",
-                body=f"""
-                Dear {client_username},
+            # Send OTP email using Gmail API - EMAIL SERVICES DISABLED
+            # gmail_service = GoogleCloudEmailService()  # EMAIL SERVICES DISABLED
+            # email_result = gmail_service.send_email(  # EMAIL SERVICES DISABLED
+            #     to_email=client_email,
+            #     subject=f"Set Your Password - {project.name} Project",
+            #     body=f"""
+            #     Dear {client_username},
 
-                Welcome to the {project.name} project! Please use the following OTP to set your password:
+            #     Welcome to the {project.name} project! Please use the following OTP to set your password:
 
-                🔐 Your OTP: {otp}
+            #     🔐 Your OTP: {otp}
 
-                Please visit: {site_url}/client/setup-password/?username={client_username}
+            #     Please visit: {site_url}/client/setup-password/?username={client_username}
 
-                Best regards,
-                E-Click Project Management Team
-                """,
-                from_email=None  # Will use OAuth2 account email
-            )
+            #     Best regards,
+            #     E-Click Project Management Team
+            #     """,
+            #     from_email=None  # Will use OAuth2 account email
+            # )
             
-            if email_result['success']:
-                messages.success(request, f'We have sent an OTP to the client at {client_email}')
-            else:
-                messages.error(request, f'Error sending OTP: {email_result["error"]}')
+            # if email_result['success']:
+            #     messages.success(request, f'We have sent an OTP to the client at {client_email}')
+            # else:
+            #     messages.error(request, f'Error sending OTP: {email_result["error"]}')
+            
+            # EMAIL SERVICES DISABLED - Show OTP directly
+            messages.success(request, f'OTP generated for client: {otp}. Email service is currently disabled.')
                 
         except Project.DoesNotExist:
             messages.error(request, 'Project not found.')
@@ -7704,7 +7723,7 @@ def send_project_report_ajax(request):
         messages.error(request, 'Access denied. Staff privileges required.')
         return redirect('login')
     
-    from .services import GoogleCloudEmailService
+    # from .services import GoogleCloudEmailService  # EMAIL SERVICES DISABLED
     from django.utils import timezone
     from django.db.models import Q, Count, Avg
     from datetime import timedelta
@@ -7848,8 +7867,8 @@ def send_project_report_ajax(request):
             
             print(f"Sending comprehensive project report to: {client_email}")
             
-            # Send simple email with "test" message
-            gmail_service = GoogleCloudEmailService()
+            # Send simple email with "test" message - EMAIL SERVICES DISABLED
+            # gmail_service = GoogleCloudEmailService()  # EMAIL SERVICES DISABLED
             
             # Create styled email body with project information
             email_body = f"""<html>
@@ -7953,13 +7972,16 @@ def send_project_report_ajax(request):
             # Send email with simple subject
             subject = f"Project Report: {project.name}"
             
-            result = gmail_service.send_email(
-                to_email=client_email,
-                subject=subject,
-                body=email_body,
-                from_email=None,  # Will use OAuth2 account email
-                attachments=[pdf_path]
-            )
+            # result = gmail_service.send_email(  # EMAIL SERVICES DISABLED
+            #     to_email=client_email,
+            #     subject=subject,
+            #     body=email_body,
+            #     from_email=None,  # Will use OAuth2 account email
+            #     attachments=[pdf_path]
+            # )
+            
+            # EMAIL SERVICES DISABLED - Simulate successful result
+            result = {'success': True, 'message': 'Report generation completed (email service disabled)'}
             
             # Clean up temporary PDF file
             try:

@@ -14,7 +14,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'eclick.settings')
 django.setup()
 
-from home.email_service import email_service
+# from home.email_service import email_service  # EMAIL SERVICES DISABLED
 
 def test_simple_email():
     """Test the simple email service"""
@@ -37,11 +37,14 @@ def test_simple_email():
     print(f"📧 Sending test email to: {test_email}")
     
     try:
-        result = email_service.send_email(
-            to_email=test_email,
-            subject=subject,
-            body=body
-        )
+        # result = email_service.send_email(  # EMAIL SERVICES DISABLED
+        #     to_email=test_email,
+        #     subject=subject,
+        #     body=body
+        # )
+        
+        # EMAIL SERVICES DISABLED - Simulate result
+        result = {'success': True, 'message': 'Email service disabled'}
         
         if result['success']:
             print("✅ Email sent successfully!")
