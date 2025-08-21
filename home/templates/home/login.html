@@ -38,33 +38,24 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
     
-    <!-- Lazy load Tailwind CSS -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
     <script>
-        // Load Tailwind CSS asynchronously
-        (function() {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://cdn.tailwindcss.com';
-            link.onload = function() {
-                // Initialize Tailwind config after loading
-                if (window.tailwind) {
-                    tailwind.config = {
-                        darkMode: 'class',
-                        theme: {
-                            extend: {
-                                colors: {
-                                    'accent': '#ef4444',
-                                    'accent-dark': '#dc2626',
-                                    'eclick-600': '#dc2626',
-                                    'eclick-700': '#b91c1c',
-                                }
-                            }
-                        }
-                    };
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'accent': '#ef4444',
+                        'accent-dark': '#dc2626',
+                        'eclick-600': '#dc2626',
+                        'eclick-700': '#b91c1c',
+                    }
                 }
-            };
-            document.head.appendChild(link);
-        })();
+            }
+        }
     </script>
     
 
