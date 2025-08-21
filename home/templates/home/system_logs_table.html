@@ -1,0 +1,141 @@
+{% if page_obj %}
+<div class="users-table">
+    <div class="table-header">
+        <div class="table-cell">User</div>
+        <div class="table-cell">Action</div>
+        <div class="table-cell">Details</div>
+        <div class="table-cell">Timestamp</div>
+        <div class="table-cell">IP Address</div>
+        <div class="table-cell">System Info</div>
+    </div>
+    
+    {% for log in page_obj %}
+    <div class="table-row">
+        <div class="table-cell user-cell" data-label="User">
+            <div class="user-info">
+                <div class="user-avatar">
+                    {% if log.user %}
+                        <div class="avatar">{{ log.user.username|first|upper }}</div>
+                    {% else %}
+                        <div class="avatar failed">?</div>
+                    {% endif %}
+                </div>
+                <div class="user-details">
+                    <span class="username">
+                        {% if log.user %}
+                            {{ log.user.username }}
+                        {% else %}
+                            <span class="failed-attempt">{{ log.additional_info.attempted_username|default:"Unknown" }}</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="table-cell action-cell" data-label="Action">
+            <span class="action-badge action-{{ log.action }}">
+                {% if log.action == 'navigation' %}
+                    Navigate
+                {% else %}
+                    {{ log.get_action_display }}
+                {% endif %}
+            </span>
+        </div>
+        
+        <div class="table-cell details-cell" data-label="Details">
+            <div class="action-details">
+                {% if log.action == 'task_status_change' %}
+                    <div class="detail-item">
+                        <strong>Task:</strong> {{ log.additional_info.task_title|default:"N/A" }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Project:</strong> {{ log.additional_info.project_name|default:"N/A" }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Status Change:</strong> 
+                        <span class="status-change">
+                            {{ log.additional_info.old_status|default:"N/A" }} → {{ log.additional_info.new_status|default:"N/A" }}
+                        </span>
+                    </div>
+                {% elif log.action == 'project_created' %}
+                    <div class="detail-item">
+                        <strong>Project:</strong> {{ log.additional_info.project_name|default:"N/A" }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Client:</strong> {{ log.additional_info.client|default:"N/A" }}
+                    </div>
+                {% elif log.action == 'report_sent' %}
+                    <div class="detail-item">
+                        <strong>Report Type:</strong> {{ log.additional_info.report_type|default:"N/A" }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Recipient:</strong> {{ log.additional_info.recipient_email|default:"N/A" }}
+                    </div>
+                {% elif log.action == 'navigation' %}
+                    <div class="detail-item">
+                        <strong>Page:</strong> {{ log.additional_info.page_name|default:"N/A" }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>URL:</strong> {{ log.additional_info.page_url|default:"N/A" }}
+                    </div>
+                {% else %}
+                    <div class="detail-item">
+                        {% if log.related_project %}
+                            <strong>Project:</strong> {{ log.related_project.name }}
+                        {% endif %}
+                        {% if log.related_task %}
+                            <strong>Task:</strong> {{ log.related_task.title }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="table-cell timestamp-cell" data-label="Timestamp">
+            <div class="timestamp">
+                <div class="date">{{ log.timestamp|date:"M d, Y" }}</div>
+                <div class="time">{{ log.timestamp|time:"H:i:s" }}</div>
+            </div>
+        </div>
+        
+        <div class="table-cell ip-cell" data-label="IP Address">
+            <span class="ip-address">{{ log.ip_address|default:"N/A" }}</span>
+        </div>
+        
+        <div class="table-cell system-cell" data-label="System Info">
+            <div class="system-info">
+                {% if log.os_info %}
+                    <div class="os-info">{{ log.os_info }}</div>
+                {% endif %}
+                {% if log.browser_info %}
+                    <div class="browser-info">{{ log.browser_info }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if user_filter %}&user={{ user_filter }}{% endif %}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="pagination-btn">Previous</a>
+    {% endif %}
+    
+    <span class="pagination-info">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+    
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if user_filter %}&user={{ user_filter }}{% endif %}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="pagination-btn">Next</a>
+    {% endif %}
+</div>
+{% endif %}
+{% else %}
+<div class="no-logs">
+    <div class="no-logs-icon">📝</div>
+    <h3>No Logs Found</h3>
+    <p>No system logs match the current filters. Try adjusting your search criteria.</p>
+</div>
+{% endif %}

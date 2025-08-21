@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Settings - E-Click</title>
+    
+    <style>
+        :root {
+            /* Modern Professional Theme - Matching Admin Controls */
+            --primary: #6366f1;
+            --primary-light: #a5b4fc;
+            --primary-dark: #4f46e5;
+            --secondary: #64748b;
+            --secondary-light: #f1f5f9;
+            --secondary-dark: #475569;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --success-dark: #059669;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --warning-dark: #d97706;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --danger-dark: #dc2626;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            --info-dark: #2563eb;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-light: #e2e8f0;
+            --border-medium: #cbd5e1;
+            --border-dark: #64748b;
+            --background-light: #f8fafc;
+            --background-white: #ffffff;
+            --background-primary: #ffffff;
+            --background-secondary: #f8fafc;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-soft: 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --sidebar-width: 280px;
+            --radius-small: 6px;
+            
+            /* Dark theme variables */
+            --dark-bg-primary: #0f172a;
+            --dark-bg-secondary: #1e293b;
+            --dark-bg-tertiary: #334155;
+            --dark-text-primary: #f1f5f9;
+            --dark-text-secondary: #cbd5e1;
+            --dark-text-muted: #94a3b8;
+            --dark-border-light: #334155;
+            --dark-border-medium: #475569;
+            --dark-primary: #6366f1;
+        }
+
+        [data-theme="dark"] {
+            --text-primary: var(--dark-text-primary);
+            --text-secondary: var(--dark-text-secondary);
+            --text-muted: var(--dark-text-muted);
+            --border-light: var(--dark-border-light);
+            --border-medium: var(--dark-border-medium);
+            --background-light: var(--dark-bg-tertiary);
+            --background-white: var(--dark-bg-primary);
+            --background-primary: var(--dark-bg-primary);
+            --background-secondary: var(--dark-bg-secondary);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: var(--background-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Minimalist Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--background-primary);
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-right: 1px solid var(--border-light);
+        }
+
+        /* Minimalist Scrollbar */
+        .sidebar::-webkit-scrollbar {
+            width: 1px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-medium);
+            border-radius: 0;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--border-dark);
+        }
+
+        /* Minimalist Logo */
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin: 0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 2rem 2rem 1rem;
+            background: transparent;
+            border: none;
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .logo:hover {
+            color: var(--text-secondary);
+            transform: none;
+        }
+
+        .logo .nav-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+        /* Minimalist Navigation */
+        .nav-links {
+            list-style: none;
+            padding: 1rem 0 2rem;
+            margin: 0;
+        }
+
+        .nav-links li {
+            margin-bottom: 0;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            gap: 1rem;
+            font-weight: 300;
+            font-size: 0.875rem;
+            border: none;
+            background: transparent;
+            margin: 0;
+            box-shadow: none;
+            position: relative;
+            letter-spacing: 0.025em;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: var(--background-secondary);
+            color: var(--text-primary);
+            transform: none;
+            box-shadow: none;
+            border: none;
+            padding-left: 2.5rem;
+        }
+
+        .nav-links a:hover::before {
+            background: var(--text-primary);
+        }
+
+        .nav-links a.active {
+            background: var(--background-secondary);
+            color: var(--text-primary);
+            font-weight: 400;
+            box-shadow: none;
+            border: none;
+            transform: none;
+            padding-left: 2.5rem;
+        }
+
+        .nav-links a.active::before {
+            background: var(--text-primary);
+        }
+
+        .nav-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+
+        .nav-links a:hover .nav-icon,
+        .nav-links a.active .nav-icon {
+            opacity: 1;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            width: calc(100% - var(--sidebar-width));
+            overflow-x: hidden;
+            background: var(--background-secondary);
+        }
+
+        /* Minimalist Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 300;
+            margin-top: 0.5rem;
+        }
+
+        /* Settings Container */
+        .settings-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Settings Sections */
+        .settings-section {
+            margin-bottom: 3rem;
+        }
+
+        .settings-section h2 {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 300;
+            letter-spacing: -0.025em;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .settings-card {
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 2rem 0;
+            margin-bottom: 0;
+            border: none;
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .settings-card:hover {
+            padding-left: 1rem;
+            border-bottom-color: var(--border-medium);
+        }
+
+        /* Profile Section */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .avatar-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .avatar-image:hover {
+            border-color: var(--border-medium);
+            transform: scale(1.02);
+        }
+
+        .avatar-upload {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .profile-avatar:hover .avatar-upload {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .avatar-upload:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md);
+        }
+
+        .profile-info h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .profile-info p {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 300;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 300;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 0;
+            border: none;
+            border-bottom: 1px solid var(--border-light);
+            border-radius: 0;
+            font-size: 1rem;
+            background: transparent;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            color: var(--text-primary);
+            font-weight: 300;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-bottom: 2px solid var(--text-primary);
+            background: transparent;
+            box-shadow: none;
+            transform: translateY(-1px);
+        }
+
+        .form-input:hover {
+            border-bottom-color: var(--border-medium);
+            background: transparent;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        /* Theme Toggle Styles */
+        .theme-toggle-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .theme-toggle-header h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 300;
+            letter-spacing: -0.025em;
+        }
+
+        .theme-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem 0;
+            background: transparent;
+            border-radius: 0;
+            border: none;
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle-wrapper:hover {
+            padding-left: 1rem;
+            border-bottom-color: var(--border-medium);
+        }
+
+        .theme-toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+            cursor: pointer;
+        }
+
+        .theme-toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--border-medium);
+            transition: 0.4s;
+            border-radius: 28px;
+            border: 1px solid var(--border-light);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: var(--background-primary);
+            transition: 0.4s;
+            border-radius: 50%;
+            border: 1px solid var(--border-light);
+        }
+
+        input:checked + .toggle-slider {
+            background: var(--text-primary);
+            border-color: var(--text-primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+            border-color: var(--text-primary);
+        }
+
+        .toggle-label {
+            font-weight: 300;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+        }
+
+        .help-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-weight: 300;
+            font-style: italic;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 300;
+            text-decoration: none;
+            border: 1px solid;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+            background: transparent;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--text-primary);
+            color: var(--background-primary);
+        }
+
+        .btn-icon {
+            width: 1rem;
+            height: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Settings Actions */
+        .settings-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* File Upload */
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            padding: 1rem;
+            background: var(--background-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-small);
+            cursor: pointer;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .menu-toggle:hover {
+            background: var(--background-secondary);
+            border-color: var(--border-medium);
+        }
+
+        .menu-toggle svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Mobile Backdrop */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 999;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: var(--shadow-medium);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-backdrop.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1rem;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .logo {
+                padding: 1.5rem 2rem 1rem;
+                font-size: 1.1rem;
+            }
+
+            .nav-links {
+                padding: 0.5rem 0 2rem;
+            }
+
+            .profile-section {
+                flex-direction: column;
+                text-align: center;
+                gap: 2rem;
+            }
+
+            .settings-card:hover {
+                padding-left: 0;
+            }
+
+            .settings-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+
+            .theme-toggle-wrapper {
+                justify-content: space-between;
+            }
+
+            .theme-toggle-wrapper:hover {
+                padding-left: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .settings-section h2 {
+                font-size: 1.125rem;
+            }
+
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+            }
+
+            .avatar-image {
+                width: 100px;
+                height: 100px;
+            }
+
+            .settings-card {
+                padding: 1.5rem 0;
+            }
+
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        /* Enhanced form validation feedback */
+        .form-input:valid {
+            border-bottom-color: var(--success);
+        }
+
+        .form-input:invalid:not(:focus):not(:placeholder-shown) {
+            border-bottom-color: var(--danger);
+        }
+
+        /* Smooth animations */
+        .settings-section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .settings-section:nth-child(1) { animation-delay: 0.1s; }
+        .settings-section:nth-child(2) { animation-delay: 0.2s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus improvements */
+        .form-input:focus-visible,
+        .btn:focus-visible {
+            outline: 2px solid var(--text-primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <a href="{% url 'client_dashboard' %}" class="logo">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z"/>
+                </svg>
+                E-Click Client
+            </a>
+            
+            <ul class="nav-links">
+                <li>
+                    <a href="{% url 'client_dashboard' %}">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="active">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                        </svg>
+                        Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'client_logout' %}">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+                        </svg>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1 class="welcome-text">Client Settings</h1>
+            </div>
+
+            <div class="settings-container">
+                <!-- Profile Information Section -->
+                <div class="settings-section">
+                    <h2>Profile Information</h2>
+                    <div class="settings-card">
+                        <div class="profile-section">
+                            <div class="profile-avatar">
+                                {% if client.profile_picture %}
+                                    <img src="{{ client.profile_picture.url }}" 
+                                         alt="Profile Picture" class="avatar-image" id="profile-image">
+                                {% else %}
+                                    <img src="/static/images/default-avatar.svg" 
+                                         alt="Profile Picture" class="avatar-image" id="profile-image">
+                                {% endif %}
+                                <label class="avatar-upload file-upload">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <input type="file" id="profile-upload" accept="image/*" onchange="previewImage(this)">
+                                </label>
+                            </div>
+                            
+                            <div class="profile-info">
+                                <h3>{{ client.username }}</h3>
+                                <p>{{ client.email }}</p>
+                                <p>Member since {{ client.created_at|date:"F Y" }}</p>
+                            </div>
+                        </div>
+
+                        <form method="post" enctype="multipart/form-data" id="profile-form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" id="username" name="username" class="form-input" 
+                                       value="{{ client.username }}" required placeholder="Enter username">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" id="email" name="email" class="form-input" 
+                                       value="{{ client.email }}" required placeholder="Enter email address">
+                            </div>
+                            
+                            <div class="settings-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Theme Settings Section -->
+                <div class="settings-section">
+                    <h2>Appearance Settings</h2>
+                    <div class="settings-card">
+                        <div class="theme-toggle-container">
+                            <div class="theme-toggle-header">
+                                <h3>Dark Mode</h3>
+                                <p class="help-text">Switch between light and dark themes</p>
+                            </div>
+                            <div class="theme-toggle-wrapper">
+                                <label class="theme-toggle-switch">
+                                    <input type="checkbox" id="theme-toggle" onchange="toggleTheme()">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label" id="toggle-label">Light Mode</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <svg fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+        </svg>
+    </button>
+
+    <!-- Mobile Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+    <script>
+        // Theme Management
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeToggle = document.getElementById('theme-toggle');
+            const toggleLabel = document.getElementById('toggle-label');
+            const currentTheme = html.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            // Update toggle state and label
+            themeToggle.checked = newTheme === 'dark';
+            toggleLabel.textContent = newTheme === 'dark' ? 'Dark Mode' : 'Light Mode';
+            
+            // Apply theme to body as well for compatibility
+            document.body.setAttribute('data-theme', newTheme);
+        }
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const themeToggle = document.getElementById('theme-toggle');
+            const toggleLabel = document.getElementById('toggle-label');
+            
+            // Set the theme
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.body.setAttribute('data-theme', savedTheme);
+            
+            // Update toggle state and label
+            themeToggle.checked = savedTheme === 'dark';
+            toggleLabel.textContent = savedTheme === 'dark' ? 'Dark Mode' : 'Light Mode';
+
+            // Enhanced form interactions
+            const inputs = document.querySelectorAll('.form-input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'translateY(-2px)';
+                });
+
+                input.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'translateY(0)';
+                });
+
+                input.addEventListener('input', function() {
+                    // Add subtle animation feedback
+                    this.style.transform = 'scale(1.01)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 200);
+                });
+            });
+
+            // Enhanced button interactions
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+        });
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profile-image').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('profile-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const profileImage = document.getElementById('profile-upload').files[0];
+            
+            if (profileImage) {
+                formData.append('profile_picture', profileImage);
+            }
+            
+            // Submit the form
+            this.submit();
+        });
+
+        // Sidebar toggle functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            sidebar.classList.toggle('active');
+            backdrop.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                    backdrop.classList.remove('active');
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                backdrop.classList.remove('active');
+            }
+        });
+
+        // Handle escape key to close sidebar
+        document.addEventListener('keydown', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            if (event.key === 'Escape' && window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+                backdrop.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

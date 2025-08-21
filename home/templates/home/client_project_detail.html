@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.name }} - Project Details - E-Click</title>
+    
+    <style>
+        :root {
+            /* Modern Professional Theme */
+            --primary: #6366f1;
+            --primary-light: #a5b4fc;
+            --primary-dark: #4f46e5;
+            --secondary: #64748b;
+            --secondary-light: #f1f5f9;
+            --secondary-dark: #475569;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --success-dark: #059669;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --warning-dark: #d97706;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --danger-dark: #dc2626;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            --info-dark: #2563eb;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-light: #e2e8f0;
+            --border-medium: #cbd5e1;
+            --background-light: #f8fafc;
+            --background-white: #ffffff;
+            --background-primary: #ffffff;
+            --background-secondary: #f8fafc;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-soft: 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --sidebar-width: 280px;
+            --radius-small: 6px;
+            
+            /* Dark theme variables */
+            --dark-bg-primary: #0f172a;
+            --dark-bg-secondary: #1e293b;
+            --dark-bg-tertiary: #334155;
+            --dark-text-primary: #f1f5f9;
+            --dark-text-secondary: #cbd5e1;
+            --dark-text-muted: #94a3b8;
+            --dark-border-light: #334155;
+            --dark-border-medium: #475569;
+            --dark-primary: #6366f1;
+        }
+
+        [data-theme="dark"] {
+            --text-primary: var(--dark-text-primary);
+            --text-secondary: var(--dark-text-secondary);
+            --text-muted: var(--dark-text-muted);
+            --border-light: var(--dark-border-light);
+            --border-medium: var(--dark-border-medium);
+            --background-light: var(--dark-bg-tertiary);
+            --background-white: var(--dark-bg-primary);
+            --background-primary: var(--dark-bg-primary);
+            --background-secondary: var(--dark-bg-secondary);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: var(--background-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] body {
+            background-color: var(--dark-bg-primary);
+            color: var(--dark-text-primary);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Minimalist Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--background-primary);
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-right: 1px solid var(--border-light);
+        }
+
+        /* Minimalist Scrollbar */
+        .sidebar::-webkit-scrollbar {
+            width: 1px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-medium);
+            border-radius: 0;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--border-dark);
+        }
+
+        /* Minimalist Logo */
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin: 0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 2rem 2rem 1rem;
+            background: transparent;
+            border: none;
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .logo:hover {
+            color: var(--text-secondary);
+            transform: none;
+        }
+
+        .logo .nav-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+        }
+
+        /* Minimalist Navigation */
+        .nav-links {
+            list-style: none;
+            padding: 1rem 0 2rem;
+            margin: 0;
+        }
+
+        .nav-links li {
+            margin-bottom: 0;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            gap: 1rem;
+            font-weight: 300;
+            font-size: 0.875rem;
+            border: none;
+            background: transparent;
+            margin: 0;
+            box-shadow: none;
+            position: relative;
+            letter-spacing: 0.025em;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: var(--background-secondary);
+            color: var(--text-primary);
+            transform: none;
+            box-shadow: none;
+            border: none;
+            padding-left: 2.5rem;
+        }
+
+        .nav-links a:hover::before {
+            background: var(--text-primary);
+        }
+
+        .nav-links a.active {
+            background: var(--background-secondary);
+            color: var(--text-primary);
+            font-weight: 400;
+            box-shadow: none;
+            border: none;
+            transform: none;
+            padding-left: 2.5rem;
+        }
+
+        .nav-links a.active::before {
+            background: var(--text-primary);
+        }
+
+        .nav-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+
+        .nav-links a:hover .nav-icon,
+        .nav-links a.active .nav-icon {
+            opacity: 1;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            background: var(--background-light);
+            min-height: 100vh;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--text-primary);
+        }
+
+        /* Settings Container */
+        .settings-container {
+            max-width: 1200px;
+        }
+
+        /* Settings Section */
+        .settings-section {
+            margin-bottom: 3rem;
+        }
+
+        .settings-section h2 {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.9rem;
+        }
+
+        .settings-card {
+            background: var(--background-white);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .settings-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        /* Project Header Card */
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+        }
+
+        .project-info h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+        }
+
+        .project-meta {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .meta-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--text-muted);
+        }
+
+        .meta-content h4 {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-content p {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: transparent;
+            border: 1px solid;
+        }
+
+        .status-completed {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .status-in-progress {
+            border-color: var(--info);
+            color: var(--info);
+        }
+
+        .status-planned {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        /* Progress Circle */
+        .progress-section {
+            text-align: center;
+        }
+
+        .progress-circle {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+
+        .progress-circle svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .progress-bg {
+            stroke: var(--border-light);
+            fill: none;
+            stroke-width: 8;
+        }
+
+        .progress-bar {
+            stroke: var(--primary);
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.5s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .progress-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 2rem;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            border-color: var(--border-medium);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 300;
+        }
+
+        /* Tasks Table */
+        .tasks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .tasks-header h2 {
+            margin: 0;
+        }
+
+        .task-count {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            background: var(--background-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .tasks-table {
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: var(--background-secondary);
+            border-bottom: 1px solid var(--border-light);
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+            align-items: center;
+        }
+
+        .table-row:hover {
+            background: var(--background-secondary);
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .task-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .task-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .priority-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: transparent;
+            border: 1px solid;
+        }
+
+        .priority-urgent {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .priority-high {
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .priority-medium {
+            border-color: var(--info);
+            color: var(--info);
+        }
+
+        .priority-low {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .task-date {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .task-assignee {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Subtasks */
+        .subtasks-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .subtasks-header {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .subtask-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--background-secondary);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtask-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .subtask-status.completed {
+            background-color: var(--success);
+        }
+
+        .subtask-status.in-progress {
+            background-color: var(--info);
+        }
+
+        .subtask-status.on-hold {
+            background-color: var(--danger);
+        }
+
+        .subtask-status.pending {
+            background-color: var(--text-muted);
+        }
+
+        .subtask-title {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .subtask-status-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Activity Section */
+        .activity-list {
+            margin-top: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--background-secondary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .activity-icon i {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .activity-time {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .activity-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 0 1rem;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .project-header {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .project-meta {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .table-header,
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .table-header {
+                display: none;
+            }
+
+            .table-row {
+                display: block;
+                padding: 1rem;
+            }
+
+            .table-row > div {
+                margin-bottom: 0.5rem;
+            }
+
+            .task-title {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <a href="{% url 'client_dashboard' %}" class="logo">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z"/>
+                </svg>
+                E-Click Client
+            </a>
+            
+            <ul class="nav-links">
+                <li>
+                    <a href="{% url 'client_dashboard' %}">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'client_settings' %}">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                        </svg>
+                        Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'client_logout' %}">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+                        </svg>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="{% url 'client_dashboard' %}"><i class="fas fa-home"></i> Dashboard</a> / <span>{{ project.name }}</span>
+        </div>
+
+        <div class="settings-container">
+            <!-- Project Header Section -->
+            <div class="settings-section">
+                <h2>Project Overview</h2>
+                <div class="settings-card">
+                    <div class="project-header">
+                        <div class="project-info">
+                            <h1>{{ project.name }}</h1>
+                            <span class="status-badge 
+                                {% if project.status == 'completed' %}status-completed
+                                {% elif project.status == 'in_progress' %}status-in-progress
+                                {% else %}status-planned{% endif %}">
+                                {{ project.get_status_display }}
+                            </span>
+                            
+                            <div class="project-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar meta-icon"></i>
+                                    <div class="meta-content">
+                                        <h4>Start Date</h4>
+                                        <p>{% if project.start_date %}{{ project.start_date|date:"M d, Y" }}{% else %}Not set{% endif %}</p>
+                                    </div>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-flag-checkered meta-icon"></i>
+                                    <div class="meta-content">
+                                        <h4>End Date</h4>
+                                        <p>{% if project.end_date %}{{ project.end_date|date:"M d, Y" }}{% else %}Not set{% endif %}</p>
+                                    </div>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-users meta-icon"></i>
+                                    <div class="meta-content">
+                                        <h4>Team Members</h4>
+                                        <p>{{ project.assigned_users.count }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-section">
+                            <div class="progress-circle">
+                                <svg viewBox="0 0 120 120">
+                                    <circle class="progress-bg" cx="60" cy="60" r="54"></circle>
+                                    <circle class="progress-bar" cx="60" cy="60" r="54" stroke-dasharray="{{ progress_percentage|floatformat:0 }}, 100"></circle>
+                                </svg>
+                                <div class="progress-text">{{ progress_percentage|floatformat:0 }}%</div>
+                            </div>
+                            <div class="progress-label">Complete</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Statistics Section -->
+            <div class="settings-section">
+                <h2>Project Statistics</h2>
+                <div class="settings-card">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ total_tasks }}</div>
+                            <div class="stat-label">Total Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ completed_tasks }}</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ in_progress_tasks }}</div>
+                            <div class="stat-label">In Progress</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">{{ on_hold_tasks }}</div>
+                            <div class="stat-label">On Hold</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Section -->
+            <div class="settings-section">
+                <h2>Project Tasks</h2>
+                <div class="settings-card">
+                    <div class="tasks-header">
+                        <h2>Task Management</h2>
+                        <span class="task-count">{{ tasks|length }} tasks</span>
+                    </div>
+
+                    <div class="tasks-table">
+                        <div class="table-header">
+                            <div>Task Details</div>
+                            <div>Priority</div>
+                            <div>Status</div>
+                            <div>Due Date</div>
+                            <div>Assignee</div>
+                        </div>
+                        
+                        {% for task in tasks %}
+                        <div class="table-row">
+                            <div>
+                                <div class="task-title">{{ task.title }}</div>
+                                {% if task.description %}
+                                <div class="task-description">{{ task.description }}</div>
+                                {% endif %}
+                                {% if task.subtasks.all %}
+                                <div class="subtasks-section">
+                                    <div class="subtasks-header">Subtasks ({{ task.subtasks.count }})</div>
+                                    {% for subtask in task.subtasks.all %}
+                                    <div class="subtask-item">
+                                        <div class="subtask-status 
+                                            {% if subtask.status == 'completed' %}completed
+                                            {% elif subtask.status == 'in_progress' %}in-progress
+                                            {% elif subtask.status == 'on_hold' %}on-hold
+                                            {% else %}pending{% endif %}"></div>
+                                        <div class="subtask-title">{{ subtask.title }}</div>
+                                        <div class="subtask-status-text">{{ subtask.get_status_display }}</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <span class="priority-badge 
+                                    {% if task.priority == 'urgent' %}priority-urgent
+                                    {% elif task.priority == 'high' %}priority-high
+                                    {% elif task.priority == 'medium' %}priority-medium
+                                    {% else %}priority-low{% endif %}">
+                                    {{ task.get_priority_display }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="status-badge 
+                                    {% if task.status == 'completed' %}status-completed
+                                    {% elif task.status == 'in_progress' %}status-in-progress
+                                    {% elif task.status == 'on_hold' %}priority-urgent
+                                    {% else %}status-planned{% endif %}">
+                                    {{ task.get_status_display }}
+                                </span>
+                            </div>
+                            <div class="task-date">
+                                {% if task.end_date %}{{ task.end_date|date:"M d, Y" }}{% else %}End date not set{% endif %}
+                            </div>
+                            <div class="task-assignee">
+                                {% if task.assigned_user %}{{ task.assigned_user.get_full_name }}{% else %}Unassigned{% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity Section -->
+            {% if task_updates %}
+            <div class="settings-section">
+                <h2>Recent Activity</h2>
+                <div class="settings-card">
+                    <div class="activity-list">
+                        {% for update in task_updates %}
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-header">
+                                    <span class="activity-title">{{ update.task.title }}</span>
+                                    <span class="activity-time">{{ update.created_at|timesince }} ago</span>
+                                </div>
+                                <div class="activity-description">{{ update.update_text }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <svg fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+        </svg>
+    </button>
+
+    <!-- Mobile Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+    <script>
+        // Theme functionality - check for saved theme preference from client settings
+        const html = document.documentElement;
+        const currentTheme = localStorage.getItem('client_theme') || 'light';
+        html.setAttribute('data-theme', currentTheme);
+
+        // Progress circle animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBar = document.querySelector('.progress-bar');
+            const percentage = {{ progress_percentage|floatformat:0 }}; // Real progress percentage
+            const circumference = 2 * Math.PI * 54; // radius = 54
+            const strokeDasharray = (percentage / 100) * circumference;
+            
+            progressBar.style.strokeDasharray = `${strokeDasharray}, ${circumference}`;
+        });
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</body>
+</html>
