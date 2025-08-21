@@ -97,14 +97,7 @@
             <div class="section-content">
                 <div class="gantt-container">
                     <div id="ganttChart" class="gantt-chart">
-                        <!-- Loading state -->
-                        <div class="loading-state">
-                            <div style="font-size: 1.2rem; margin-bottom: 16px; color: var(--text-primary);">
-                                <strong>Loading Project Timeline</strong>
-                            </div>
-                            <div style="margin-bottom: 20px;">Please wait while we fetch your project data...</div>
-                            <div class="loading-spinner"></div>
-                        </div>
+                        <!-- Gantt chart will be rendered here -->
                     </div>
                 </div>
             </div>
@@ -1129,26 +1122,7 @@
     }
 
     /* Loading state */
-    .loading-state {
-        padding: 40px;
-        text-align: center;
-        color: var(--text-muted);
-    }
 
-    .loading-spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 2px solid var(--border-light);
-        border-top: 2px solid var(--primary);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
 
          /* Scroll controls styling */
      .gantt-scroll-controls {
@@ -1371,8 +1345,8 @@ function showErrorMessage(message) {
     const container = document.getElementById('ganttChart');
     if (container) {
         container.innerHTML = `
-            <div class="loading-state">
-                <div style="font-size: 1.2rem; margin-bottom: 16px; color: var(--danger);">
+            <div style="padding: 40px; text-align: center; color: var(--danger);">
+                <div style="font-size: 1.2rem; margin-bottom: 16px;">
                     <strong>Error Loading Data</strong>
                 </div>
                 <div style="margin-bottom: 20px;">${message}</div>
@@ -1481,7 +1455,7 @@ function renderGanttChart() {
     
     if (ganttData.length === 0) {
         console.log('No projects data available');
-        container.innerHTML = '<div class="loading-state"><div style="padding: 20px; text-align: center; color: var(--text-muted);">No projects available to display</div></div>';
+        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">No projects available to display</div>';
         return;
     }
 
