@@ -16,21 +16,21 @@ sys.path.append(str(BASE_DIR))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'eclick.settings')
 django.setup()
 
-from home.services import GoogleCloudEmailService
+# from home.services import GoogleCloudEmailService  # DISABLED
 
 def test_oauth2_email():
     """Test sending an email using OAuth2"""
     try:
         print("🧪 Testing OAuth2 email sending...")
         
-        # Initialize the Gmail service
-        service = GoogleCloudEmailService()
+        # Initialize the Gmail service - DISABLED
+        # service = GoogleCloudEmailService()
         
-        if not service.service:
-            print("❌ Gmail service not initialized")
-            return
+        # if not service.service:
+        #     print("❌ Gmail service not initialized")
+        #     return
         
-        print("✅ Gmail service initialized successfully")
+        # print("✅ Gmail service initialized successfully")
         
         # Test email data - CHANGE THIS TO YOUR EMAIL FOR TESTING
         test_email = "ethansevenster5@gmail.com"  # Change this to your email for testing
@@ -50,23 +50,25 @@ def test_oauth2_email():
         print(f"📧 From: OAuth2 account (mocptydata@gmail.com)")
         print(f"📧 Subject: {subject}")
         
-        # Send the email
-        result = service.send_email(
-            to_email=test_email,
-            subject=subject,
-            body=body,
-            from_email=None  # This will use the OAuth2 account email
-        )
+        # Send the email - DISABLED
+        # result = service.send_email(
+        #     to_email=test_email,
+        #     subject=subject,
+        #     body=body,
+        #     from_email=None  # This will use the OAuth2 account email
+        # )
         
-        if result.get('success'):
-            print("✅ Email sent successfully!")
-            print(f"📧 Message ID: {result.get('message_id', 'N/A')}")
-            print(f"📧 Message: {result.get('message', 'N/A')}")
-            print("\n🎉 OAuth2 email sending is working perfectly!")
-            print("📧 All emails will now be sent from: mocptydata@gmail.com")
-        else:
-            print("❌ Email sending failed!")
-            print(f"📧 Error: {result.get('error', 'Unknown error')}")
+        # if result.get('success'):
+        #     print("✅ Email sent successfully!")
+        #     print(f"📧 Message ID: {result.get('message_id', 'N/A')}")
+        #     print(f"📧 Message: {result.get('message', 'N/A')}")
+        #     print("\n🎉 OAuth2 email sending is working perfectly!")
+        #     print("📧 All emails will now be sent from: mocptydata@gmail.com")
+        # else:
+        #     print("❌ Email sending failed!")
+        #     print(f"📧 Error: {result.get('message_id', 'Unknown error')}")
+        
+        print("📧 Email service is disabled - no emails will be sent")
             
     except Exception as e:
         print(f"❌ Error during OAuth2 email test: {str(e)}")

@@ -4,9 +4,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
+# from google.oauth2 import service_account
+# from googleapiclient.discovery import build
+# from googleapiclient.errors import HttpError
 from django.conf import settings
 import logging
 
@@ -28,9 +28,9 @@ class GoogleCloudEmailService:
             
             if os.path.exists(credentials_path):
                 # Use OAuth2 credentials
-                from google_auth_oauthlib.flow import InstalledAppFlow
-                from google.auth.transport.requests import Request
-                from googleapiclient.discovery import build
+                # from google_auth_oauthlib.flow import InstalledAppFlow
+                # from google.auth.transport.requests import Request
+                # from googleapiclient.discovery import build
                 import pickle
                 
                 # Gmail API scopes
@@ -57,12 +57,12 @@ class GoogleCloudEmailService:
                     with open(token_path, 'wb') as token:
                         pickle.dump(creds, token)
                 
-                self.service = build('gmail', 'v1', credentials=creds)
-                logger.info("Gmail service initialized with OAuth2 credentials")
+                # self.service = build('gmail', 'v1', credentials=creds)
+                # logger.info("Gmail service initialized with OAuth2 credentials")
                 
             else:
                 # Fallback to API key (limited functionality)
-                from googleapiclient.discovery import build
+                # from googleapiclient.discovery import build
                 
                 # Note: Gmail API requires OAuth2 for full functionality
                 # API key can be used for other Google Cloud services
@@ -105,13 +105,13 @@ class GoogleCloudEmailService:
                 message['from'] = from_email
             else:
                 # Get the email from OAuth2 credentials
-                try:
-                    user_info = self.service.users().getProfile(userId='me').execute()
-                    oauth2_email = user_info.get('emailAddress', 'noreply@eclick.com')
-                    message['from'] = oauth2_email
-                except Exception as e:
-                    logger.warning(f"Could not get OAuth2 user email: {e}")
-                    message['from'] = 'noreply@eclick.com'  # Fallback
+                # try:
+                #     user_info = self.service.users().getProfile(userId='me').execute()
+                #     oauth2_email = user_info.get('emailAddress', 'noreply@eclick.com')
+                #     message['from'] = oauth2_email
+                # except Exception as e:
+                #     logger.warning(f"Could not get OAuth2 user email: {e}")
+                message['from'] = 'noreply@eclick.com'  # Fallback
             
             # Add body
             if '<html>' in body.lower():
@@ -142,23 +142,22 @@ class GoogleCloudEmailService:
             raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
             
             # Send the email
-            sent_message = self.service.users().messages().send(
-                userId='me',
-                body={'raw': raw_message}
-            ).execute()
+            # sent_message = self.service.users().messages().send(
+            #     userId='me',
+            #     body={'raw': raw_message}
+            # ).execute()
             
-            return {
-                'success': True,
-                'message_id': sent_message['id'],
-                'message': 'Email sent successfully'
-            }
-            
-        except HttpError as error:
-            logger.error(f"Gmail API error: {error}")
             return {
                 'success': False,
-                'error': f'Gmail API error: {str(error)}'
+                'error': 'Gmail service disabled - no email sent'
             }
+            
+        # except HttpError as error:
+        #     logger.error(f"Gmail API error: {error}")
+        #     return {
+        #         'success': False,
+        #         'error': f'Gmail API error: {str(error)}'
+        #     }
         except Exception as e:
             logger.error(f"Error sending email: {str(e)}")
             return {
@@ -506,5 +505,5 @@ class GoogleCloudEmailService:
         
         return recommendations_html
 
-# Create a global instance
-email_service = GoogleCloudEmailService() 
+# Create a global instance - DISABLED
+# email_service = GoogleCloudEmailService() 
