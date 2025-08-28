@@ -14,14 +14,25 @@ SECRET_KEY = 'django-insecure-your-secret-key'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '167.88.43.168', '77.37.121.135', '*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '167.88.43.168', '77.37.121.135', 'eclick.co.za', 'www.eclick.co.za', '*']
 
 # Login URL for @login_required decorator
 LOGIN_URL = '/login/'
 
-# Email Configuration - DISABLED
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Console backend - no real emails
-DEFAULT_FROM_EMAIL = 'noreply@eclick.com'
+# Email Configuration - Production Ready for Hostinger Ubuntu
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.hostinger.com')  # Hostinger's SMTP server
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'False').lower() == 'true'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'admin@eclick.co.za')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+
+# Alternative: Use Gmail SMTP if you prefer
+# EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+# EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+# EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
 
 # Google Cloud API Configuration - DISABLED
 # GOOGLE_CLOUD_API_KEY = 'AIzaSyBAHeuA83Rl--GvorBIZlY8UOratOu-X2U'
@@ -97,16 +108,13 @@ DATABASES = {
             'charset': 'utf8mb4',
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO'",
             'autocommit': True,
-            'connect_timeout': 30,  # Reduced from 60 to 30 seconds
-            'read_timeout': 30,     # Reduced from 60 to 30 seconds
-            'write_timeout': 30,    # Reduced from 60 to 30 seconds
-            'sql_mode': 'STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO',
-            'charset': 'utf8mb4',
+            'connect_timeout': 60,  # Increased timeout for better stability
+            'read_timeout': 60,     # Increased timeout for better stability
+            'write_timeout': 60,    # Increased timeout for better stability
             'use_unicode': True,
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO'",
+            'sql_mode': 'STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO',
         },
-        'CONN_MAX_AGE': 300,  # Reduced from 600 to 5 minutes for better connection management
-        'CONN_HEALTH_CHECKS': True,  # Enable connection health checks
+        'CONN_MAX_AGE': 0,  # Disable persistent connections to avoid connection issues
         'ATOMIC_REQUESTS': False,  # Disable atomic requests for better performance
     }
 }
@@ -169,5 +177,7 @@ CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com")
 CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com")
 CSP_IMG_SRC = ("'self'", "data:", "https:")
 CSP_FONT_SRC = ("'self'", "https:")
+CSP_FRAME_SRC = ("'self'", "https://www.google.com", "https://maps.google.com", "https://www.google.com/maps")
+CSP_FRAME_ANCESTORS = ("'self'",)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
