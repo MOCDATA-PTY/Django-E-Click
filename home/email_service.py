@@ -532,23 +532,19 @@ class SimpleEmailService:
         encoded_username = quote(client_username)
         setup_url = f"{site_url}/client/setup-password/?username={encoded_username}" if site_url else f"/client/setup-password/?username={encoded_username}"
         
-        text_body = f"""
-Welcome to the {project_name} project!
+        text_body = f"""Dear {client_username},
 
-Your username: {client_username}
+Welcome to the {project_name} Project. To securely set up your password, please use the One-Time Password (OTP) provided below:
 
-To set your password, please use the following OTP code:
-{otp}
+🔐 Your OTP: {otp}
 
-This OTP will expire in 10 minutes.
+To proceed, click the link below and follow the instructions:
+create password
 
-You can set your password by visiting:
-{setup_url}
-
-If you didn't request this, please ignore this email.
+If you did not request this setup, please disregard this message.
 
 Best regards,
-E-Click Team
+E-Click Project Management Team
         """
         
         return text_body.strip()
@@ -559,23 +555,19 @@ E-Click Team
         encoded_username = quote(username)
         setup_url = f"{site_url}/user/setup-password/?username={encoded_username}" if site_url else f"/user/setup-password/?username={encoded_username}"
         
-        text_body = f"""
-Welcome to E-Click!
+        text_body = f"""Dear {username},
 
-Your username: {username}
+Welcome to E-Click. To securely set up your password, please use the One-Time Password (OTP) provided below:
 
-To set your password, please use the following OTP code:
-{otp}
+🔐 Your OTP: {otp}
 
-This OTP will expire in 10 minutes.
+To proceed, click the link below and follow the instructions:
+create password
 
-You can set your password by visiting:
-{setup_url}
-
-If you didn't request this, please ignore this email.
+If you did not request this setup, please disregard this message.
 
 Best regards,
-E-Click Team
+E-Click Project Management Team
         """
         
         return text_body.strip()
@@ -586,27 +578,21 @@ E-Click Team
         encoded_username = quote(username)
         reset_url = f"{site_url}/user/reset-password/?username={encoded_username}" if site_url else f"/user/reset-password/?username={encoded_username}"
         
-        text_body = f"""
+        text_body = f"""Dear {username},
+
 Password Reset Request - E-Click
 
-Your username: {username}
+An administrator has requested a password reset for your account. To securely reset your password, please use the One-Time Password (OTP) provided below:
 
-An administrator has requested a password reset for your account.
+🔐 Your OTP: {otp}
 
-To reset your password, please use the following OTP code:
-{otp}
+To proceed, click the link below and follow the instructions:
+create password
 
-This OTP will expire in 10 minutes.
-
-You can reset your password by visiting:
-{reset_url}
-
-IMPORTANT: Click on the link above or copy and paste it into your web browser.
-
-If you didn't request this password reset, please contact your administrator immediately.
+If you did not request this password reset, please contact your administrator immediately.
 
 Best regards,
-E-Click Team
+E-Click Project Management Team
         """
         
         return text_body.strip()

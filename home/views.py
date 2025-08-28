@@ -5244,7 +5244,7 @@ def send_client_otp(request):
             otp = client.generate_otp()
             
             # Use localhost for development
-            site_url = "http://127.0.0.1:8000"
+            site_url = request.build_absolute_uri('/').rstrip('/')
             
             # Send OTP email using SimpleEmailService with Microsoft SMTP
             from .email_service import SimpleEmailService
