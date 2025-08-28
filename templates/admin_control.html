@@ -341,6 +341,15 @@
                                                 </button>
                                                 {% endif %}
                                             </form>
+                                            
+                                            <form method="post" class="inline">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                <button type="submit" name="action" value="reset_password" 
+                                                        class="px-2 py-1 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors">
+                                                    Reset Password
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

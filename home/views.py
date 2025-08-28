@@ -670,39 +670,18 @@ def add_project(request):
                         email_result = email_service.send_email(
                             to_email=client_email,
                             subject=f"Set Your Password - {name} Project",
-                            body=f"""
-                            <html>
-                            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                                    <div style="text-align: center; margin-bottom: 30px;">
-                                        <h1 style="color: #3b82f6; margin-bottom: 10px;">E-Click Technologies</h1>
-                                        <h2 style="color: #374151; margin-bottom: 20px;">Set Your Password</h2>
-                                    </div>
-                                    
-                                    <div style="background: #f9fafb; padding: 25px; border-radius: 10px; margin-bottom: 25px;">
-                                        <p style="font-size: 16px; margin-bottom: 20px;">Dear <strong>{client_username}</strong>,</p>
-                                        
-                                        <p style="font-size: 16px; margin-bottom: 20px;">Welcome to the <strong>{name}</strong> project! Please use the following OTP to set your password:</p>
-                                        
-                                        <div style="background: #3b82f6; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 25px 0;">
-                                            <h3 style="margin: 0; font-size: 18px;">🔐 Your OTP Code</h3>
-                                            <p style="font-size: 24px; font-weight: bold; margin: 10px 0 0 0; letter-spacing: 3px;">{otp}</p>
-                                        </div>
-                                        
-                                        <p style="font-size: 16px; margin-bottom: 20px;">Please visit the link below to set your password:</p>
-                                        
-                                        <div style="text-align: center; margin: 25px 0;">
-                                            <a href="{site_url}/client/setup-password/?username={client_username}" style="background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Set Password Now</a>
-                                        </div>
-                                    </div>
-                                    
-                                    <div style="text-align: center; color: #6b7280; font-size: 14px;">
-                                        <p>Best regards,<br><strong>E-Click Project Management Team</strong></p>
-                                    </div>
-                                </div>
-                            </body>
-                            </html>
-                            """,
+                            body=f"""Dear {client_username},
+
+Welcome to the {name} project! Please use the following OTP to set your password:
+
+🔐 Your OTP: {otp}
+
+Please visit: {site_url}/client/setup-password/?username={client_username}
+
+This OTP will expire in 10 minutes.
+
+Best regards,
+E-Click Project Management Team""",
                             from_email=None  # Will use default from settings
                         )
                         
@@ -3332,39 +3311,18 @@ def admin_control(request):
                     email_result = email_service.send_email(
                         to_email=email,
                         subject="Set Your Password - Welcome to E-Click",
-                        body=f"""
-                        <html>
-                        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                                <div style="text-align: center; margin-bottom: 30px;">
-                                    <h1 style="color: #3b82f6; margin-bottom: 10px;">E-Click Technologies</h1>
-                                    <h2 style="color: #374151; margin-bottom: 20px;">Set Your Password</h2>
-                                </div>
-                                
-                                <div style="background: #f9fafb; padding: 25px; border-radius: 10px; margin-bottom: 25px;">
-                                    <p style="font-size: 16px; margin-bottom: 20px;">Dear <strong>{username}</strong>,</p>
-                                    
-                                    <p style="font-size: 16px; margin-bottom: 20px;">Welcome to E-Click! Please use the following OTP to set your password:</p>
-                                    
-                                    <div style="background: #3b82f6; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 25px 0;">
-                                        <h3 style="margin: 0; font-size: 18px;">🔐 Your OTP Code</h3>
-                                        <p style="font-size: 24px; font-weight: bold; margin: 10px 0 0 0; letter-spacing: 3px;">{otp}</p>
-                                    </div>
-                                    
-                                    <p style="font-size: 16px; margin-bottom: 20px;">Please visit the link below to set your password:</p>
-                                    
-                                                                            <div style="text-align: center; margin: 25px 0;">
-                                            <a href="{site_url}/user/setup-password/?username={username}" style="background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Set Password Now</a>
-                                        </div>
-                                </div>
-                                
-                                <div style="text-align: center; color: #6b7280; font-size: 14px;">
-                                    <p>Best regards,<br><strong>E-Click Team</strong></p>
-                                </div>
-                            </div>
-                        </body>
-                        </html>
-                        """,
+                        body=f"""Dear {username},
+
+Welcome to E-Click! Please use the following OTP to set your password:
+
+🔐 Your OTP: {otp}
+
+Please visit: {site_url}/user/setup-password/?username={username}
+
+This OTP will expire in 10 minutes.
+
+Best regards,
+E-Click Team""",
                         from_email=None  # Will use default from settings
                     )
                     
@@ -3485,6 +3443,50 @@ def admin_control(request):
             profile.save()
             
             messages.success(request, f'User {user.username} account has been unlocked.')
+            return redirect('admin_control')
+        
+        elif action == 'reset_password':
+            user_id = request.POST.get('user_id')
+            user = get_object_or_404(User, id=user_id)
+            
+            try:
+                # Generate new OTP for password reset
+                from .models import generate_user_otp
+                otp = generate_user_otp(user)
+                
+                # Send password reset email
+                site_url = request.build_absolute_uri('/').rstrip('/')
+                from .email_service import SimpleEmailService
+                email_service = SimpleEmailService()
+                
+                email_result = email_service.send_email(
+                    to_email=user.email,
+                    subject="Password Reset - E-Click",
+                    body=f"""Dear {user.username},
+
+Your password has been reset by an administrator.
+
+Please use the following OTP to set a new password:
+
+🔐 Your OTP: {otp}
+
+Please visit: {site_url}/user/setup-password/?username={user.username}
+
+This OTP will expire in 10 minutes.
+
+Best regards,
+E-Click Team""",
+                    from_email=None
+                )
+                
+                if email_result['success']:
+                    messages.success(request, f'Password reset email sent to {user.username} at {user.email}')
+                else:
+                    messages.warning(request, f'Password reset email failed: {email_result.get("error", "Unknown error")}')
+                    
+            except Exception as e:
+                messages.error(request, f'Error resetting password for {user.username}: {str(e)}')
+            
             return redirect('admin_control')
         
         elif action == 'update_user_permissions':
