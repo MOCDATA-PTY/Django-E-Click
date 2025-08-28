@@ -671,19 +671,14 @@ def add_project(request):
                             to_email=client_email,
                             subject=f"Set Your Password - {name} Project",
                             body=f"""<html>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <p>Dear {client_username},</p>
-    
-    <p>Welcome to the {name} project! Please use the following OTP to set your password:</p>
-    
-    <p style="font-size: 18px; font-weight: bold; color: #2563eb;">🔐 Your OTP: {otp}</p>
-    
-    <p>You can set your password here:</p>
-    <p><a href="{site_url}/client/setup-password/?username={client_username}" style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up New Password</a></p>
-    
-    <p style="color: #dc2626; font-weight: bold;">⚠️ Please note: This OTP is valid for 10 minutes only.</p>
-    
-    <p>Best regards,<br>E-Click Project Management Team</p>
+<body>
+<p><img src=\"https://eclick.co.za/wp-content/uploads/2024/01/eclick-logo.png\" alt=\"E-Click Logo\" width=\"140\"></p>
+<p>Dear {client_username},</p>
+<p>Welcome to the {name} project! Please use the One-Time Password (OTP) below to set your password:</p>
+<p>OTP: {otp}</p>
+<p>You can set your password here: <a href=\"{site_url}/client/setup-password/?username={client_username}\">Set Up New Password</a></p>
+<p>This OTP is valid for 10 minutes.</p>
+<p>Best regards,<br>E-Click Project Management Team</p>
 </body>
 </html>""",
                             from_email=None  # Will use default from settings
@@ -3316,19 +3311,14 @@ def admin_control(request):
                         to_email=email,
                         subject="Set Your Password - Welcome to E-Click",
                         body=f"""<html>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <p>Dear {username},</p>
-    
-    <p>Welcome to E-Click! Please use the following OTP to set your password:</p>
-    
-    <p style="font-size: 18px; font-weight: bold; color: #2563eb;">🔐 Your OTP: {otp}</p>
-    
-    <p>You can set your password here:</p>
-    <p><a href="{site_url}/user/setup-password/?username={username}" style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up New Password</a></p>
-    
-    <p style="color: #dc2626; font-weight: bold;">⚠️ Please note: This OTP is valid for 10 minutes only.</p>
-    
-    <p>Best regards,<br>E-Click Team</p>
+<body>
+<p><img src="https://eclick.co.za/wp-content/uploads/2024/01/eclick-logo.png" alt="E-Click Logo" width="140"></p>
+<p>Dear {username},</p>
+<p>Welcome to E-Click! Please use the One-Time Password (OTP) below to set your password:</p>
+<p>OTP: {otp}</p>
+<p>You can set your password here: <a href="{site_url}/user/setup-password/?username={username}">Set Up New Password</a></p>
+<p>This OTP is valid for 10 minutes.</p>
+<p>Best regards,<br>E-Click Team</p>
 </body>
 </html>""",
                         from_email=None  # Will use default from settings
@@ -3471,21 +3461,15 @@ def admin_control(request):
                     to_email=user.email,
                     subject="Password Reset - E-Click",
                     body=f"""<html>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <p>Dear {user.username},</p>
-    
-    <p>Your account password has been reset by an administrator. To create a new password, please use the One-Time Password (OTP) provided below:</p>
-    
-    <p style="font-size: 18px; font-weight: bold; color: #2563eb;">🔐 OTP: {otp}</p>
-    
-    <p>You can reset your password here:</p>
-    <p><a href="{site_url}/user/setup-password/?username={user.username}" style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up New Password</a></p>
-    
-    <p style="color: #dc2626; font-weight: bold;">⚠️ Please note: This OTP is valid for 10 minutes only.</p>
-    
-    <p>If you did not request this password reset, please contact our support team immediately.</p>
-    
-    <p>Best regards,<br>E-Click Team</p>
+<body>
+<p><img src="https://eclick.co.za/wp-content/uploads/2024/01/eclick-logo.png" alt="E-Click Logo" width="140"></p>
+<p>Dear {user.username},</p>
+<p>Your password has been reset by an administrator. Use the One-Time Password (OTP) below to set a new password:</p>
+<p>OTP: {otp}</p>
+<p>Reset your password here: <a href="{site_url}/user/setup-password/?username={user.username}">Set Up New Password</a></p>
+<p>This OTP is valid for 10 minutes.</p>
+<p>If you did not request this password reset, please contact our support team immediately.</p>
+<p>Best regards,<br>E-Click Team</p>
 </body>
 </html>""",
                     from_email=None
