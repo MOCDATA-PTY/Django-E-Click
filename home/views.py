@@ -672,7 +672,7 @@ def add_project(request):
                             subject=f"Set Your Password - {name} Project",
                             body=f"""<html>
 <body>
-<p><img src=\"https://eclick.co.za/wp-content/uploads/2024/01/eclick-logo.png\" alt=\"E-Click Logo\" width=\"140\"></p>
+<p><img src=\"{site_url}/static/images/E-CLICK_LOGO-removebg-preview.png\" alt=\"E-Click Logo\" width=\"140\"></p>
 <p>Dear {client_username},</p>
 <p>Welcome to the {name} project! Please use the One-Time Password (OTP) below to set your password:</p>
 <p>OTP: {otp}</p>
@@ -3312,7 +3312,7 @@ def admin_control(request):
                         subject="Set Your Password - Welcome to E-Click",
                         body=f"""<html>
 <body>
-<p><img src="https://eclick.co.za/wp-content/uploads/2024/01/eclick-logo.png" alt="E-Click Logo" width="140"></p>
+<p><img src="{site_url}/static/images/E-CLICK_LOGO-removebg-preview.png" alt="E-Click Logo" width="140"></p>
 <p>Dear {username},</p>
 <p>Welcome to E-Click! Please use the One-Time Password (OTP) below to set your password:</p>
 <p>OTP: {otp}</p>
@@ -3462,7 +3462,7 @@ def admin_control(request):
                     subject="Password Reset - E-Click",
                     body=f"""<html>
 <body>
-<p><img src="https://eclick.co.za/wp-content/uploads/2024/01/eclick-logo.png" alt="E-Click Logo" width="140"></p>
+<p><img src="{site_url}/static/images/E-CLICK_LOGO-removebg-preview.png" alt="E-Click Logo" width="140"></p>
 <p>Dear {user.username},</p>
 <p>Your password has been reset by an administrator. Use the One-Time Password (OTP) below to set a new password:</p>
 <p>OTP: {otp}</p>
