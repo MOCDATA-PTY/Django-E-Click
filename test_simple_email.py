@@ -22,14 +22,16 @@ def test_simple_email():
     print("=" * 50)
     
     # Test basic email sending
-    test_email = "test@example.com"  # Replace with your test email
-    subject = "Test Email from E-Click"
+    test_email = "marnus.badenhors@eclick.co.za"  # Test the specific email that was having issues
+    subject = "Test Email from E-Click System"
     body = """
     <html>
     <body>
         <h1>Test Email</h1>
         <p>This is a test email from the E-Click system using Django's built-in email functionality.</p>
         <p>If you receive this email, the email service is working correctly!</p>
+        <p>Sent to: marnus.badenhors@eclick.co.za</p>
+        <p>Time: Test email to verify email service functionality</p>
     </body>
     </html>
     """

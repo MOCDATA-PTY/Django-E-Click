@@ -3318,7 +3318,7 @@ def admin_control(request):
 
                         🔐 Your OTP: {otp}
 
-                        Please visit: {site_url}/user-setup-password/
+                        Please visit: {site_url}/user/setup-password/
 
                         Best regards,
                         E-Click Team
