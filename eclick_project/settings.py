@@ -149,14 +149,14 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 # Custom user model - REQUIRED for your User model to work
 AUTH_USER_MODEL = 'main.User'
 
-# Email Configuration
+# Email Configuration - Using your eclick.co.za email server
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # For Gmail
+EMAIL_HOST = 'mail.eclick.co.za'  # Your eclick.co.za SMTP server
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-email@gmail.com'  # Replace with your email
-EMAIL_HOST_PASSWORD = 'your-app-password'  # Replace with your app password
-DEFAULT_FROM_EMAIL = 'your-email@gmail.com'  # Replace with your email
+EMAIL_HOST_USER = 'admin@eclick.co.za'  # Your eclick.co.za email
+EMAIL_HOST_PASSWORD = 'EClickAdmin@1'  # Your eclick.co.za password
+DEFAULT_FROM_EMAIL = 'admin@eclick.co.za'  # Your eclick.co.za email
 
 # Authentication backends - FIXED to use the correct backend
 AUTHENTICATION_BACKENDS = [

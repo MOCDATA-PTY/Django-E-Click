@@ -195,6 +195,164 @@ def toggle_theme(request):
 
 def contact(request):
     """Contact page view"""
+    if request.method == 'POST':
+        # Get form data
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        subject = request.POST.get('subject', '').strip()
+        message = request.POST.get('message', '').strip()
+        
+        # Validation
+        if not all([first_name, last_name, email, subject, message]):
+            messages.error(request, 'Please fill in all required fields.')
+            return render(request, 'contact.html')
+        
+        if not email or '@' not in email:
+            messages.error(request, 'Please enter a valid email address.')
+            return render(request, 'contact.html')
+        
+        try:
+            # Import email service
+            from home.email_service import email_service
+            
+            # Create email content
+            full_name = f"{first_name} {last_name}"
+            email_subject = f"Contact Form: {subject}"
+            
+            # Create HTML email body
+            html_body = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>New Contact Form Submission</title>
+                <style>
+                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                    .header {{ background: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }}
+                    .content {{ background: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px; }}
+                    .field {{ margin-bottom: 15px; }}
+                    .label {{ font-weight: bold; color: #dc2626; }}
+                    .value {{ margin-left: 10px; }}
+                    .message-box {{ background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #dc2626; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h2>New Contact Form Submission</h2>
+                        <p>E-Click Website Contact Form</p>
+                    </div>
+                    <div class="content">
+                        <div class="field">
+                            <span class="label">Name:</span>
+                            <span class="value">{full_name}</span>
+                        </div>
+                        <div class="field">
+                            <span class="label">Email:</span>
+                            <span class="value">{email}</span>
+                        </div>
+                        <div class="field">
+                            <span class="label">Phone:</span>
+                            <span class="value">{phone if phone else 'Not provided'}</span>
+                        </div>
+                        <div class="field">
+                            <span class="label">Subject:</span>
+                            <span class="value">{subject}</span>
+                        </div>
+                        <div class="field">
+                            <span class="label">Message:</span>
+                            <div class="message-box">{message}</div>
+                        </div>
+                        <div style="margin-top: 20px; padding: 15px; background: #e5f3ff; border-radius: 5px; border-left: 4px solid #0066cc;">
+                            <p><strong>Submission Details:</strong></p>
+                            <p>Submitted on: {request.META.get('HTTP_HOST', 'Unknown')}</p>
+                            <p>IP Address: {request.META.get('REMOTE_ADDR', 'Unknown')}</p>
+                            <p>User Agent: {request.META.get('HTTP_USER_AGENT', 'Unknown')}</p>
+                        </div>
+                        <div class="contact-info">
+                            <h3>Need immediate assistance?</h3>
+                            <p><strong>Phone:</strong> +27 76 740 1777</p>
+                            <p><strong>Email:</strong> info@eclick.co.za</p>
+                            <p><strong>Office Hours:</strong> Monday - Friday: 8:00 AM - 6:00 PM SAST</p>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            
+            # Create plain text version
+            text_body = f"""
+New Contact Form Submission - E-Click Website
+
+Name: {full_name}
+Email: {email}
+Phone: {phone if phone else 'Not provided'}
+Subject: {subject}
+
+Message:
+{message}
+
+---
+Submitted on: {request.META.get('HTTP_HOST', 'Unknown')}
+IP Address: {request.META.get('REMOTE_ADDR', 'Unknown')}
+            """
+            
+            # Send email to admin
+            admin_email_result = email_service.send_email(
+                to_email='info@eclick.co.za',
+                subject=email_subject,
+                body=html_body,
+                from_email=email_service.from_email,
+                cc_emails=['ethansevenster621@gmail.com']  # CC to developer for monitoring
+            )
+            
+            # Send confirmation email to user
+            user_email_result = email_service.send_email(
+                to_email=email,
+                subject="Thank you for contacting E-Click - We've received your message",
+                body=user_confirmation_html,
+                from_email=email_service.from_email,
+                cc_emails=['ethansevenster621@gmail.com']  # CC to developer for monitoring
+            )
+            
+            # Check if both emails were sent successfully
+            if admin_email_result['success'] and user_email_result['success']:
+                messages.success(request, 'Thank you! Your message has been sent successfully. We\'ll get back to you soon, and you\'ll receive a confirmation email.')
+            elif admin_email_result['success']:
+                messages.warning(request, 'Your message was received by our team, but we couldn\'t send you a confirmation email. We\'ll still get back to you soon.')
+            elif user_email_result['success']:
+                messages.warning(request, 'You\'ll receive a confirmation email, but there was an issue sending your message to our team. Please try again or contact us directly.')
+            else:
+                messages.error(request, 'Sorry, there was an error sending your message. Please try again or contact us directly at +27 76 740 1777.')
+                return render(request, 'contact.html')
+            
+            # Log the contact form submission
+            try:
+                from home.models import SystemLog
+                SystemLog.log_action(
+                    user=None,
+                    action='contact_form_submission',
+                    target_model='Contact',
+                    target_id=None,
+                    target_name=f"Contact from {full_name} ({email})",
+                    request=request
+                )
+            except Exception as log_error:
+                # Log error but don't fail the form submission
+                print(f"Failed to log contact form submission: {log_error}")
+            
+            # Redirect to prevent form resubmission
+            return redirect('main:contact')
+            
+        except Exception as e:
+            print(f"Contact form error: {str(e)}")
+            messages.error(request, f'Sorry, there was an error sending your message: {str(e)}. Please try again or contact us directly at +27 76 740 1777.')
+            return render(request, 'contact.html')
+    
     return render(request, 'contact.html')
 
 @require_POST 

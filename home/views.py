@@ -31,6 +31,7 @@ import uuid
 # email_service = SimpleEmailService()  # Commented out - using Gmail API instead
 
 def home(request):
+    """Public Home page (index)"""
     return render(request, 'home/index.html')
 
 def about(request):
@@ -42,12 +43,86 @@ def solutions(request):
     return render(request, 'home/solutions.html')
 
 def contact(request):
-    """Public Contact page"""
+    """Public Contact page with form handling"""
+    if request.method == 'POST':
+        try:
+            # Extract form data
+            first_name = request.POST.get('first_name', '').strip()
+            last_name = request.POST.get('last_name', '').strip()
+            email = request.POST.get('email', '').strip()
+            phone = request.POST.get('phone', '').strip()
+            subject = request.POST.get('subject', '').strip()
+            message = request.POST.get('message', '').strip()
+            
+            # Basic validation
+            if not all([first_name, last_name, email, subject, message]):
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'Please fill in all required fields.'
+                })
+            
+            # Email validation
+            import re
+            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if not re.match(email_pattern, email):
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'Please enter a valid email address.'
+                })
+            
+            # Send email notification using your email service
+            from django.core.mail import send_mail
+            from django.conf import settings
+            
+            # Prepare email content
+            email_subject = f"New Contact Form Submission – E-Click Website"
+            email_message = f"""New Contact Form Submission – E-Click Website
+
+Name: {first_name} {last_name}
+Email: {email}
+
+Phone: {phone}
+Subject: {subject}
+
+Message:
+{message}"""
+            
+            try:
+                send_mail(
+                    email_subject,
+                    email_message,
+                    'admin@eclick.co.za',  # From your eclick.co.za email
+                    ['ethansevenster621@gmail.com'],  # To your Gmail
+                    fail_silently=False,
+                )
+                
+                return JsonResponse({
+                    'success': True, 
+                    'message': 'Thank you for your message! We will get back to you soon.'
+                })
+            except Exception as e:
+                # Log the error but don't expose it to the user
+                print(f"Email sending failed: {e}")
+                return JsonResponse({
+                    'success': True,  # Still return success to avoid user confusion
+                    'message': 'Thank you for your message! We will get back to you soon.'
+                })
+                
+        except Exception as e:
+            return JsonResponse({
+                'success': False, 
+                'message': 'An error occurred while processing your request. Please try again.'
+            })
+    
     return render(request, 'home/contact.html')
 
 def services(request):
     """Public Services page (supports existing template links)"""
     return render(request, 'home/services.html')
+
+def clients(request):
+    """Public Clients page"""
+    return render(request, 'home/clients.html')
 
 def login_view(request):
     """Simplified login view for both admin and clients without CSRF"""
@@ -566,51 +641,67 @@ def add_project(request):
                         # New client - will need OTP
                         if not client_username:
                             # Generate username from email if not provided
-                            client_username = client_email.split('@')[0]
+                            base_username = client_email.split('@')[0]
+                            # Check if username already exists and make it unique
+                            counter = 1
+                            client_username = base_username
+                            while Client.objects.filter(username=client_username).exists():
+                                client_username = f"{base_username}{counter}"
+                                counter += 1
                         
                         # Create new client
-                        new_client = Client.objects.create(
-                            username=client_username,
-                            email=client_email,
-                            is_active=True
-                        )
+                        try:
+                            new_client = Client.objects.create(
+                                username=client_username,
+                                email=client_email,
+                                is_active=True
+                            )
+                        except Exception as e:
+                            messages.error(request, f'Error creating client: {str(e)}')
+                            return redirect('projects_page')
                         
                         # Generate and send OTP for new client
                         otp = new_client.generate_otp()
                         
-                        # Send OTP email using Gmail API - DISABLED
-                        # site_url = "http://127.0.0.1:8000"
-                        # gmail_service = GoogleCloudEmailService()
-                        # email_result = gmail_service.send_email(
-                        #     to_email=client_email,
-                        #     subject=f"Set Your Password - {name} Project",
-                        #     body=f"""
-                        #     Dear {client_username},
+                        # Send OTP email using SimpleEmailService with Microsoft SMTP
+                        site_url = request.build_absolute_uri('/').rstrip('/')
+                        from .email_service import SimpleEmailService
+                        email_service = SimpleEmailService()
+                        email_result = email_service.send_email(
+                            to_email=client_email,
+                            subject=f"Set Your Password - {name} Project",
+                            body=f"""
+                            Dear {client_username},
 
-                        #     Welcome to the {name} project! Please use the following OTP to set your password:
+                            Welcome to the {name} project! Please use the following OTP to set your password:
 
-                        #     🔐 Your OTP: {otp}
+                            🔐 Your OTP: {otp}
 
-                        #     Please visit: {site_url}/client/setup-password/
+                            Please visit: {site_url}/client/setup-password/
 
-                        #     Best regards,
-                        #     E-Click Project Management Team
-                        #     """,
-                        #     from_email=None  # Will use OAuth2 account email
-                        # )
+                            Best regards,
+                            E-Click Project Management Team
+                            """,
+                            from_email=None  # Will use default from settings
+                        )
                         
-                        # Email service is disabled - just show success message
-                        messages.success(request, f'Project "{name}" created successfully! Email notifications are disabled.')
+                        if email_result['success']:
+                            messages.success(request, f'Project "{name}" created successfully! OTP email sent to {client_email}')
+                        else:
+                            messages.warning(request, f'Project "{name}" created successfully! OTP email failed: {email_result.get("error", "Unknown error")}')
                 
                 # Create project (dates will be calculated from tasks)
-                project = Project.objects.create(
-                    name=name,
-                    client=client,
-                    client_username=client_username,
-                    client_email=client_email,
-                    status=status,
-                    priority='medium'  # Add default priority
-                )
+                try:
+                    project = Project.objects.create(
+                        name=name,
+                        client=client,
+                        client_username=client_username,
+                        client_email=client_email,
+                        status=status
+                    )
+                except Exception as e:
+                    messages.error(request, f'Error creating project: {str(e)}')
+                    return redirect('projects_page')
                 
                 # Log project creation
                 SystemLog.log_project_created(request.user, project, request)
@@ -636,16 +727,24 @@ def add_project(request):
                         # Get development status for this task
                         task_development_status = request.POST.get(f'task_development_status_{task_counter}', 'original_quoted')
                         
+                        # Get priority for this task
+                        task_priority = request.POST.get(f'task_priority_{task_counter}', 'medium')
+                        
                         # Create task
-                        task = Task.objects.create(
-                            project=project,
-                            title=task_title,
-                            description=task_description,
-                            status=task_status,
-                            development_status=task_development_status,
-                            start_date=task_start_date,
-                            end_date=task_end_date
-                        )
+                        try:
+                            task = Task.objects.create(
+                                project=project,
+                                title=task_title,
+                                description=task_description,
+                                status=task_status,
+                                development_status=task_development_status,
+                                priority=task_priority,
+                                start_date=task_start_date,
+                                end_date=task_end_date
+                            )
+                        except Exception as e:
+                            messages.error(request, f'Error creating task "{task_title}": {str(e)}')
+                            return redirect('projects_page')
                         
                         # Handle estimated hours if provided
                         estimated_hours = request.POST.get(f'task_estimated_hours_{task_counter}')
@@ -697,14 +796,22 @@ def add_project(request):
                                     except ValueError:
                                         pass
                                 
-                                SubTask.objects.create(
-                                    task=task,
-                                    title=subtask_title,
-                                    description=subtask_description,
-                                    status=subtask_status,
-                                    start_date=subtask_start_date,
-                                    end_date=subtask_end_date
-                                )
+                                # Get priority for this subtask
+                                subtask_priority = request.POST.get(f'subtask_priority_{task_counter}_{subtask_counter}', 'medium')
+                                
+                                try:
+                                    SubTask.objects.create(
+                                        task=task,
+                                        title=subtask_title,
+                                        description=subtask_description,
+                                        status=subtask_status,
+                                        priority=subtask_priority,
+                                        start_date=subtask_start_date,
+                                        end_date=subtask_end_date
+                                    )
+                                except Exception as e:
+                                    messages.error(request, f'Error creating subtask "{subtask_title}": {str(e)}')
+                                    return redirect('projects_page')
                             
                             subtask_counter += 1
                     
@@ -3197,29 +3304,32 @@ def admin_control(request):
                     from .models import generate_user_otp
                     otp = generate_user_otp(user)
                     
-                    # Send OTP email using Gmail API - DISABLED
-                    # site_url = "http://127.0.0.1:8000"
-                    # gmail_service = GoogleCloudEmailService()
-                    # email_result = gmail_service.send_email(
-                    #     to_email=email,
-                    #     subject="Set Your Password - Welcome to E-Click",
-                    #     body=f"""
-                    #     Dear {username},
+                    # Send OTP email using SimpleEmailService with Microsoft SMTP
+                    site_url = request.build_absolute_uri('/').rstrip('/')
+                    from .email_service import SimpleEmailService
+                    email_service = SimpleEmailService()
+                    email_result = email_service.send_email(
+                        to_email=email,
+                        subject="Set Your Password - Welcome to E-Click",
+                        body=f"""
+                        Dear {username},
 
-                    #     Welcome to E-Click! Please use the following OTP to set your password:
+                        Welcome to E-Click! Please use the following OTP to set your password:
 
-                    #     🔐 Your OTP: {otp}
+                        🔐 Your OTP: {otp}
 
-                    #     Please visit: {site_url}/user-setup-password/
+                        Please visit: {site_url}/user-setup-password/
 
-                    #     Best regards,
-                    #     E-Click Team
-                    #     """,
-                    #     from_email=None  # Will use OAuth2 account email
-                    # )
+                        Best regards,
+                        E-Click Team
+                        """,
+                        from_email=None  # Will use default from settings
+                    )
                     
-                    # messages.success(request, f'User "{username}" created successfully with {role} role. OTP sent to {email} for password setup.')
-                    messages.success(request, f'User "{username}" created successfully with {role} role. Email notifications are disabled.')
+                    if email_result['success']:
+                        messages.success(request, f'User "{username}" created successfully with {role} role. OTP sent to {email} for password setup.')
+                    else:
+                        messages.warning(request, f'User "{username}" created successfully with {role} role. OTP email failed: {email_result.get("error", "Unknown error")}')
                         
                 except Exception as e:
                     messages.error(request, f'Error creating user: {str(e)}')
@@ -3411,37 +3521,36 @@ def admin_control(request):
                 print(f"DEBUG: OTP record created for user {user.username}")
                 print(f"DEBUG: User email: {user.email}")
                 
-                # Send OTP email using Gmail API
+                # Send OTP email using SimpleEmailService with Microsoft SMTP
                 print(f"DEBUG: About to send email to {user.email}")
-                # Get the current site URL for the reset link
-                # site_url = request.build_absolute_uri('/').rstrip('/')
-                # gmail_service = GoogleCloudEmailService()
-                # email_result = gmail_service.send_email(
-                #     to_email=user.email,
-                #     subject="Password Reset OTP - E-Click",
-                #     body=f"""
-                #     Dear {user.username},
+                from .email_service import SimpleEmailService
+                email_service = SimpleEmailService()
+                email_result = email_service.send_email(
+                    to_email=user.email,
+                    subject="Password Reset OTP - E-Click",
+                    body=f"""
+                    Dear {user.username},
 
-                #     You have requested a password reset. Please use the following OTP:
+                    You have requested a password reset. Please use the following OTP:
 
-                #     🔐 Your OTP: {otp}
+                    🔐 Your OTP: {otp}
 
-                #     This OTP will expire in 10 minutes.
+                    This OTP will expire in 10 minutes.
 
-                #     Best regards,
-                #     E-Click Team
-                #     """,
-                #     from_email=None  # Will use OAuth2 account email
-                # )
-                # print(f"DEBUG: Email result: {email_result}")
+                    Best regards,
+                    E-Click Team
+                    """,
+                    from_email=None  # Will use default from settings
+                )
+                print(f"DEBUG: Email result: {email_result}")
                 
-                # if not email_result['success']:
-                #     print(f"DEBUG: Email failed with error: {email_result['error']}")
-                #     messages.error(request, f'Failed to send OTP email: {email_result["error"]}')
-                #     return render(request, 'home/admin_control_enhanced.html')
+                if not email_result['success']:
+                    print(f"DEBUG: Email failed with error: {email_result['error']}")
+                    messages.error(request, f'Failed to send OTP email: {email_result["error"]}')
+                    return render(request, 'home/admin_control_enhanced.html')
                 
-                # print(f"DEBUG: Email sent successfully")
-                messages.success(request, f'Password reset OTP generated for {user.email}. Email notifications are disabled.')
+                print(f"DEBUG: Email sent successfully")
+                messages.success(request, f'Password reset OTP sent successfully to {user.email}.')
                 return redirect('admin_control')
                 
             except Exception as e:
@@ -4307,70 +4416,64 @@ def send_report(request):
             print(f"Custom message: {custom_message}")
             print(f"Date range: {date_range}")
             
-            # Send email using Gmail API - DISABLED
-            # gmail_service = GoogleCloudEmailService()
-            # result = gmail_service.send_email(
-            #     to_email=recipient_email,
-            #     subject=f"E-Click Project Management Report - {report_data['date_range']}",
-            #     body=f"""
-            #     Dear Team,
+            # Send email using SimpleEmailService with Microsoft SMTP
+            from .email_service import SimpleEmailService
+            email_service = SimpleEmailService()
+            result = email_service.send_email(
+                to_email=recipient_email,
+                subject=f"E-Click Project Management Report - {report_data['date_range']}",
+                body=f"""
+                Dear Team,
 
-            #     {custom_message if custom_message else 'Please find below the detailed project management report covering the recent period.'}
+                {custom_message if custom_message else 'Please find below the detailed project management report covering the recent period.'}
 
-            #     Report Summary:
-            #     • Total Projects: {report_data['total_projects']}
-            #     • Completed Projects: {report_data['projects_completed']}
-            #     • Projects In Progress: {report_data['projects_in_progress']}
-            #     • Total Tasks: {report_data['total_tasks']}
-            #     • Completed Tasks: {report_data['completed_tasks']}
-            #     • Task Completion Rate: {report_data['task_completion_rate']:.1f}%
-            #     • User Engagement Rate: {report_data['user_engagement_rate']:.1f}%
+                Report Summary:
+                • Total Projects: {report_data['total_projects']}
+                • Completed Projects: {report_data['projects_completed']}
+                • Projects In Progress: {report_data['projects_in_progress']}
+                • Total Tasks: {report_data['total_tasks']}
+                • Completed Tasks: {report_data['completed_tasks']}
+                • Task Completion Rate: {report_data['task_completion_rate']:.1f}%
+                • User Engagement Rate: {report_data['user_engagement_rate']:.1f}%
 
-            #     Generated on: {report_data['generated_date']}
+                Generated on: {report_data['generated_date']}
 
-            #     Best regards,
-            #     E-Click Project Management Team
-            #     """,
-            #     from_email=None  # Will use OAuth2 account email
-            # )
-            # print(f"Email service result: {result}")
+                Best regards,
+                E-Click Project Management Team
+                """,
+                from_email=None  # Will use default from settings
+            )
+            print(f"Email service result: {result}")
             
             # Log the result for debugging
-            # if result['success']:
-            #     print(f"Report sent successfully to {recipient_email}")
-            # else:
-            #     print(f"Failed to send report: {result.get('error', 'Unknown error')}")
-            
-            # if result['success']:
-            #     # Track the sent report
-            #     from .models import SentReport
-            #     SentReport.log_report_sent(
-            #         report_type='general',
-            #         sent_by=request.user,
-            #         recipient_email=recipient_email,
-            #         report_title=f'General Report - {date_range} Days',
-            #         report_data=report_data,
-            #         custom_message=custom_message
-            #     )
-                
-            #     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            #         return JsonResponse({'success': True, 'message': f'Report sent successfully to {recipient_email}'})
-            #     else:
-            #         messages.success(request, f'Report sent successfully to {recipient_email}')
-            # else:
-            #     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            #         return JsonResponse({'success': False, 'error': result.get("error", "Unknown error")})
-            #     else:
-            #         messages.error(request, f'Error sending report: {result.get("error", "Unknown error")}')
-            
-            # return redirect('send_report')
-            
-            # Email service disabled - just show success message
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': True, 'message': f'Report generated successfully. Email notifications are disabled.'})
+            if result['success']:
+                print(f"Report sent successfully to {recipient_email}")
             else:
-                messages.success(request, f'Report generated successfully. Email notifications are disabled.')
-                return redirect('send_report')
+                print(f"Failed to send report: {result.get('error', 'Unknown error')}")
+            
+            if result['success']:
+                # Track the sent report
+                from .models import SentReport
+                SentReport.log_report_sent(
+                    report_type='general',
+                    sent_by=request.user,
+                    recipient_email=recipient_email,
+                    report_title=f'General Report - {date_range} Days',
+                    report_data=report_data,
+                    custom_message=custom_message
+                )
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': True, 'message': f'Report sent successfully to {recipient_email}'})
+                else:
+                    messages.success(request, f'Report sent successfully to {recipient_email}')
+            else:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'error': result.get("error", "Unknown error")})
+                else:
+                    messages.error(request, f'Error sending report: {result.get("error", "Unknown error")}')
+            
+            return redirect('send_report')
             
         except Exception as e:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -4530,58 +4633,61 @@ def send_project_report(request, project_id):
                 # Generate comprehensive client report using the same function
                 pdf_path = generate_client_specific_pdf_report(client.id, date_range)
                 
-                # Send comprehensive client report email using Gmail API - DISABLED
-                # gmail_service = GoogleCloudEmailService()
-                # result = gmail_service.send_email(
-                #     to_email=project.client_email,
-                #     subject=f"E-Click Comprehensive Client Report: {project.client}",
-                #     body=f"""
-                #     Dear {project.client},
+                # Send comprehensive client report email using SimpleEmailService with Microsoft SMTP
+                from .email_service import SimpleEmailService
+                email_service = SimpleEmailService()
+                result = email_service.send_email(
+                    to_email=project.client_email,
+                    subject=f"E-Click Comprehensive Client Report: {project.client}",
+                    body=f"""
+                    Dear {project.client},
 
-                #     {custom_message if custom_message else 'Please find attached your comprehensive client report covering all your projects for the recent period.'}
+                    {custom_message if custom_message else 'Please find attached your comprehensive client report covering all your projects for the recent period.'}
 
-                #     This report includes:
-                #     • All your projects and their current status
-                #     • Complete task breakdown across all projects
-                #     • Performance metrics and completion rates
-                #     • Timeline analysis and progress tracking
-                #     • Date Range: {report_data['date_range']}
+                    This report includes:
+                    • All your projects and their current status
+                    • Complete task breakdown across all projects
+                    • Performance metrics and completion rates
+                    • Timeline analysis and progress tracking
+                    • Date Range: {report_data['date_range']}
 
-                #     Best regards,
-                #     E-Click Project Management Team
-                #     """,
-                #     from_email=None,  # Will use OAuth2 account email
-                #     attachments=[pdf_path]
-                # )
+                    Best regards,
+                    E-Click Project Management Team
+                    """,
+                    from_email=None,  # Will use default from settings
+                    attachments=[pdf_path]
+                )
             else:
                 # Fallback to project-specific report if client not found
                 pdf_path = generate_comprehensive_project_pdf_report(project_id, date_range)
                 
-                # gmail_service = GoogleCloudEmailService() - DISABLED
-                # result = gmail_service.send_email(
-                #     to_email=project.client_email,
-                #     subject=f"E-Click Project Report: {project.name}",
-                #     body=f"""
-                #     Dear {project.client},
+                # Send project report email using SimpleEmailService with Microsoft SMTP
+                from .email_service import SimpleEmailService
+                email_service = SimpleEmailService()
+                result = email_service.send_email(
+                    to_email=project.client_email,
+                    subject=f"E-Click Project Report: {project.name}",
+                    body=f"""
+                    Dear {project.client},
 
-                #     {custom_message if custom_message else 'Please find attached your comprehensive project report covering the recent period.'}
+                    {custom_message if custom_message else 'Please find attached your comprehensive project report covering the recent period.'}
 
-                # Project Summary:
-                # • Project Name: {project.name}
-                # • Project Status: {project.get_status_display()}
-                # • Total Tasks: {total_tasks}
-                # • Completed Tasks: {completed_tasks}
-                # • Tasks In Progress: {in_progress_tasks}
-                # • Task Completion Rate: {task_completion_rate:.1f}%
-                # • SubTask Completion Rate: {subtask_completion_rate:.1f}%
-                # • Date Range: {report_data['date_range']}
+                    Project Summary:
+                    • Project Name: {project.name}
+                    • Project Status: {project.get_status_display()}
+                    • Total Tasks: {total_tasks}
+                    • Completed Tasks: {completed_tasks}
+                    • Tasks In Progress: {in_progress_tasks}
+                    • Task Completion Rate: {task_completion_rate:.1f}%
+                    • SubTask Completion Rate: {subtask_completion_rate:.1f}%
+                    • Date Range: {report_data['date_range']}
 
-                # Best regards,
-                # E-Click Project Management Team
-                # """,
-                #     from_email=None,  # Will use OAuth2 account email
-                #     attachments=[pdf_path]
-                # )
+                    Best regards,
+                    E-Click Project Management Team
+                    """,
+                    from_email=None,  # Will use default from settings
+                    attachments=[pdf_path]
+                )
             
             # Cleanup temporary PDF
             try:
@@ -4591,11 +4697,17 @@ def send_project_report(request, project_id):
             except Exception:
                 pass
             
-            # Email service disabled - just show success message
-            if client:
-                messages.success(request, f'Comprehensive client report for {project.client} generated successfully. Email notifications are disabled.')
+            # Handle email service result
+            if result['success']:
+                if client:
+                    messages.success(request, f'Comprehensive client report for {project.client} sent successfully to {project.client_email}')
+                else:
+                    messages.success(request, f'Comprehensive project report sent successfully to {project.client_email}')
             else:
-                messages.success(request, f'Comprehensive project report generated successfully. Email notifications are disabled.')
+                if client:
+                    messages.error(request, f'Error sending client report: {result.get("error", "Unknown error")}')
+                else:
+                    messages.error(request, f'Error sending project report: {result.get("error", "Unknown error")}')
             
             return redirect('projects_page')
             
@@ -4750,8 +4862,9 @@ def send_client_report(request):
             }
             
             print(f"Sending client report to: {client_email}")
-            # Send client report email using Gmail API - DISABLED
-            # gmail_service = GoogleCloudEmailService()
+            # Send client report email using SimpleEmailService with Microsoft SMTP
+            from .email_service import SimpleEmailService
+            email_service = SimpleEmailService()
             # Build polished HTML email body for client - EXACTLY like the image
             email_body = f"""
 <html>
@@ -4862,13 +4975,13 @@ def send_client_report(request):
             # Generate client-specific PDF and attach it
             pdf_path = generate_client_specific_pdf_report(client_id)
 
-            # result = gmail_service.send_email( - DISABLED
-            #     to_email=client_email,
-            #     subject=f"Client Report - {client_username} - E-Click",
-            #     body=email_body,
-            #     from_email=None,  # Will use OAuth2 account email
-            #     attachments=[pdf_path]
-            # )
+            result = email_service.send_email(
+                to_email=client_email,
+                subject=f"Client Report - {client_username} - E-Click",
+                body=email_body,
+                from_email=None,  # Will use default from settings
+                attachments=[pdf_path]
+            )
 
             # Cleanup temporary PDF
             try:
@@ -4877,13 +4990,19 @@ def send_client_report(request):
                     os.unlink(pdf_path)
             except Exception:
                 pass
-            # print(f"Client email service result: {result}") - DISABLED
+            print(f"Client email service result: {result}")
             
-            # Email service disabled - just show success message
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': True, 'message': f'Client report generated successfully. Email notifications are disabled.'})
+            # Handle email service result
+            if result['success']:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': True, 'message': f'Client report sent successfully to {client_email}'})
+                else:
+                    messages.success(request, f'Client report sent successfully to {client_email}')
             else:
-                messages.success(request, f'Client report generated successfully. Email notifications are disabled.')
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'error': result.get("error", "Unknown error")})
+                else:
+                    messages.error(request, f'Error sending client report: {result.get("error", "Unknown error")}')
             
         except Exception as e:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -5127,30 +5246,31 @@ def send_client_otp(request):
             # Use localhost for development
             site_url = "http://127.0.0.1:8000"
             
-            # Send OTP email using Gmail API - DISABLED
-            # gmail_service = GoogleCloudEmailService()
-            # email_result = gmail_service.send_email(
-            #     to_email=client_email,
-            #     subject=f"Set Your Password - {project.name} Project",
-            #     body=f"""
-            #     Dear {client_username},
+            # Send OTP email using SimpleEmailService with Microsoft SMTP
+            from .email_service import SimpleEmailService
+            email_service = SimpleEmailService()
+            email_result = email_service.send_email(
+                to_email=client_email,
+                subject=f"Set Your Password - {project.name} Project",
+                body=f"""
+                Dear {client_username},
 
-            #     Welcome to the {project.name} project! Please use the following OTP to set your password:
+                Welcome to the {project.name} project! Please use the following OTP to set your password:
 
-            #     🔐 Your OTP: {otp}
+                🔐 Your OTP: {otp}
 
-            #     Please visit: {site_url}/client/setup-password/?username={client_username}
+                Please visit: {site_url}/client/setup-password/?username={client_username}
 
-            #     Best regards,
-            #     E-Click Project Management Team
-            #     """,
-            #     from_email=None  # Will use OAuth2 account email
-            # )
+                Best regards,
+                E-Click Project Management Team
+                """,
+                from_email=None  # Will use default from settings
+            )
             
-            # if email_result['success']:
-            #     messages.success(request, f'We have sent an OTP to the client at {client_email}')
-            # else:
-            #     messages.error(request, f'Error sending OTP: {email_result["error"]}')
+            if email_result['success']:
+                messages.success(request, f'We have sent an OTP to the client at {client_email}')
+            else:
+                messages.error(request, f'Error sending OTP: {email_result["error"]}')
                 
         except Project.DoesNotExist:
             messages.error(request, 'Project not found.')
@@ -6929,13 +7049,16 @@ def send_project_report_ajax(request):
             # Send email with simple subject
             subject = f"Project Report: {project.name}"
             
-            # result = gmail_service.send_email( - DISABLED
-            #     to_email=client_email,
-            #     subject=subject,
-            #     body=email_body,
-            #     from_email=None,  # Will use OAuth2 account email
-            #     attachments=[pdf_path]
-            # )
+            # Send email using SimpleEmailService with Microsoft SMTP
+            from .email_service import SimpleEmailService
+            email_service = SimpleEmailService()
+            result = email_service.send_email(
+                to_email=client_email,
+                subject=subject,
+                body=email_body,
+                from_email=None,  # Will use default from settings
+                attachments=[pdf_path]
+            )
             
             # Clean up temporary PDF file
             try:
@@ -6945,22 +7068,28 @@ def send_project_report_ajax(request):
             except Exception:
                 pass
                 
-            # print(f"Enhanced project email service result: {result}") - DISABLED
+            print(f"Enhanced project email service result: {result}")
             
-            # Email service disabled - just show success message
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': True, 
-                    'message': f'Enhanced project report generated successfully. Email notifications are disabled.',
-                    'report_summary': {
-                        'tasks_completed': completed_tasks,
-                        'completion_rate': f"{task_completion_rate:.1f}%",
-                        'timeline_progress': f"{timeline_progress:.1f}%",
-                        'days_remaining': days_remaining
-                    }
-                })
+            # Handle email service result
+            if result['success']:
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True, 
+                        'message': f'Enhanced project report sent successfully to {client_email}',
+                        'report_summary': {
+                            'tasks_completed': completed_tasks,
+                            'completion_rate': f"{task_completion_rate:.1f}%",
+                            'timeline_progress': f"{timeline_progress:.1f}%",
+                            'days_remaining': days_remaining
+                        }
+                    })
+                else:
+                    messages.success(request, f'Enhanced project report sent successfully to {client_email}')
             else:
-                messages.success(request, f'Enhanced project report generated successfully. Email notifications are disabled.')
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'error': f'Error sending report: {result.get("error", "Unknown error")}'})
+                else:
+                    messages.error(request, f'Error sending enhanced project report: {result.get("error", "Unknown error")}')
             
         except Exception as e:
             import traceback

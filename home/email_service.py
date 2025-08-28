@@ -611,7 +611,7 @@ E-Click Team
         
         return text_body.strip()
 
-    def send_email(self, to_email, subject, body, from_email=None, attachments=None):
+    def send_email(self, to_email, subject, body, from_email=None, attachments=None, cc_emails=None):
         """
         Send email using Django's built-in email functionality
         
@@ -621,6 +621,7 @@ E-Click Team
             body (str): Email body (HTML or plain text)
             from_email (str): Sender email (optional, uses default if not provided)
             attachments (list): List of attachment file paths (optional)
+            cc_emails (list): List of CC email addresses (optional)
         
         Returns:
             dict: Response with success status and message
@@ -636,6 +637,11 @@ E-Click Team
                 from_email=from_email or self.from_email,
                 to=[to_email]
             )
+            
+            # Add CC emails if provided
+            if cc_emails:
+                email.cc = cc_emails
+                self.logger.info(f"Adding CC emails: {cc_emails}")
             
             # Set content type
             if is_html:
@@ -666,6 +672,8 @@ E-Click Team
             email.send()
             
             self.logger.info(f"Email sent successfully to {to_email}")
+            if cc_emails:
+                self.logger.info(f"Email CC'd to: {cc_emails}")
             return {
                 'success': True,
                 'message': 'Email sent successfully'

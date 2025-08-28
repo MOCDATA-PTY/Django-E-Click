@@ -7,6 +7,7 @@ urlpatterns = [
     path('solutions/', views.solutions, name='solutions'),
     path('contact/', views.contact, name='contact'),
     path('services/', views.services, name='services'),
+    path('clients/', views.clients, name='clients'),
     path('login/', views.login_view, name='login'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('dashboard/gantt-data/', views.dashboard_gantt_data, name='dashboard_gantt_data'),
