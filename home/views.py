@@ -671,16 +671,37 @@ def add_project(request):
                             to_email=client_email,
                             subject=f"Set Your Password - {name} Project",
                             body=f"""
-                            Dear {client_username},
-
-                            Welcome to the {name} project! Please use the following OTP to set your password:
-
-                            🔐 Your OTP: {otp}
-
-                            Please visit: {site_url}/client/setup-password/
-
-                            Best regards,
-                            E-Click Project Management Team
+                            <html>
+                            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                                    <div style="text-align: center; margin-bottom: 30px;">
+                                        <h1 style="color: #3b82f6; margin-bottom: 10px;">E-Click Technologies</h1>
+                                        <h2 style="color: #374151; margin-bottom: 20px;">Set Your Password</h2>
+                                    </div>
+                                    
+                                    <div style="background: #f9fafb; padding: 25px; border-radius: 10px; margin-bottom: 25px;">
+                                        <p style="font-size: 16px; margin-bottom: 20px;">Dear <strong>{client_username}</strong>,</p>
+                                        
+                                        <p style="font-size: 16px; margin-bottom: 20px;">Welcome to the <strong>{name}</strong> project! Please use the following OTP to set your password:</p>
+                                        
+                                        <div style="background: #3b82f6; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 25px 0;">
+                                            <h3 style="margin: 0; font-size: 18px;">🔐 Your OTP Code</h3>
+                                            <p style="font-size: 24px; font-weight: bold; margin: 10px 0 0 0; letter-spacing: 3px;">{otp}</p>
+                                        </div>
+                                        
+                                        <p style="font-size: 16px; margin-bottom: 20px;">Please visit the link below to set your password:</p>
+                                        
+                                        <div style="text-align: center; margin: 25px 0;">
+                                            <a href="{site_url}/client/setup-password/?username={client_username}" style="background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Set Password Now</a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="text-align: center; color: #6b7280; font-size: 14px;">
+                                        <p>Best regards,<br><strong>E-Click Project Management Team</strong></p>
+                                    </div>
+                                </div>
+                            </body>
+                            </html>
                             """,
                             from_email=None  # Will use default from settings
                         )
@@ -3312,16 +3333,37 @@ def admin_control(request):
                         to_email=email,
                         subject="Set Your Password - Welcome to E-Click",
                         body=f"""
-                        Dear {username},
-
-                        Welcome to E-Click! Please use the following OTP to set your password:
-
-                        🔐 Your OTP: {otp}
-
-                        Please visit: {site_url}/user/setup-password/
-
-                        Best regards,
-                        E-Click Team
+                        <html>
+                        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                                <div style="text-align: center; margin-bottom: 30px;">
+                                    <h1 style="color: #3b82f6; margin-bottom: 10px;">E-Click Technologies</h1>
+                                    <h2 style="color: #374151; margin-bottom: 20px;">Set Your Password</h2>
+                                </div>
+                                
+                                <div style="background: #f9fafb; padding: 25px; border-radius: 10px; margin-bottom: 25px;">
+                                    <p style="font-size: 16px; margin-bottom: 20px;">Dear <strong>{username}</strong>,</p>
+                                    
+                                    <p style="font-size: 16px; margin-bottom: 20px;">Welcome to E-Click! Please use the following OTP to set your password:</p>
+                                    
+                                    <div style="background: #3b82f6; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 25px 0;">
+                                        <h3 style="margin: 0; font-size: 18px;">🔐 Your OTP Code</h3>
+                                        <p style="font-size: 24px; font-weight: bold; margin: 10px 0 0 0; letter-spacing: 3px;">{otp}</p>
+                                    </div>
+                                    
+                                    <p style="font-size: 16px; margin-bottom: 20px;">Please visit the link below to set your password:</p>
+                                    
+                                                                            <div style="text-align: center; margin: 25px 0;">
+                                            <a href="{site_url}/user/setup-password/?username={username}" style="background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Set Password Now</a>
+                                        </div>
+                                </div>
+                                
+                                <div style="text-align: center; color: #6b7280; font-size: 14px;">
+                                    <p>Best regards,<br><strong>E-Click Team</strong></p>
+                                </div>
+                            </div>
+                        </body>
+                        </html>
                         """,
                         from_email=None  # Will use default from settings
                     )
