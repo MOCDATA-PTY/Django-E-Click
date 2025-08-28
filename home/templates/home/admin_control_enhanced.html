@@ -142,6 +142,11 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                                 </svg>
                             </button>
+                            <button class="action-btn" onclick="resetUserPassword('{{ user.id }}')" title="Reset Password">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                </svg>
+                            </button>
                             <button class="action-btn danger" onclick="deleteUser('{{ user.id }}')" title="Delete User">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -4174,6 +4179,46 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('Error deleting user. Please try again.');
+            });
+        }
+    }
+
+    function resetUserPassword(userId) {
+        console.log('resetUserPassword called with userId:', userId);
+        if (confirm('Are you sure you want to reset the password for this user? A new OTP will be sent to their email.')) {
+            // Get the CSRF token from the form
+            const csrfToken = getCSRFToken();
+            if (!csrfToken) return;
+            
+            console.log('CSRF token obtained, submitting reset password request...');
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append('action', 'reset_password');
+            formData.append('user_id', userId);
+            formData.append('csrfmiddlewaretoken', csrfToken);
+            
+            // Submit the reset password request
+            fetch('{% url "admin_control" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => {
+                console.log('Reset password response status:', response.status);
+                if (response.ok) {
+                    console.log('Password reset email sent successfully');
+                    alert('Password reset email sent successfully to the user.');
+                } else {
+                    console.error('Reset password failed with status:', response.status);
+                    alert('Error resetting password. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error resetting password. Please try again.');
             });
         }
     }
