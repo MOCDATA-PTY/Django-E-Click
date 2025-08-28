@@ -670,18 +670,22 @@ def add_project(request):
                         email_result = email_service.send_email(
                             to_email=client_email,
                             subject=f"Set Your Password - {name} Project",
-                            body=f"""Dear {client_username},
-
-Welcome to the {name} project! Please use the following OTP to set your password:
-
-🔐 Your OTP: {otp}
-
-Please visit: {site_url}/client/setup-password/?username={client_username}
-
-This OTP will expire in 10 minutes.
-
-Best regards,
-E-Click Project Management Team""",
+                            body=f"""<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <p>Dear {client_username},</p>
+    
+    <p>Welcome to the {name} project! Please use the following OTP to set your password:</p>
+    
+    <p style="font-size: 18px; font-weight: bold; color: #2563eb;">🔐 Your OTP: {otp}</p>
+    
+    <p>You can set your password here:</p>
+    <p><a href="{site_url}/client/setup-password/?username={client_username}" style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up New Password</a></p>
+    
+    <p style="color: #dc2626; font-weight: bold;">⚠️ Please note: This OTP is valid for 10 minutes only.</p>
+    
+    <p>Best regards,<br>E-Click Project Management Team</p>
+</body>
+</html>""",
                             from_email=None  # Will use default from settings
                         )
                         
@@ -3311,18 +3315,22 @@ def admin_control(request):
                     email_result = email_service.send_email(
                         to_email=email,
                         subject="Set Your Password - Welcome to E-Click",
-                        body=f"""Dear {username},
-
-Welcome to E-Click! Please use the following OTP to set your password:
-
-🔐 Your OTP: {otp}
-
-Please visit: {site_url}/user/setup-password/?username={username}
-
-This OTP will expire in 10 minutes.
-
-Best regards,
-E-Click Team""",
+                        body=f"""<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <p>Dear {username},</p>
+    
+    <p>Welcome to E-Click! Please use the following OTP to set your password:</p>
+    
+    <p style="font-size: 18px; font-weight: bold; color: #2563eb;">🔐 Your OTP: {otp}</p>
+    
+    <p>You can set your password here:</p>
+    <p><a href="{site_url}/user/setup-password/?username={username}" style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up New Password</a></p>
+    
+    <p style="color: #dc2626; font-weight: bold;">⚠️ Please note: This OTP is valid for 10 minutes only.</p>
+    
+    <p>Best regards,<br>E-Click Team</p>
+</body>
+</html>""",
                         from_email=None  # Will use default from settings
                     )
                     
@@ -3462,20 +3470,24 @@ E-Click Team""",
                 email_result = email_service.send_email(
                     to_email=user.email,
                     subject="Password Reset - E-Click",
-                    body=f"""Dear {user.username},
-
-Your password has been reset by an administrator.
-
-Please use the following OTP to set a new password:
-
-🔐 Your OTP: {otp}
-
-Please visit: {site_url}/user/setup-password/?username={user.username}
-
-This OTP will expire in 10 minutes.
-
-Best regards,
-E-Click Team""",
+                    body=f"""<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <p>Dear {user.username},</p>
+    
+    <p>Your account password has been reset by an administrator. To create a new password, please use the One-Time Password (OTP) provided below:</p>
+    
+    <p style="font-size: 18px; font-weight: bold; color: #2563eb;">🔐 OTP: {otp}</p>
+    
+    <p>You can reset your password here:</p>
+    <p><a href="{site_url}/user/setup-password/?username={user.username}" style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up New Password</a></p>
+    
+    <p style="color: #dc2626; font-weight: bold;">⚠️ Please note: This OTP is valid for 10 minutes only.</p>
+    
+    <p>If you did not request this password reset, please contact our support team immediately.</p>
+    
+    <p>Best regards,<br>E-Click Team</p>
+</body>
+</html>""",
                     from_email=None
                 )
                 
@@ -5296,18 +5308,22 @@ def send_client_otp(request):
             email_result = email_service.send_email(
                 to_email=client_email,
                 subject=f"Set Your Password - {project.name} Project",
-                body=f"""
-                Dear {client_username},
-
-                Welcome to the {project.name} project! Please use the following OTP to set your password:
-
-                🔐 Your OTP: {otp}
-
-                Please visit: {site_url}/client/setup-password/?username={client_username}
-
-                Best regards,
-                E-Click Project Management Team
-                """,
+                body=f"""<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <p>Dear {client_username},</p>
+    
+    <p>Welcome to the {project.name} project! Please use the following OTP to set your password:</p>
+    
+    <p style="font-size: 18px; font-weight: bold; color: #2563eb;">🔐 Your OTP: {otp}</p>
+    
+    <p>You can set your password here:</p>
+    <p><a href="{site_url}/client/setup-password/?username={client_username}" style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up New Password</a></p>
+    
+    <p style="color: #dc2626; font-weight: bold;">⚠️ Please note: This OTP is valid for 10 minutes only.</p>
+    
+    <p>Best regards,<br>E-Click Project Management Team</p>
+</body>
+</html>""",
                 from_email=None  # Will use default from settings
             )
             
