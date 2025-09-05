@@ -1,9 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import datetime, timedelta
 import random
 import string
+
+User = get_user_model()
 
 
 class Project(models.Model):

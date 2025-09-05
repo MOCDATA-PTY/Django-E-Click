@@ -1,7 +1,9 @@
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from home.models import Project, Client, Task, SubTask, TaskComment, SubTaskComment, ClientOTP
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Command(BaseCommand):
