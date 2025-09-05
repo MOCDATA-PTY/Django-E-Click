@@ -201,7 +201,7 @@ def main():
         start_gunicorn()
         
         print("🎉 Deployment completed successfully!")
-        print(f"🌐 Application is running on http://167.88.43.168:{PORT}")
+        print(f"🌐 Application is running on http://77.37.121.135:{PORT}")
         
     except Exception as e:
         print(f"❌ Deployment failed: {e}")

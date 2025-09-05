@@ -136,7 +136,7 @@ else
 fi
 
 echo "🎉 Deployment completed successfully!"
-echo "🌐 Application is running on http://167.88.43.168:$PORT"
+echo "🌐 Application is running on http://77.37.121.135:$PORT"
 echo ""
 echo "To check server status: sudo systemctl status eclick"
 echo "To view logs: sudo journalctl -u eclick -f"
