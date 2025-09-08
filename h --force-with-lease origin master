@@ -1,0 +1,9 @@
+[33med910fc[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #2 from MOCDATA-PTY/clean-master
+[33m7c892b8[m[33m ([m[1;31morigin/clean-master[m[33m)[m Disable all email services and Gmail OAuth2 functionality - Comment out email sending, OAuth2 tokens, and Gmail scopes while preserving code for future use
+[33m36e8910[m Merge pull request #1 from MOCDATA-PTY/clean-master
+[33m3df85c4[m Updated Gantt chart with progress bars and improved UI
+[33m78c645f[m Complete project update with all changes including login page improvements
+[33m9bf014b[m Remove signup and login buttons from login page for cleaner UI
+[33m5399044[m Add current database with all data
+[33md8bf86b[m Fix CSRF settings for production deployment
+[33m9b25199[m Initial commit with database and deployment package

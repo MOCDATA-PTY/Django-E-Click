@@ -1,0 +1,3 @@
+[33m185c222[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m Redesign user and client setup password templates with beautiful light mode admin design
+[33mda904f7[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Fix incorrect user setup password URL in email template
+[33m03e6445[m Fix sidebar overflow-x issue in admin templates

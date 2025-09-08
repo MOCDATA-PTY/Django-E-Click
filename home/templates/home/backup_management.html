@@ -1,0 +1,1112 @@
+{% extends 'home/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}System Restore & Backup - E-Click{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<style>
+/* Enhanced Theme Variables for Backup Management */
+:root {
+    /* Light Mode Colors */
+    --backup-primary: #3b82f6;
+    --backup-success: #10b981;
+    --backup-warning: #f59e0b;
+    --backup-danger: #ef4444;
+    --backup-accent: #6c757d;
+    --backup-info: #17a2b8;
+    
+    /* Light Mode Backgrounds */
+    --backup-bg-primary: #ffffff;
+    --backup-bg-secondary: #f8f9fa;
+    --backup-bg-tertiary: #e9ecef;
+    
+    /* Light Mode Borders */
+    --backup-border-light: #e9ecef;
+    --backup-border-medium: #dee2e6;
+    --backup-border-dark: #adb5bd;
+    
+    /* Light Mode Text */
+    --backup-text-primary: #1a1a1a;
+    --backup-text-secondary: #6c757d;
+    --backup-text-muted: #adb5bd;
+    --backup-text-white: #ffffff;
+    
+    /* Light Mode Shadows */
+    --backup-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --backup-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --backup-shadow-heavy: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    /* Dark Mode Colors */
+    --backup-primary: #60a5fa;
+    --backup-success: #34d399;
+    --backup-warning: #fbbf24;
+    --backup-danger: #f87171;
+    --backup-accent: #9ca3af;
+    --backup-info: #7dd3fc;
+    
+    /* Dark Mode Backgrounds */
+    --backup-bg-primary: #1a202c;
+    --backup-bg-secondary: #2d3748;
+    --backup-bg-tertiary: #4a5568;
+    
+    /* Dark Mode Borders */
+    --backup-border-light: #4a5568;
+    --backup-border-medium: #718096;
+    --backup-border-dark: #a0aec0;
+    
+    /* Dark Mode Text */
+    --backup-text-primary: #ffffff;
+    --backup-text-secondary: #a0aec0;
+    --backup-text-muted: #718096;
+    --backup-text-white: #1a202c;
+    
+    /* Dark Mode Shadows */
+    --backup-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --backup-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --backup-shadow-heavy: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced Button Styles */
+.backup-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.backup-btn-primary {
+    background: var(--backup-primary);
+    color: var(--backup-text-white);
+}
+
+.backup-btn-success {
+    background: var(--backup-success);
+    color: var(--backup-text-white);
+}
+
+.backup-btn-warning {
+    background: var(--backup-warning);
+    color: var(--backup-text-white);
+}
+
+.backup-btn-danger {
+    background: var(--backup-danger);
+    color: var(--backup-text-white);
+}
+
+.backup-btn-accent {
+    background: var(--backup-accent);
+    color: var(--backup-text-white);
+}
+
+.backup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--backup-shadow-medium);
+}
+
+/* Enhanced Card Styles */
+.backup-card {
+    background: var(--backup-bg-primary);
+    border: 1px solid var(--backup-border-light);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.backup-card:hover {
+    box-shadow: var(--backup-shadow-light);
+    border-color: var(--backup-border-medium);
+}
+
+/* Enhanced Table Styles */
+.backup-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid var(--backup-border-light);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--backup-bg-primary);
+}
+
+.backup-table th {
+    background: var(--backup-bg-secondary);
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--backup-border-light);
+    color: var(--backup-text-primary);
+    font-weight: 600;
+}
+
+.backup-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--backup-border-light);
+    color: var(--backup-text-primary);
+}
+
+.backup-table tr:hover {
+    background: var(--backup-bg-secondary);
+}
+
+/* Enhanced Badge Styles */
+.backup-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid;
+}
+
+.backup-badge-manual {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--backup-primary);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.backup-badge-automatic {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--backup-success);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.backup-badge-uploaded {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--backup-warning);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.backup-badge-available {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--backup-success);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.backup-badge-corrupted {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--backup-danger);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.backup-badge-restored {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--backup-primary);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* Dark mode badge improvements */
+[data-theme="dark"] .backup-badge {
+    border-width: 2px;
+    font-weight: 600;
+}
+
+/* Enhanced Modal Styles */
+.backup-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.backup-modal-content {
+    background: var(--backup-bg-primary);
+    margin: 5% auto;
+    padding: 0;
+    border: 1px solid var(--backup-border-light);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: var(--backup-shadow-heavy);
+}
+
+.backup-modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--backup-border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.backup-modal-header h3 {
+    margin: 0;
+    color: var(--backup-text-primary);
+}
+
+.backup-close {
+    color: var(--backup-text-muted);
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.backup-close:hover {
+    color: var(--backup-text-primary);
+}
+
+.backup-modal-body {
+    padding: 1.5rem;
+}
+
+.backup-modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--backup-border-light);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* Enhanced Form Styles */
+.backup-form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--backup-border-light);
+    border-radius: 8px;
+    background: var(--backup-bg-primary);
+    color: var(--backup-text-primary);
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.backup-form-input:focus {
+    outline: none;
+    border-color: var(--backup-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.backup-form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--backup-text-primary);
+    font-weight: 500;
+}
+
+.backup-form-help {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--backup-text-muted);
+    font-size: 0.875rem;
+}
+
+/* Enhanced Warning Message */
+.backup-warning {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.backup-warning-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--backup-warning);
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.backup-warning h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--backup-warning);
+}
+
+.backup-warning p {
+    margin: 0 0 0.5rem 0;
+    color: var(--backup-text-secondary);
+    line-height: 1.6;
+}
+
+.backup-warning p:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .backup-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .backup-actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .backup-modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+}
+
+/* Smooth transitions for theme switching */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+</style>
+
+<div class="main-content">
+    <!-- Dashboard Header -->
+    <div class="header">
+        <h1 class="welcome-text">System Restore & Backup</h1>
+    </div>
+
+    {% if messages %}
+    <div class="messages" style="margin-bottom: 2rem;">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}message-{{ message.tags }}{% endif %}" style="padding: 1rem; margin-bottom: 1rem; border-radius: 8px; border: 1px solid var(--border-light); background: var(--background-primary);">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions Section -->
+    <div class="backup-card">
+        <h2 style="margin: 0 0 1.5rem 0; color: var(--backup-text-primary); font-size: 1.5rem; font-weight: 600;">Quick Actions</h2>
+        <div class="backup-actions-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+            <!-- Create Restore Point -->
+            <div style="padding: 1.5rem; border: 1px solid var(--backup-border-light); border-radius: 8px; background: var(--backup-bg-secondary); text-align: center;">
+                <div style="width: 3rem; height: 3rem; margin: 0 auto 1rem; color: var(--backup-primary);">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <h3 style="margin: 0 0 0.5rem 0; color: var(--backup-text-primary); font-size: 1.125rem;">Create Restore Point</h3>
+                <p style="margin: 0 0 1rem 0; color: var(--backup-text-secondary); font-size: 0.875rem;">Save current system state for future restoration</p>
+                <button onclick="showCreateRestorePoint()" class="backup-btn backup-btn-primary" style="width: 100%;">
+                    Create Restore Point
+                </button>
+            </div>
+
+            <!-- Export All Data -->
+            <div style="padding: 1.5rem; border: 1px solid var(--border-light); border-radius: 8px; background: var(--background-secondary); text-align: center;">
+                <div style="width: 3rem; height: 3rem; margin: 0 auto 1rem; color: var(--success);">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <h3 style="margin: 0 0 0.5rem 0; color: var(--text-primary); font-size: 1.125rem;">Export All Data</h3>
+                <p style="margin: 0 0 1rem 0; color: var(--text-secondary); font-size: 0.875rem;">Download complete database backup</p>
+                <button onclick="exportAllData()" style="background: var(--success); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; cursor: pointer; width: 100%;">
+                    Export Data
+                </button>
+            </div>
+
+            <!-- Upload Backup -->
+            <div style="padding: 1.5rem; border: 1px solid var(--border-light); border-radius: 8px; background: var(--background-secondary); text-align: center;">
+                <div style="width: 3rem; height: 3rem; margin: 0 auto 1rem; color: var(--accent);">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                    </svg>
+                </div>
+                <h3 style="margin: 0 0 0.5rem 0; color: var(--text-primary); font-size: 1.125rem;">Upload Backup</h3>
+                <p style="margin: 0 0 1rem 0; color: var(--text-secondary); font-size: 0.875rem;">Restore from external backup file</p>
+                <button onclick="showUploadBackup()" style="background: var(--accent); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 500; cursor: pointer; width: 100%;">
+                    Upload Backup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status Section -->
+    <div style="background: var(--background-primary); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--border-light);">
+        <h2 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.5rem; font-weight: 600;">System Status</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+            <div style="text-align: center; padding: 1.5rem; background: var(--background-secondary); border-radius: 8px; border: 1px solid var(--border-light);">
+                <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary); margin-bottom: 0.5rem;">{{ total_backups }}</div>
+                <div style="color: var(--text-secondary); font-size: 0.875rem; font-weight: 500;">Total Restore Points</div>
+            </div>
+            <div style="text-align: center; padding: 1.5rem; background: var(--background-secondary); border-radius: 8px; border: 1px solid var(--border-light);">
+                <div style="font-size: 2.5rem; font-weight: 700; color: var(--success); margin-bottom: 0.5rem;">{{ available_backups }}</div>
+                <div style="color: var(--text-secondary); font-size: 0.875rem; font-weight: 500;">Available Points</div>
+            </div>
+            <div style="text-align: center; padding: 1.5rem; background: var(--background-secondary); border-radius: 8px; border: 1px solid var(--border-light);">
+                <div style="font-size: 2.5rem; font-weight: 700; color: var(--info); margin-bottom: 0.5rem;">{{ total_size_mb }} MB</div>
+                <div style="color: var(--text-secondary); font-size: 0.875rem; font-weight: 500;">Total Size</div>
+            </div>
+            <div style="text-align: center; padding: 1.5rem; background: var(--background-secondary); border-radius: 8px; border: 1px solid var(--border-light);">
+                <div style="font-size: 2.5rem; font-weight: 700; color: var(--warning); margin-bottom: 0.5rem;">{{ backups|length }}</div>
+                <div style="color: var(--text-secondary); font-size: 0.875rem; font-weight: 500;">Backup Files</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restore Points Section -->
+    <div style="background: var(--background-primary); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--border-light);">
+        <h2 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.5rem; font-weight: 600;">Restore Points</h2>
+        {% if backups %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid var(--border-light); border-radius: 8px; overflow: hidden;">
+                <thead style="background: var(--background-secondary);">
+                    <tr>
+                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-light); color: var(--text-primary); font-weight: 600;">Restore Point</th>
+                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-light); color: var(--text-primary); font-weight: 600;">Type</th>
+                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-light); color: var(--text-primary); font-weight: 600;">Size</th>
+                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-light); color: var(--text-primary); font-weight: 600;">Status</th>
+                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-light); color: var(--text-primary); font-weight: 600;">Created</th>
+                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-light); color: var(--text-primary); font-weight: 600;">Created By</th>
+                        <th style="padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-light); color: var(--text-primary); font-weight: 600;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for backup in backups %}
+                    <tr style="border-bottom: 1px solid var(--border-light);">
+                        <td style="padding: 1rem;">
+                            <div>
+                                <strong style="color: var(--text-primary);">{{ backup.filename }}</strong>
+                                {% if backup.description %}
+                                <div style="color: var(--text-secondary); font-size: 0.875rem; margin-top: 0.25rem;">{{ backup.description }}</div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td style="padding: 1rem;">
+                                                            <span class="backup-type-badge backup-type-{{ backup.backup_type }}">
+                                {% if backup.backup_type == 'manual' %}Restore Point
+                                {% elif backup.backup_type == 'automatic' %}Auto Backup
+                                {% else %}Uploaded{% endif %}
+                            </span>
+                        </td>
+                        <td style="padding: 1rem; color: var(--text-primary);">{{ backup.file_size_mb }} MB</td>
+                        <td style="padding: 1rem;">
+                            <span class="status-badge status-{{ backup.status }}">
+                                {{ backup.get_status_display }}
+                            </span>
+                        </td>
+                        <td style="padding: 1rem; color: var(--text-primary);">{{ backup.created_at|date:"M d, Y H:i" }}</td>
+                        <td style="padding: 1rem; color: var(--text-primary);">{{ backup.created_by.username|default:"System" }}</td>
+                        <td style="padding: 1rem;">
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                {% if backup.is_available %}
+                                    <button onclick="confirmRestore({{ backup.id }}, '{{ backup.filename }}')" 
+                                            style="padding: 0.375rem 0.75rem; background: var(--warning); color: white; border: none; border-radius: 6px; font-size: 0.875rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;"
+                                            title="Restore to this point">
+                                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        Restore
+                                    </button>
+                                    <a href="{% url 'download_backup' backup.id %}" 
+                                       style="padding: 0.375rem 0.75rem; background: var(--accent); color: white; border: none; border-radius: 6px; font-size: 0.875rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.25rem;"
+                                       title="Download">
+                                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                    </a>
+                                {% endif %}
+                                <button onclick="confirmDelete({{ backup.id }}, '{{ backup.filename }}')" 
+                                        style="padding: 0.375rem 0.75rem; background: var(--danger); color: white; border: none; border-radius: 6px; font-size: 0.875rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.25rem;"
+                                        title="Delete">
+                                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 4rem 2rem; color: var(--text-secondary);">
+            <div style="width: 4rem; height: 4rem; margin: 0 auto 1.5rem; color: var(--text-muted);">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                </svg>
+            </div>
+            <h3 style="margin: 0 0 1rem 0; color: var(--text-primary);">No Restore Points Found</h3>
+            <p style="margin: 0; font-size: 1.125rem;">Create your first restore point to protect your data, or upload an existing backup file.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Information Section -->
+    <div style="background: var(--background-primary); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--border-light);">
+        <h2 style="margin: 0 0 1.5rem 0; color: var(--text-primary); font-size: 1.5rem; font-weight: 600;">How It Works</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <div style="padding: 1.5rem; border: 1px solid var(--border-light); border-radius: 8px; background: var(--background-secondary);">
+                <h4 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 1.125rem;">🔄 Restore Points</h4>
+                <p style="margin: 0; color: var(--text-secondary); line-height: 1.6;">Create restore points before making major changes. Like Windows System Restore, you can roll back to any previous state.</p>
+            </div>
+            <div style="padding: 1.5rem; border: 1px solid var(--border-light); border-radius: 8px; background: var(--background-secondary);">
+                <h4 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 1.125rem;">📤 Export Data</h4>
+                <p style="margin: 0; color: var(--text-secondary); line-height: 1.6;">Export your complete database to JSON format. Perfect for backups, migrations, or sharing data between systems.</p>
+            </div>
+            <div style="padding: 1.5rem; border: 1px solid var(--border-light); border-radius: 8px; background: var(--background-secondary);">
+                <h4 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 1.125rem;">🛡️ Safe Restoration</h4>
+                <p style="margin: 0; color: var(--text-secondary); line-height: 1.6;">Every restore operation creates a safety backup first. Your current data is never lost during restoration.</p>
+            </div>
+            <div style="padding: 1.5rem; border: 1px solid var(--border-light); border-radius: 8px; background: var(--background-secondary);">
+                <h4 style="margin: 0 0 1rem 0; color: var(--text-primary); font-size: 1.125rem;">📁 File Management</h4>
+                <p style="margin: 0; color: var(--text-secondary); line-height: 1.6;">Upload existing backups, download restore points, and manage your backup collection with ease.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Restore Point Modal -->
+<div id="createRestorePointModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create Restore Point</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form method="post" action="{% url 'create_backup' %}">
+                {% csrf_token %}
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="restore_point_description" style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">Restore Point Description</label>
+                    <textarea id="restore_point_description" name="description" rows="3" 
+                              placeholder="Describe what this restore point contains (e.g., 'Before major update', 'After user import', etc.)"
+                              style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-light); border-radius: 8px; background: var(--background-primary); color: var(--text-primary); font-family: inherit; resize: vertical;" required></textarea>
+                </div>
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                        <svg style="width: 1.25rem; height: 1.25rem; color: #10b981; margin-top: 0.125rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <strong style="color: #10b981;">Creating a restore point...</strong>
+                            <p style="margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.875rem;">This will save your current database state. You can restore to this point anytime.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 0; border: none; margin: 0;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('createRestorePointModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Restore Point</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Backup Modal -->
+<div id="uploadBackupModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Upload Backup File</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form method="post" action="{% url 'upload_backup' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="backup_file" style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">Select Backup File</label>
+                    <input type="file" id="backup_file" name="backup_file" 
+                           accept=".json" required
+                           style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-light); border-radius: 8px; background: var(--background-primary); color: var(--text-primary); font-family: inherit;">
+                    <small style="display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.875rem;">Only JSON backup files are supported. Maximum file size: 100MB</small>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="upload_description" style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">Description (Optional)</label>
+                    <textarea id="upload_description" name="description" rows="3" 
+                              placeholder="Describe this uploaded backup..."
+                              style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-light); border-radius: 8px; background: var(--background-primary); color: var(--text-primary); font-family: inherit; resize: vertical;"></textarea>
+                </div>
+                <div class="modal-footer" style="padding: 0; border: none; margin: 0;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('uploadBackupModal')">Cancel</button>
+                    <button type="submit" class="btn btn-accent">Upload Backup</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Restore Confirmation Modal -->
+<div id="restoreModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Confirm System Restore</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="warning-message">
+                <svg class="warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <div>
+                    <h4>⚠️ Warning: This will restore your system to a previous state!</h4>
+                    <p>Restoring from a backup will replace all current data with the backup data. This action cannot be undone.</p>
+                    <p><strong>Restore point:</strong> <span id="restoreBackupName"></span></p>
+                    <p><strong>Safety measure:</strong> A backup of your current data will be created automatically before the restore.</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('restoreModal')">Cancel</button>
+            <a href="#" id="confirmRestoreBtn" class="btn btn-warning">Confirm Restore</a>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Confirm Backup Deletion</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="warning-message">
+                <svg class="warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <div>
+                    <h4>🗑️ Warning: This will permanently delete the restore point!</h4>
+                    <p>Deleting a restore point will remove both the database record and the physical file. This action cannot be undone.</p>
+                    <p><strong>Restore point to delete:</strong> <span id="deleteBackupName"></span></p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('deleteModal')">Cancel</button>
+            <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Confirm Delete</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function showCreateRestorePoint() {
+    document.getElementById('createRestorePointModal').style.display = 'block';
+}
+
+function showUploadBackup() {
+    document.getElementById('uploadBackupModal').style.display = 'block';
+}
+
+function exportAllData() {
+    // Create a temporary form to download all data
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "create_backup" %}';
+    
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = 'csrfmiddlewaretoken';
+    csrfToken.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    const description = document.createElement('input');
+    description.type = 'hidden';
+    description.name = 'description';
+    description.value = 'Full Data Export - ' + new Date().toLocaleString();
+    
+    const exportFlag = document.createElement('input');
+    exportFlag.type = 'hidden';
+    exportFlag.name = 'export_all';
+    exportFlag.value = 'true';
+    
+    form.appendChild(csrfToken);
+    form.appendChild(description);
+    form.appendChild(exportFlag);
+    
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+}
+
+function confirmRestore(backupId, backupName) {
+    document.getElementById('restoreBackupName').textContent = backupName;
+    document.getElementById('confirmRestoreBtn').onclick = function() {
+        // Show loading state
+        this.textContent = 'Restoring...';
+        this.disabled = true;
+        
+        // Create and submit form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/backup-management/restore/${backupId}/`;
+        
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = 'csrfmiddlewaretoken';
+        csrfToken.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        form.appendChild(csrfToken);
+        document.body.appendChild(form);
+        form.submit();
+    };
+    document.getElementById('restoreModal').style.display = 'block';
+}
+
+function confirmDelete(backupId, backupName) {
+    document.getElementById('deleteBackupName').textContent = backupName;
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        // Show loading state
+        this.textContent = 'Deleting...';
+        this.disabled = true;
+        
+        // Create and submit form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/backup-management/delete/${backupId}/`;
+        
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = 'csrfmiddlewaretoken';
+        csrfToken.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        form.appendChild(csrfToken);
+        document.body.appendChild(form);
+        form.submit();
+    };
+    document.getElementById('deleteModal').style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+}
+
+// Close modal when clicking X
+document.querySelectorAll('.close').forEach(function(closeBtn) {
+    closeBtn.onclick = function() {
+        closeBtn.closest('.modal').style.display = 'none';
+    }
+});
+</script>
+
+<style>
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: var(--background-primary);
+    margin: 5% auto;
+    padding: 0;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.close {
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close:hover {
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.warning-message {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 8px;
+}
+
+.warning-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--warning);
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.warning-message h4 {
+    margin: 0 0 0.5rem 0;
+    color: var(--warning);
+}
+
+.warning-message p {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-secondary);
+}
+
+.warning-message p:last-child {
+    margin-bottom: 0;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-secondary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-accent {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-warning {
+    background: var(--warning);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark mode specific styles */
+[data-theme="dark"] .modal-content {
+    background: var(--background-secondary);
+    border-color: var(--border-dark);
+}
+
+[data-theme="dark"] .warning-message {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+[data-theme="dark"] .warning-message h4 {
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .warning-message p {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .close {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .close:hover {
+    color: var(--text-primary);
+}
+
+/* Badge styles */
+.backup-type-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.backup-type-manual {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.backup-type-automatic {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.backup-type-uploaded {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-available {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-corrupted {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.status-restored {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Dark mode badge improvements */
+[data-theme="dark"] .backup-type-badge,
+[data-theme="dark"] .status-badge {
+    border-width: 2px;
+    font-weight: 600;
+}
+
+/* Dark mode form improvements */
+[data-theme="dark"] input[type="file"] {
+    background: var(--background-secondary);
+    border-color: var(--border-medium);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] input[type="file"]::-webkit-file-upload-button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 1rem;
+}
+
+[data-theme="dark"] input[type="file"]::-webkit-file-upload-button:hover {
+    background: var(--primary);
+}
+
+/* Dark mode table improvements */
+[data-theme="dark"] table {
+    border-color: var(--border-medium);
+}
+
+[data-theme="dark"] th {
+    background: var(--background-tertiary);
+    border-color: var(--border-medium);
+}
+
+[data-theme="dark"] td {
+    border-color: var(--border-medium);
+}
+
+[data-theme="dark"] tr:hover {
+    background: var(--background-tertiary);
+}
+
+/* Dark mode button improvements */
+[data-theme="dark"] button[type="submit"] {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] button[type="submit"]:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark mode card improvements */
+[data-theme="dark"] .info-card {
+    background: var(--background-secondary);
+    border-color: var(--border-medium);
+}
+
+[data-theme="dark"] .info-card:hover {
+    background: var(--background-tertiary);
+    border-color: var(--border-dark);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+}
+
+/* Enhanced dark mode support */
+@media (prefers-color-scheme: dark) {
+    .modal {
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+    
+    .modal-content {
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    }
+}
+</style>
+{% endblock %}
