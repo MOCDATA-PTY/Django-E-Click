@@ -1,0 +1,731 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="admin-controls">
+    <div class="dashboard-header">
+        <h1>Send Complete Report</h1>
+        <p>Generate and send comprehensive reports to stakeholders</p>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="settings-container">
+        <section class="setting-section">
+            <div class="section-header">
+                <h2>Report Configuration</h2>
+                <p>Configure the report parameters and content</p>
+            </div>
+            
+            <form method="post" class="settings-form">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="report_type">Report Type</label>
+                        <select id="report_type" name="report_type" class="form-input" required>
+                            <option value="">Select Report Type</option>
+                            <option value="monthly">Monthly Report</option>
+                            <option value="quarterly">Quarterly Report</option>
+                            <option value="annual">Annual Report</option>
+                            <option value="custom">Custom Report</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="report_period">Report Period</label>
+                        <select id="report_period" name="report_period" class="form-input" required>
+                            <option value="">Select Period</option>
+                            <option value="current_month">Current Month</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="current_quarter">Current Quarter</option>
+                            <option value="last_quarter">Last Quarter</option>
+                            <option value="current_year">Current Year</option>
+                            <option value="last_year">Last Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="start_date">Start Date</label>
+                        <input type="date" id="start_date" name="start_date" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="end_date">End Date</label>
+                        <input type="date" id="end_date" name="end_date" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="report_title">Report Title</label>
+                    <input type="text" id="report_title" name="report_title" class="form-input" placeholder="Enter report title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="report_description">Report Description</label>
+                    <textarea id="report_description" name="report_description" class="form-input" rows="4" placeholder="Enter report description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="recipients">Recipients</label>
+                    <input type="text" id="recipients" name="recipients" class="form-input" placeholder="Enter email addresses separated by commas" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="include_charts">Include Charts & Graphs</label>
+                    <select id="include_charts" name="include_charts" class="form-input">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="include_summary">Include Executive Summary</label>
+                    <select id="include_summary" name="include_summary" class="form-input">
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="format">Report Format</label>
+                    <select id="format" name="format" class="form-input" required>
+                        <option value="pdf">PDF</option>
+                        <option value="excel">Excel</option>
+                        <option value="word">Word Document</option>
+                        <option value="html">HTML</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Generate & Send Report</button>
+                    <button type="button" class="btn btn-secondary" onclick="previewReport()">Preview Report</button>
+                    <button type="button" class="btn btn-outline" onclick="resetForm()">Reset Form</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="setting-section">
+            <div class="section-header">
+                <h2>Recent Reports Sent</h2>
+                <p>Quick reference to previously sent reports</p>
+            </div>
+            
+            <div class="table-container">
+                {% if sent_reports %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Report Type</th>
+                            <th>Recipient</th>
+                            <th>Title</th>
+                            <th>Sent Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in sent_reports %}
+                        <tr>
+                            <td>{{ report.get_report_type_display }}</td>
+                            <td>{{ report.recipient_email }}</td>
+                            <td>{{ report.report_title|default:"N/A" }}</td>
+                            <td>{{ report.sent_at|date:"M d, Y H:i" }}</td>
+                            <td><span class="status-badge success">{{ report.status|title }}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline" onclick="resendReport({{ report.id }})">Resend</button>
+                                <button class="btn btn-sm btn-outline" onclick="viewReportDetails({{ report.id }})">View</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="no-reports">
+                    <div class="no-reports-icon">📊</div>
+                    <h3>No Reports Sent Yet</h3>
+                    <p>Reports you send will appear here for quick reference and tracking</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+
+<style>
+:root {
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --secondary: #6b7280;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --background: #ffffff;
+    --surface: #f9fafb;
+    --border: #e5e7eb;
+    --text: #1f2937;
+    --text-secondary: #6b7280;
+    --radius-small: 0.375rem;
+    --radius-medium: 0.5rem;
+    --radius-large: 0.75rem;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] {
+    --background: #111827;
+    --surface: #1f2937;
+    --border: #374151;
+    --text: #f9fafb;
+    --text-secondary: #d1d5db;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--background);
+    color: var(--text);
+    line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.admin-controls {
+    min-height: 100vh;
+    background-color: var(--background);
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border-radius: var(--radius-large);
+    box-shadow: var(--shadow-lg);
+}
+
+.dashboard-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+}
+
+.dashboard-header p {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+.messages {
+    margin-bottom: 2rem;
+}
+
+.message {
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    border-radius: var(--radius-medium);
+    font-weight: 500;
+    border-left: 4px solid;
+}
+
+.message.success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border-left-color: var(--success);
+}
+
+.message.error {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+    border-left-color: var(--error);
+}
+
+.message.warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    border-left-color: var(--warning);
+}
+
+.settings-container {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: 1fr;
+}
+
+.setting-section {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-large);
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.setting-section:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.section-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.section-header p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: var(--text);
+    font-size: 0.875rem;
+}
+
+.form-input {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-small);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: var(--background);
+    color: var(--text);
+    font-family: inherit;
+    font-weight: 300;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+select.form-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    /* Default light mode arrow */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-color: #ffffff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+    border-radius: var(--radius-small);
+    padding: 0.75rem 1rem;
+    width: 100%;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-weight: 300;
+}
+
+select.form-input:hover {
+    border-color: var(--primary);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+select.form-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--radius-medium);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-width: 120px;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+    background-color: var(--secondary);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #4b5563;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-outline {
+    background-color: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.btn-outline:hover {
+    background-color: var(--primary);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    min-width: auto;
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: var(--radius-medium);
+    border: 1px solid var(--border);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--background);
+}
+
+.data-table th,
+.data-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+    background-color: var(--surface);
+    font-weight: 600;
+    color: var(--text);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.data-table td {
+    color: var(--text);
+    font-size: 0.875rem;
+}
+
+.data-table tr:hover {
+    background-color: var(--surface);
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-badge.success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.no-reports {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-secondary);
+}
+
+.no-reports-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.6;
+}
+
+.no-reports h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.no-reports p {
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Dark Mode Specific Styling */
+[data-theme="dark"] {
+    --background: #111827;
+    --surface: #1f2937;
+    --border: #374151;
+    --text: #f9fafb;
+    --text-secondary: #d1d5db;
+}
+
+[data-theme="dark"] .setting-section {
+    background-color: var(--surface);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .form-input {
+    background-color: var(--surface);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .form-input:focus {
+    border-color: var(--primary);
+    background-color: var(--surface);
+}
+
+[data-theme="dark"] .data-table {
+    background-color: var(--background);
+}
+
+[data-theme="dark"] .data-table th {
+    background-color: var(--surface);
+    color: var(--text);
+}
+
+[data-theme="dark"] .data-table td {
+    color: var(--text);
+}
+
+[data-theme="dark"] .data-table tr:hover {
+    background-color: var(--surface);
+}
+
+/* Dark Mode Specific Dropdown Styling */
+[data-theme="dark"] select.form-input {
+    background-color: #1f2937;
+    color: #f9fafb;
+    border-color: #4b5563;
+}
+
+[data-theme="dark"] select.form-input:hover {
+    border-color: var(--primary);
+    background-color: #1f2937;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+[data-theme="dark"] select.form-input:focus {
+    border-color: var(--primary);
+    background-color: #1f2937;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .admin-controls {
+        padding: 1rem;
+    }
+    
+    .dashboard-header {
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+    
+    .setting-section {
+        padding: 1.5rem;
+    }
+    
+    .table-container {
+        font-size: 0.75rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-controls {
+        padding: 0.5rem;
+    }
+    
+    .dashboard-header {
+        padding: 1rem;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .setting-section {
+        padding: 1rem;
+    }
+    
+    .form-actions {
+        gap: 0.75rem;
+    }
+}
+</style>
+
+<script>
+function previewReport() {
+    // Get form data
+    const formData = new FormData(document.querySelector('.settings-form'));
+    const reportType = formData.get('report_type');
+    const reportPeriod = formData.get('report_period');
+    
+    if (!reportType || !reportPeriod) {
+        alert('Please select report type and period first');
+        return;
+    }
+    
+    // Show preview (this would typically open a modal or new window)
+    alert(`Preview: ${reportType} report for ${reportPeriod}`);
+}
+
+function resendReport(reportId) {
+    if (confirm('Are you sure you want to resend this report?')) {
+        // This would typically make an AJAX call to resend the report
+        alert(`Resending report ${reportId}...`);
+        // TODO: Implement resend functionality
+    }
+}
+
+function viewReportDetails(reportId) {
+    // This would typically open a modal or navigate to a details page
+    alert(`Viewing details for report ${reportId}...`);
+    // TODO: Implement view details functionality
+}
+
+function resetForm() {
+    document.querySelector('.settings-form').reset();
+}
+
+// Auto-populate end date when start date is selected
+document.getElementById('start_date').addEventListener('change', function() {
+    const startDate = new Date(this.value);
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 1);
+    
+    document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
+});
+
+// Auto-populate report title based on type and period
+document.getElementById('report_type').addEventListener('change', updateReportTitle);
+document.getElementById('report_period').addEventListener('change', updateReportTitle);
+
+function updateReportTitle() {
+    const reportType = document.getElementById('report_type').value;
+    const reportPeriod = document.getElementById('report_period').value;
+    
+    if (reportType && reportPeriod) {
+        const title = `${reportPeriod.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} ${reportType.replace(/\b\w/g, l => l.toUpperCase())}`;
+        document.getElementById('report_title').value = title;
+    }
+}
+
+// Form validation
+document.querySelector('.settings-form').addEventListener('submit', function(e) {
+    const startDate = new Date(document.getElementById('start_date').value);
+    const endDate = new Date(document.getElementById('end_date').value);
+    
+    if (endDate <= startDate) {
+        e.preventDefault();
+        alert('End date must be after start date');
+        return;
+    }
+    
+    // Show loading state
+    const submitBtn = document.querySelector('button[type="submit"]');
+    submitBtn.textContent = 'Generating Report...';
+    submitBtn.disabled = true;
+});
+</script>
+{% endblock %}

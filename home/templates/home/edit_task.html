@@ -1,0 +1,242 @@
+{% extends 'home/dashboard_base.html' %}
+
+{% block content %}
+<div class="main-content">
+    <div class="header">
+        <div class="header-content">
+            <h1 class="welcome-text">Edit Task</h1>
+            <p class="subtitle">{{ task.title }} - {{ project.name }}</p>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'project_tasks' project.id %}" class="btn btn-secondary">
+                <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Tasks
+            </a>
+        </div>
+    </div>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}message-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="edit-form-container">
+        <div class="edit-form-card">
+            <div class="form-header">
+                <h2>Edit Task Details</h2>
+            </div>
+            
+            <form method="POST" class="edit-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="title">Task Title *</label>
+                    <input type="text" id="title" name="title" value="{{ task.title }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="3" class="form-input">{{ task.description }}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" name="priority" class="form-input">
+                        <option value="low" {% if task.priority == 'low' %}selected{% endif %}>Low</option>
+                        <option value="medium" {% if task.priority == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="high" {% if task.priority == 'high' %}selected{% endif %}>High</option>
+                        <option value="urgent" {% if task.priority == 'urgent' %}selected{% endif %}>Urgent</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" class="form-input">
+                        <option value="not_started" {% if task.status == 'not_started' %}selected{% endif %}>Not Started</option>
+                        <option value="in_progress" {% if task.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                        <option value="in_progress_guidance_required" {% if task.status == 'in_progress_guidance_required' %}selected{% endif %}>In Progress (Guidance Required)</option>
+                        <option value="completed" {% if task.status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="completed_review_pending" {% if task.status == 'completed_review_pending' %}selected{% endif %}>Completed (Review Pending)</option>
+                        <option value="completed_data_discrepancy_addressing" {% if task.status == 'completed_data_discrepancy_addressing' %}selected{% endif %}>Completed (Data Discrepancy addressing)</option>
+                        <option value="on_hold" {% if task.status == 'on_hold' %}selected{% endif %}>On Hold</option>
+                        <option value="cancelled" {% if task.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" value="{{ task.start_date|date:'Y-m-d' }}" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" id="end_date" name="end_date" value="{{ task.end_date|date:'Y-m-d' }}" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="estimated_hours">Estimated Hours</label>
+                    <input type="number" id="estimated_hours" name="estimated_hours" value="{{ task.estimated_hours|default:'' }}" step="0.5" min="0" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="assigned_to">Assigned To</label>
+                    <select id="assigned_to" name="assigned_to" class="form-input" multiple>
+                        {% for user in all_users %}
+                            <option value="{{ user.id }}" {% if user in task.assigned_users.all %}selected{% endif %}>
+                                {{ user.get_full_name|default:user.username }} ({{ user.email }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-text text-muted">Hold Ctrl (or Cmd on Mac) to select multiple users</small>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .edit-form-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .edit-form-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+    }
+    
+    .form-header h2 {
+        margin: 0 0 2rem 0;
+        color: var(--text-color);
+        font-size: 1.5rem;
+    }
+    
+    .edit-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .form-group label {
+        font-weight: 500;
+        color: var(--text-color);
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.2s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1rem;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    .btn-primary:hover {
+        background: #1e40af;
+    }
+    
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+    
+    .btn-secondary:hover {
+        background: #374151;
+    }
+    
+    .messages {
+        margin-bottom: 1rem;
+    }
+    
+    .message {
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .message-success {
+        background: #d1fae5;
+        color: #065f46;
+    }
+    
+    .message-error {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .edit-form-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %} 
