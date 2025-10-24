@@ -1,0 +1,786 @@
+{% extends 'home/dashboard_base.html' %}
+
+{% block content %}
+<div class="planner-container">
+    <!-- Header Section -->
+    <div class="planner-header">
+        <div class="header-content">
+            <h1 class="planner-title">My Task Planner</h1>
+            <p class="planner-subtitle">Manage your assigned tasks and keep track of progress</p>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-number">{{ total_tasks }}</span>
+                <span class="stat-label">Total Tasks</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ completed_tasks }}</span>
+                <span class="stat-label">Completed</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">{{ pending_tasks }}</span>
+                <span class="stat-label">Pending</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Bell -->
+    <div class="notification-bell" onclick="toggleNotifications()">
+        <i class="icon">🔔</i>
+        {% if notifications %}
+        <span class="notification-badge">{{ notifications.count }}</span>
+        {% endif %}
+    </div>
+
+    <!-- Notifications Panel -->
+    <div id="notificationsPanel" class="notifications-panel">
+        <div class="notifications-header">
+            <h3>Notifications</h3>
+            <button class="close-btn" onclick="toggleNotifications()">×</button>
+        </div>
+        <div class="notifications-list">
+            {% for notification in notifications %}
+            <div class="notification-item">
+                <div class="notification-content">
+                    <h4>{{ notification.title }}</h4>
+                    <p>{{ notification.message }}</p>
+                    <span class="notification-time">{{ notification.created_at|timesince }} ago</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-notifications">
+                <p>No new notifications</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="kanban-board">
+        <!-- Not Started Column -->
+        <div class="kanban-column">
+            <div class="column-header not-started">
+                <h3>Not Started</h3>
+                <span class="task-count">{{ task_groups.not_started.count }}</span>
+            </div>
+            <div class="column-content" id="not-started-column">
+                {% for task in task_groups.not_started %}
+                <div class="task-card" data-task-id="{{ task.id }}">
+                    <div class="task-header">
+                        <h4 class="task-title">{{ task.title }}</h4>
+                        <span class="priority-badge priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+                    </div>
+                    <p class="task-description">{{ task.description|truncatewords:20 }}</p>
+                    <div class="task-meta">
+                        <span class="project-name">{{ task.project.name }}</span>
+                        {% if task.start_date and task.end_date %}
+                        <span class="task-dates">{{ task.start_date|date:"M d" }} - {{ task.end_date|date:"M d" }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-primary" onclick="openUpdateModal({{ task.id }}, 'in_progress')">Start</button>
+                        <button class="btn btn-sm btn-secondary" onclick="openUpdateModal({{ task.id }}, 'on_hold')">Hold</button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-column">
+                    <p>No tasks</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- In Progress Column -->
+        <div class="kanban-column">
+            <div class="column-header in-progress">
+                <h3>In Progress</h3>
+                <span class="task-count">{{ task_groups.in_progress.count }}</span>
+            </div>
+            <div class="column-content" id="in-progress-column">
+                {% for task in task_groups.in_progress %}
+                <div class="task-card" data-task-id="{{ task.id }}">
+                    <div class="task-header">
+                        <h4 class="task-title">{{ task.title }}</h4>
+                        <span class="priority-badge priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+                    </div>
+                    <p class="task-description">{{ task.description|truncatewords:20 }}</p>
+                    <div class="task-meta">
+                        <span class="project-name">{{ task.project.name }}</span>
+                        {% if task.start_date and task.end_date %}
+                        <span class="task-dates">{{ task.start_date|date:"M d" }} - {{ task.end_date|date:"M d" }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-success" onclick="openUpdateModal({{ task.id }}, 'completed')">Complete</button>
+                        <button class="btn btn-sm btn-warning" onclick="openUpdateModal({{ task.id }}, 'delayed')">Delay</button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-column">
+                    <p>No tasks</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- On Hold Column -->
+        <div class="kanban-column">
+            <div class="column-header on-hold">
+                <h3>On Hold</h3>
+                <span class="task-count">{{ task_groups.on_hold.count }}</span>
+            </div>
+            <div class="column-content" id="on-hold-column">
+                {% for task in task_groups.on_hold %}
+                <div class="task-card" data-task-id="{{ task.id }}">
+                    <div class="task-header">
+                        <h4 class="task-title">{{ task.title }}</h4>
+                        <span class="priority-badge priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+                    </div>
+                    <p class="task-description">{{ task.description|truncatewords:20 }}</p>
+                    <div class="task-meta">
+                        <span class="project-name">{{ task.project.name }}</span>
+                        {% if task.start_date and task.end_date %}
+                        <span class="task-dates">{{ task.start_date|date:"M d" }} - {{ task.end_date|date:"M d" }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-sm btn-primary" onclick="openUpdateModal({{ task.id }}, 'in_progress')">Resume</button>
+                        <button class="btn btn-sm btn-success" onclick="openUpdateModal({{ task.id }}, 'completed')">Complete</button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-column">
+                    <p>No tasks</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Completed Column -->
+        <div class="kanban-column">
+            <div class="column-header completed">
+                <h3>Completed</h3>
+                <span class="task-count">{{ task_groups.completed.count }}</span>
+            </div>
+            <div class="column-content" id="completed-column">
+                {% for task in task_groups.completed %}
+                <div class="task-card completed" data-task-id="{{ task.id }}">
+                    <div class="task-header">
+                        <h4 class="task-title">{{ task.title }}</h4>
+                        <span class="priority-badge priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+                    </div>
+                    <p class="task-description">{{ task.description|truncatewords:20 }}</p>
+                    <div class="task-meta">
+                        <span class="project-name">{{ task.project.name }}</span>
+                        {% if task.start_date and task.end_date %}
+                        <span class="task-dates">{{ task.start_date|date:"M d" }} - {{ task.end_date|date:"M d" }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="completion-badge">
+                        <i class="icon">✅</i> Completed
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-column">
+                    <p>No tasks</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Update Modal -->
+<div id="updateModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Update Task Status</h2>
+            <button class="modal-close" onclick="closeUpdateModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="updateTaskForm">
+                <input type="hidden" id="taskId" name="task_id">
+                <input type="hidden" id="updateType" name="update_type">
+                
+                <div class="form-group">
+                    <label for="updateReason">Reason for Update (Optional)</label>
+                    <textarea id="updateReason" name="reason" rows="3" placeholder="Explain the reason for this status change..."></textarea>
+                </div>
+                
+                <div class="form-group" id="estimatedCompletionGroup" style="display: none;">
+                    <label for="estimatedCompletion">New Estimated Completion Date</label>
+                    <input type="date" id="estimatedCompletion" name="estimated_completion">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeUpdateModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .planner-container {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .planner-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        color: white;
+    }
+
+    .planner-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .planner-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 2rem;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    .notification-bell {
+        position: fixed;
+        top: 2rem;
+        right: 2rem;
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        transition: transform 0.2s ease;
+    }
+
+    .notification-bell:hover {
+        transform: scale(1.1);
+    }
+
+    .notification-bell .icon {
+        font-size: 1.5rem;
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #ef4444;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .notifications-panel {
+        position: fixed;
+        top: 5rem;
+        right: 2rem;
+        width: 350px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        z-index: 999;
+        display: none;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .notifications-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .notifications-header h3 {
+        margin: 0;
+        color: #1f2937;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #6b7280;
+    }
+
+    .notifications-list {
+        padding: 1rem;
+    }
+
+    .notification-item {
+        padding: 1rem;
+        border-bottom: 1px solid #f3f4f6;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .notification-item:hover {
+        background: #f9fafb;
+    }
+
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+
+    .notification-content h4 {
+        margin: 0 0 0.5rem 0;
+        font-size: 0.9rem;
+        color: #1f2937;
+    }
+
+    .notification-content p {
+        margin: 0 0 0.5rem 0;
+        font-size: 0.8rem;
+        color: #6b7280;
+    }
+
+    .notification-time {
+        font-size: 0.75rem;
+        color: #9ca3af;
+    }
+
+    .no-notifications {
+        text-align: center;
+        padding: 2rem;
+        color: #6b7280;
+    }
+
+    .kanban-board {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .kanban-column {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .column-header {
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        color: white;
+    }
+
+    .column-header.not-started { background: #6b7280; }
+    .column-header.in-progress { background: #f59e0b; }
+    .column-header.on-hold { background: #ef4444; }
+    .column-header.completed { background: #10b981; }
+
+    .column-header h3 {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .task-count {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+    }
+
+    .column-content {
+        padding: 1rem;
+        min-height: 400px;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    .task-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .task-card:hover {
+        border-color: #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+
+    .task-card.completed {
+        opacity: 0.7;
+        background: #f9fafb;
+    }
+
+    .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+    }
+
+    .task-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+        flex: 1;
+    }
+
+    .priority-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .priority-low { background: #d1fae5; color: #065f46; }
+    .priority-medium { background: #fef3c7; color: #92400e; }
+    .priority-high { background: #fee2e2; color: #991b1b; }
+    .priority-urgent { background: #fecaca; color: #7f1d1d; }
+
+    .task-description {
+        margin: 0 0 1rem 0;
+        font-size: 0.875rem;
+        color: #6b7280;
+        line-height: 1.4;
+    }
+
+    .task-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-size: 0.8rem;
+        color: #9ca3af;
+    }
+
+    .project-name {
+        font-weight: 500;
+        color: #3b82f6;
+    }
+
+    .task-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .btn-primary { background: #3b82f6; color: white; }
+    .btn-primary:hover { background: #2563eb; }
+    .btn-secondary { background: #6b7280; color: white; }
+    .btn-secondary:hover { background: #4b5563; }
+    .btn-success { background: #10b981; color: white; }
+    .btn-success:hover { background: #059669; }
+    .btn-warning { background: #f59e0b; color: white; }
+    .btn-warning:hover { background: #d97706; }
+
+    .completion-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #10b981;
+        font-weight: 500;
+        font-size: 0.875rem;
+    }
+
+    .empty-column {
+        text-align: center;
+        padding: 2rem;
+        color: #9ca3af;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: white;
+        margin: 5% auto;
+        padding: 0;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        color: #1f2937;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #6b7280;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: background 0.2s ease;
+    }
+
+    .modal-close:hover {
+        background: #f3f4f6;
+        color: #1f2937;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #1f2937;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.2s ease;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .kanban-board {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .planner-container {
+            padding: 1rem;
+        }
+
+        .planner-header {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .header-stats {
+            gap: 1rem;
+        }
+
+        .kanban-board {
+            grid-template-columns: 1fr;
+        }
+
+        .notifications-panel {
+            width: 90%;
+            right: 5%;
+        }
+    }
+</style>
+
+<script>
+    let currentTaskId = null;
+    let currentUpdateType = null;
+
+    function toggleNotifications() {
+        const panel = document.getElementById('notificationsPanel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function openUpdateModal(taskId, updateType) {
+        currentTaskId = taskId;
+        currentUpdateType = updateType;
+        
+        document.getElementById('taskId').value = taskId;
+        document.getElementById('updateType').value = updateType;
+        
+        // Set modal title based on update type
+        const modalTitle = document.getElementById('modalTitle');
+        const updateTypeLabels = {
+            'completed': 'Mark as Completed',
+            'delayed': 'Mark as Delayed',
+            'on_hold': 'Put On Hold',
+            'in_progress': 'Start Task'
+        };
+        modalTitle.textContent = updateTypeLabels[updateType] || 'Update Task Status';
+        
+        // Show/hide estimated completion field for delayed tasks
+        const estimatedGroup = document.getElementById('estimatedCompletionGroup');
+        if (updateType === 'delayed') {
+            estimatedGroup.style.display = 'block';
+        } else {
+            estimatedGroup.style.display = 'none';
+        }
+        
+        document.getElementById('updateModal').style.display = 'block';
+    }
+
+    function closeUpdateModal() {
+        document.getElementById('updateModal').style.display = 'none';
+        document.getElementById('updateTaskForm').reset();
+        currentTaskId = null;
+        currentUpdateType = null;
+    }
+
+    // Handle form submission
+    document.getElementById('updateTaskForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('update_type', currentUpdateType);
+        formData.append('reason', document.getElementById('updateReason').value);
+        formData.append('estimated_completion', document.getElementById('estimatedCompletion').value);
+        
+        fetch(`/tasks/${currentTaskId}/update/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success message
+                alert(data.message);
+                
+                // Reload page to update the kanban board
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while updating the task.');
+        });
+        
+        closeUpdateModal();
+    });
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('updateModal');
+        if (event.target === modal) {
+            closeUpdateModal();
+        }
+    }
+
+    // Auto-refresh notifications every 30 seconds
+    setInterval(function() {
+        fetch('/notifications/')
+            .then(response => response.json())
+            .then(data => {
+                // Update notification badge count
+                const badge = document.querySelector('.notification-badge');
+                if (badge) {
+                    const unreadCount = data.notifications.filter(n => !n.is_read).length;
+                    if (unreadCount > 0) {
+                        badge.textContent = unreadCount;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            })
+            .catch(error => console.error('Error fetching notifications:', error));
+    }, 30000);
+</script>
+{% endblock %} 

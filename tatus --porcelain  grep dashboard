@@ -1,0 +1,33 @@
+[33mcommit 03ec6526589623c26527167a9efddaf4a9ade1c9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Merge: 40abba0 a733166
+Author: MOCDATA <mocdata@magnumopusconsultants.com>
+Date:   Fri Sep 5 01:49:06 2025 -0700
+
+    Resolve merge conflicts and add deployment scripts and test files
+
+ deploy.py                              | 211 [32m++++++++[m
+ deploy.sh                              | 143 [32m++++++[m
+ deploy_simple.py                       |  74 [32m+++[m
+ eclick/settings.py                     |   2 [32m+[m[31m-[m
+ home/credentials.json                  |   1 [32m+[m
+ home/templates/home/about.html         |   3 [32m+[m
+ node_modules/.package-lock.json        |  14 [32m+[m
+ node_modules/tailwindcss/LICENSE       |  21 [32m+[m
+ node_modules/tailwindcss/README.md     |  36 [32m++[m
+ node_modules/tailwindcss/index.css     | 896 [32m+++++++++++++++++++++++++++++++++[m
+ node_modules/tailwindcss/package.json  |  89 [32m++++[m
+ node_modules/tailwindcss/preflight.css | 393 [32m+++++++++++++++[m
+ node_modules/tailwindcss/theme.css     | 462 [32m+++++++++++++++++[m
+ node_modules/tailwindcss/utilities.css |   1 [32m+[m
+ simple_oauth_test.py                   |  57 [32m+++[m
+ test_email_content.py                  |  74 [32m+++[m
+ test_email_setup.py                    | 123 [32m+++++[m
+ test_email_with_pdf.py                 |  97 [32m++++[m
+ test_large_pdf_email.py                | 110 [32m++++[m
+ test_oauth2_email.py                   |  77 [32m+++[m
+ test_oauth_flow.py                     | 121 [32m+++++[m
+ test_pdf_content.py                    |  70 [32m+++[m
+ test_pdf_email.py                      |  73 [32m+++[m
+ test_pdf_generation.py                 |  82 [32m+++[m
+ test_simple_email.py                   |  62 [32m+++[m
+ 25 files changed, 3291 insertions(+), 1 deletion(-)

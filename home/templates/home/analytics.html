@@ -1,0 +1,1077 @@
+{% extends 'home/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard - E-Click{% endblock %}
+
+{% block extra_css %}
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+    /* CSS Variables for consistent theming - matching reports page */
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --text-muted: #9ca3af;
+        --text-white: #ffffff;
+        --background-primary: #ffffff;
+        --background-secondary: #f9fafb;
+        --background-tertiary: #f1f5f9;
+        --info: #3b82f6;
+        --border-light: #e5e7eb;
+        --border-medium: #d1d5db;
+        --border-dark: #94a3b8;
+        --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+        --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-large: 0 10px 15px rgba(0, 0, 0, 0.1);
+        --radius-small: 0.375rem;
+        --radius-medium: 0.5rem;
+        --radius-large: 0.75rem;
+    }
+
+    [data-theme="dark"] {
+        --text-primary: #f9fafb;
+        --text-secondary: #d1d5db;
+        --text-muted: #9ca3af;
+        --text-white: #ffffff;
+        --background-primary: #111827;
+        --background-secondary: #1f2937;
+        --background-tertiary: #374151;
+        --border-light: #374151;
+        --border-medium: #4b5563;
+        --border-dark: #6b7280;
+        --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.3);
+        --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.3);
+        --shadow-large: 0 10px 15px rgba(0, 0, 0, 0.3);
+        --primary: #60a5fa;
+        --primary-dark: #3b82f6;
+    }
+
+    .analytics-dashboard {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .dashboard-header {
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        padding: 2rem;
+        margin: 0 0 2rem 0;
+        text-align: center;
+        box-shadow: var(--shadow-light);
+    }
+
+    .dashboard-header h1 {
+        color: var(--text-primary);
+        margin: 0 0 0.5rem 0;
+        font-size: 2.25rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .dashboard-header p {
+        color: var(--text-secondary);
+        font-size: 1.125rem;
+        font-weight: 400;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+    }
+
+    .stat-card {
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-light);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-large);
+        border-color: var(--primary);
+    }
+
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 0.75rem;
+        line-height: 1;
+    }
+
+    .stat-label {
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+    }
+
+    .stat-trend {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-small);
+        display: inline-block;
+        font-weight: 500;
+        border: 1px solid transparent;
+    }
+
+    .stat-trend.positive {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .stat-trend.negative {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .section {
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        margin: 0 1rem 2rem 1rem;
+        overflow: hidden;
+        box-shadow: var(--shadow-light);
+    }
+
+    .section-header {
+        background: var(--background-secondary);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .section-header h2 {
+        color: var(--text-primary);
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .section-content {
+        padding: 2rem;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 2rem;
+    }
+
+    .chart-card {
+        background: var(--background-secondary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        padding: 2rem;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-light);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .chart-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    }
+
+    .chart-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-large);
+        border-color: var(--primary);
+    }
+
+    .chart-card h3 {
+        color: var(--text-primary);
+        margin: 0 0 1.5rem 0;
+        font-size: 1.25rem;
+        text-align: center;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 350px;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        justify-content: center;
+        padding: 1rem;
+        background: var(--background-tertiary);
+        border-radius: var(--radius-small);
+        border: 1px solid var(--border-light);
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        background: var(--background-primary);
+        border-radius: var(--radius-small);
+        border: 1px solid var(--border-light);
+        transition: all 0.2s ease;
+    }
+
+    .legend-item:hover {
+        background: var(--background-secondary);
+        border-color: var(--primary);
+        transform: translateY(-1px);
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .legend-color.planned { background: var(--primary); }
+    .legend-color.in-progress { background: var(--warning); }
+    .legend-color.completed { background: var(--success); }
+    .legend-color.not-started { background: var(--info); }
+    .legend-color.on-hold { background: var(--danger); }
+    .legend-color.urgent { background: var(--danger); }
+    .legend-color.high { background: var(--warning); }
+    .legend-color.medium { background: var(--primary); }
+    .legend-color.low { background: var(--success); }
+
+    .monthly-trends {
+        background: var(--background-secondary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        padding: 2rem;
+        margin-top: 2rem;
+        box-shadow: var(--shadow-light);
+    }
+
+    .monthly-trends h3 {
+        color: var(--text-primary);
+        margin: 0 0 1.5rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .trends-container {
+        height: 300px;
+        position: relative;
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-light);
+    }
+
+    /* Top Projects Section */
+    .top-projects-section {
+        margin-top: 3rem;
+    }
+
+    .top-projects-section h3 {
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .project-card {
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        padding: 1.5rem;
+        box-shadow: var(--shadow-light);
+        transition: all 0.3s ease;
+    }
+
+    .project-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-medium);
+        border-color: var(--primary);
+    }
+
+    .project-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .project-header h4 {
+        color: var(--text-primary);
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .completion-badge {
+        background: var(--primary);
+        color: var(--text-white);
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-small);
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .project-stats {
+        margin-top: 1rem;
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .stat-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .stat-value {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: var(--background-tertiary);
+        border-radius: var(--radius-small);
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        transition: width 0.3s ease;
+    }
+
+    /* Activity Feed */
+    .activity-feed {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--background-secondary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        transition: all 0.2s ease;
+    }
+
+    .activity-item:hover {
+        background: var(--background-tertiary);
+        border-color: var(--primary);
+        transform: translateX(4px);
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.125rem;
+        color: var(--text-white);
+    }
+
+    .activity-item.project .activity-icon {
+        background: var(--primary);
+    }
+
+    .activity-item.task .activity-icon {
+        background: var(--success);
+    }
+
+    .activity-content {
+        flex: 1;
+    }
+
+    .activity-title {
+        color: var(--text-primary);
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .activity-time {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .activity-status {
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-small);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .activity-status.planned { background: rgba(59, 130, 246, 0.1); color: var(--primary); }
+    .activity-status.in_progress { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+    .activity-status.completed { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+    .activity-status.on_hold { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+    .activity-status.not_started { background: rgba(107, 114, 128, 0.1); color: var(--text-secondary); }
+
+    /* Performance Metrics */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+    }
+
+    .metric-card {
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        padding: 2rem;
+        text-align: center;
+        box-shadow: var(--shadow-light);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    }
+
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-large);
+        border-color: var(--primary);
+    }
+
+    .metric-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--primary);
+        color: var(--text-white);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 1rem;
+    }
+
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+        line-height: 1;
+    }
+
+    .metric-label {
+        color: var(--text-primary);
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* Dark mode specific enhancements */
+    [data-theme="dark"] .stat-card {
+        background: var(--background-secondary);
+        border-color: var(--border-medium);
+    }
+
+    [data-theme="dark"] .chart-card {
+        background: var(--background-secondary);
+        border-color: var(--border-medium);
+    }
+
+    [data-theme="dark"] .project-card {
+        background: var(--background-secondary);
+        border-color: var(--border-medium);
+    }
+
+    [data-theme="dark"] .activity-item {
+        background: var(--background-secondary);
+        border-color: var(--border-medium);
+    }
+
+    [data-theme="dark"] .metric-card {
+        background: var(--background-secondary);
+        border-color: var(--border-medium);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stat-card, .chart-card, .project-card, .metric-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    .chart-card:nth-child(1) { animation-delay: 0.5s; }
+    .chart-card:nth-child(2) { animation-delay: 0.6s; }
+
+    .project-card:nth-child(1) { animation-delay: 0.7s; }
+    .project-card:nth-child(2) { animation-delay: 0.8s; }
+    .project-card:nth-child(3) { animation-delay: 0.9s; }
+    .project-card:nth-child(4) { animation-delay: 1.0s; }
+    .project-card:nth-child(5) { animation-delay: 1.1s; }
+
+    .metric-card:nth-child(1) { animation-delay: 1.2s; }
+    .metric-card:nth-child(2) { animation-delay: 1.3s; }
+    .metric-card:nth-child(3) { animation-delay: 1.4s; }
+    .metric-card:nth-child(4) { animation-delay: 1.5s; }
+
+    @media (max-width: 768px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+
+        
+        .section {
+            margin: 0 0.5rem 1.5rem 0.5rem;
+        }
+        
+        .section-content {
+            padding: 1.5rem;
+        }
+        
+        .chart-card {
+            padding: 1.5rem;
+        }
+        
+        .projects-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+            padding: 0 0.5rem;
+        }
+        
+        .dashboard-header {
+            padding: 1.5rem;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 1.75rem;
+        }
+        
+        .section {
+            margin: 0 0.25rem 1rem 0.25rem;
+        }
+        
+        .section-content {
+            padding: 1rem;
+        }
+        
+        .chart-card {
+            padding: 1rem;
+        }
+        
+        .monthly-trends {
+            padding: 1.5rem;
+        }
+        
+        .trends-container {
+            padding: 1rem;
+        }
+        
+        .projects-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .metrics-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .metric-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="analytics-dashboard">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <h1>Analytics Dashboard</h1>
+        <p>Comprehensive overview of your system performance and project metrics</p>
+        
+
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_projects }}</div>
+            <div class="stat-label">Total Projects</div>
+            <div class="stat-trend {% if project_trend >= 0 %}positive{% else %}negative{% endif %}">
+                {% if project_trend >= 0 %}↗{% else %}↘{% endif %} {{ project_trend_abs }}% from last month
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_tasks }}</div>
+            <div class="stat-label">Total Tasks</div>
+            <div class="stat-trend positive">↗ {{ task_completion_rate }}% completed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label">Team Members</div>
+            <div class="stat-trend positive">↗ {{ active_users }} active</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_clients }}</div>
+            <div class="stat-label">Active Clients</div>
+            <div class="stat-trend positive">↗ {{ active_clients }} engaged</div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Performance Analytics</h2>
+        </div>
+        <div class="section-content">
+            <div class="charts-grid">
+                <!-- Project Status Overview -->
+                <div class="chart-card">
+                    <h3>Project Status Overview</h3>
+                    <div class="chart-container">
+                        <canvas id="projectStatusChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-color planned"></span>
+                            <span>Planned ({{ planned_projects }})</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color in-progress"></span>
+                            <span>In Progress ({{ active_projects }})</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color completed"></span>
+                            <span>Completed ({{ completed_projects }})</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Status Distribution -->
+                <div class="chart-card">
+                    <h3>Task Status Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="taskStatusChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-color not-started"></span>
+                            <span>Not Started ({{ not_started_tasks }})</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color in-progress"></span>
+                            <span>In Progress ({{ in_progress_tasks }})</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color on-hold"></span>
+                            <span>On Hold ({{ on_hold_tasks }})</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color completed"></span>
+                            <span>Completed ({{ completed_tasks }})</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Trends -->
+            <div class="monthly-trends">
+                <h3>Monthly Trends (Last 6 Months)</h3>
+                <div class="trends-container">
+                    <canvas id="monthlyTrendsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Charts Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Detailed Analytics</h2>
+        </div>
+        <div class="section-content">
+            <div class="charts-grid">
+
+
+                <!-- Client Project Distribution -->
+                <div class="chart-card">
+                    <h3>Client Project Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="clientProjectChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Performing Projects -->
+            <div class="top-projects-section">
+                <h3>Top Performing Projects</h3>
+                <div class="projects-grid">
+                    {% for project in top_projects %}
+                    <div class="project-card">
+                        <div class="project-header">
+                            <h4>{{ project.name }}</h4>
+                            <div class="completion-badge">{{ project.completion_rate }}%</div>
+                        </div>
+                        <div class="project-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Tasks:</span>
+                                <span class="stat-value">{{ project.completed_tasks }}/{{ project.total_tasks }}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ project.completion_rate }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Recent Activity</h2>
+        </div>
+        <div class="section-content">
+            <div class="activity-feed">
+                {% for activity in recent_activity %}
+                <div class="activity-item {{ activity.type }}">
+                    <div class="activity-icon">
+                        {% if activity.type == 'project' %}
+                            <i class="fas fa-project-diagram"></i>
+                        {% else %}
+                            <i class="fas fa-tasks"></i>
+                        {% endif %}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">{{ activity.title }}</div>
+                        <div class="activity-time">{{ activity.time }}</div>
+                    </div>
+                    <div class="activity-status {{ activity.status }}">
+                        {{ activity.status|title }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Metrics Section -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Performance Overview</h2>
+        </div>
+        <div class="section-content">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ performance_metrics.project_completion }}%</div>
+                        <div class="metric-label">Project Completion</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ performance_metrics.task_completion }}%</div>
+                        <div class="metric-label">Task Completion</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ performance_metrics.user_activity }}%</div>
+                        <div class="metric-label">User Activity</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ performance_metrics.client_engagement }}%</div>
+                        <div class="metric-label">Client Engagement</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Initialize theme from global settings
+    document.addEventListener('DOMContentLoaded', function() {
+        // Theme will be handled by the global theme toggle in settings
+        
+        // Project Status Chart
+        const projectStatusCtx = document.getElementById('projectStatusChart').getContext('2d');
+        new Chart(projectStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Planned', 'In Progress', 'Completed'],
+                datasets: [{
+                    data: [{{ planned_projects }}, {{ active_projects }}, {{ completed_projects }}],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(40, 167, 69, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(40, 167, 69, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        display: false 
+                    }
+                }
+            }
+        });
+
+        // Task Status Chart
+        const taskStatusCtx = document.getElementById('taskStatusChart').getContext('2d');
+        new Chart(taskStatusCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Not Started', 'In Progress', 'On Hold', 'Completed'],
+                datasets: [{
+                    label: 'Tasks',
+                    data: [{{ not_started_tasks }}, {{ in_progress_tasks }}, {{ on_hold_tasks }}, {{ completed_tasks }}],
+                    backgroundColor: [
+                        'rgba(23, 162, 184, 0.8)',
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(220, 53, 69, 0.8)',
+                        'rgba(40, 167, 69, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(23, 162, 184, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(220, 53, 69, 1)',
+                        'rgba(40, 167, 69, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Monthly Trends Chart
+        const monthlyTrendsCtx = document.getElementById('monthlyTrendsChart').getContext('2d');
+        new Chart(monthlyTrendsCtx, {
+            type: 'line',
+            data: {
+                labels: [{% for month in monthly_data %}'{{ month.month }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Projects',
+                    data: [{% for month in monthly_data %}{{ month.projects }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Tasks',
+                    data: [{% for month in monthly_data %}{{ month.tasks }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    borderColor: 'rgba(40, 167, 69, 1)',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+
+
+
+        // Client Project Distribution Chart
+        const clientProjectCtx = document.getElementById('clientProjectChart').getContext('2d');
+        new Chart(clientProjectCtx, {
+            type: 'bar',
+            data: {
+                labels: [{% for client in client_project_data %}'{{ client.client }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+                datasets: [{
+                    label: 'Total Projects',
+                    data: [{% for client in client_project_data %}{{ client.projects }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                }, {
+                    label: 'Completed Projects',
+                    data: [{% for client in client_project_data %}{{ client.completed }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                    borderColor: 'rgba(16, 185, 129, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
