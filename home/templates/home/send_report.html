@@ -112,12 +112,12 @@
                         </svg>
                         Send Complete Report
                     </button>
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='{% url 'reports' %}'">
+                    <a href="{% url 'reports' %}" class="btn btn-secondary">
                         <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                         </svg>
                         Back to Reports
-                    </button>
+                    </a>
                 </div>
             </form>
         </div>
@@ -741,23 +741,5 @@
         }
     `;
     document.head.appendChild(style);
-
-    // Listen for theme changes
-    document.addEventListener('DOMContentLoaded', function() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        
-        window.addEventListener('storage', function(event) {
-            if (event.key === 'theme') {
-                const newTheme = event.newValue || 'light';
-                document.documentElement.setAttribute('data-theme', newTheme);
-            }
-        });
-        
-        window.addEventListener('themeChanged', function(event) {
-            const newTheme = event.detail.theme;
-            document.documentElement.setAttribute('data-theme', newTheme);
-        });
-    });
 </script>
 {% endblock %}

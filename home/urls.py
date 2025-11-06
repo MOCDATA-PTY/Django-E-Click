@@ -74,6 +74,7 @@ urlpatterns = [
     # path('system-monitoring/', views.system_monitoring, name='system_monitoring'),
 
     path('client/dashboard/', views.client_dashboard, name='client_dashboard'),
+    path('client/gantt-data/', views.client_gantt_data, name='client_gantt_data'),
     path('client/settings/', views.client_settings, name='client_settings'),
     path('client/project/<int:project_id>/', views.client_project_detail, name='client_project_detail'),
     path('client/logout/', views.client_logout, name='client_logout'),

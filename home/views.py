@@ -6173,8 +6173,9 @@ def client_dashboard(request):
             project_tasks = project.tasks.all().order_by('-updated_at')[:3]
             completed_tasks_count = project.tasks.filter(status='completed').count()
             total_tasks_count = project.tasks.count()
-            
+
             project.completed_tasks_count = completed_tasks_count
+            project.remaining_tasks_count = total_tasks_count - completed_tasks_count
             total_all_tasks += total_tasks_count
             total_completed_tasks += completed_tasks_count
             
@@ -6249,6 +6250,64 @@ def client_project_detail(request, project_id):
     except Project.DoesNotExist:
         messages.error(request, 'Project not found.')
         return redirect('client_dashboard')
+
+def client_gantt_data(request):
+    """API endpoint for client Gantt chart data"""
+    if 'client_id' not in request.session:
+        return JsonResponse({'success': False, 'error': 'Not authenticated'})
+
+    client_id = request.session['client_id']
+    try:
+        client = Client.objects.get(id=client_id, is_active=True)
+        projects = Project.objects.filter(client_email=client.email).order_by('-created_at')
+
+        gantt_data = []
+        for project in projects:
+            project_data = {
+                'id': project.id,
+                'name': project.name,
+                'client': project.client,
+                'start_date': project.start_date.isoformat() if project.start_date else None,
+                'end_date': project.end_date.isoformat() if project.end_date else None,
+                'status': project.status,
+                'tasks': []
+            }
+
+            # Get tasks for this project
+            tasks = project.tasks.all().order_by('start_date', 'created_at')
+            for task in tasks:
+                task_data = {
+                    'id': task.id,
+                    'title': task.title,
+                    'start_date': task.start_date.isoformat() if task.start_date else None,
+                    'end_date': task.end_date.isoformat() if task.end_date else None,
+                    'status': task.status,
+                    'priority': task.priority,
+                    'subtasks': []
+                }
+
+                # Get subtasks for this task
+                subtasks = task.subtasks.all().order_by('start_date', 'created_at')
+                for subtask in subtasks:
+                    subtask_data = {
+                        'id': subtask.id,
+                        'title': subtask.title,
+                        'start_date': subtask.start_date.isoformat() if subtask.start_date else None,
+                        'end_date': subtask.end_date.isoformat() if subtask.end_date else None,
+                        'status': subtask.status,
+                        'priority': subtask.priority
+                    }
+                    task_data['subtasks'].append(subtask_data)
+
+                project_data['tasks'].append(task_data)
+
+            gantt_data.append(project_data)
+
+        return JsonResponse({'success': True, 'projects': gantt_data})
+    except Client.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Client not found'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
 def client_logout(request):
     """Client logout"""
