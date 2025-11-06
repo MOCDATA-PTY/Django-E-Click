@@ -5718,7 +5718,7 @@ def send_project_report(request, project_id):
         timeline_progress = 0
         if project.start_date and project.end_date:
             total_duration = (project.end_date - project.start_date).days
-            elapsed_duration = (end_date - project.start_date).days
+            elapsed_duration = (end_date.date() - project.start_date).days
             if total_duration > 0:
                 timeline_progress = (elapsed_duration / total_duration) * 100
         
