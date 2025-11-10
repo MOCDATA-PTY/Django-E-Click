@@ -6460,8 +6460,8 @@ def client_settings(request):
             if username and email:
                 # Check if username or email already exists for other clients
                 existing_client = Client.objects.filter(
-                    (models.Q(username=username) | models.Q(email=email)) & 
-                    ~models.Q(id=client_id)
+                    (Q(username=username) | Q(email=email)) &
+                    ~Q(id=client_id)
                 ).first()
                 
                 if existing_client:
@@ -6486,16 +6486,7 @@ def client_settings(request):
                         client.profile_picture = profile_picture
                     
                     client.save()
-                    
-                    # Log the changes for admin visibility
-                    from .models import SystemLog
-                    SystemLog.objects.create(
-                        action='client_profile_updated',
-                        description=f'Client {old_username} ({old_email}) updated profile: username to "{username}", email to "{email}"',
-                        related_client=client,
-                        user=None  # No user since this is client action
-                    )
-                    
+
                     messages.success(request, 'Profile updated successfully!')
                     return redirect('client_settings')
         

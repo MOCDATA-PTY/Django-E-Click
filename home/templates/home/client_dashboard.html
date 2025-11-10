@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1768,7 +1768,7 @@
         const html = document.documentElement;
         
         // Check for saved theme preference from client settings
-        const currentTheme = localStorage.getItem('client_theme') || 'light';
+        const currentTheme = localStorage.getItem('theme') || 'light';
         html.setAttribute('data-theme', currentTheme);
         
         // Enhanced animations and interactions
