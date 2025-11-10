@@ -327,24 +327,41 @@
                                     <div class="subtask-item {% if subtask.is_completed %}completed{% endif %}" data-subtask-id="{{ subtask.id }}">
                                         <div class="subtask-content">
                                             <div class="subtask-header">
-                                                <span class="subtask-title">{{ subtask.title }}</span>
-                                                <div class="subtask-meta">
-                                                    <span class="subtask-priority priority-{{ subtask.priority }}">{{ subtask.get_priority_display }}</span>
-                                                    {% if subtask.start_date or subtask.end_date %}
-                                                    <span class="subtask-dates">
-                                                        {% if subtask.start_date %}{{ subtask.start_date|date:"M d" }}{% endif %}
-                                                        {% if subtask.start_date and subtask.end_date %} - {% endif %}
-                                                        {% if subtask.end_date %}{{ subtask.end_date|date:"M d" }}{% endif %}
-                                                    </span>
-                                                    {% endif %}
+                                                <div class="subtask-info">
+                                                    <h5 class="subtask-title">{{ subtask.title }}</h5>
+                                                    <div class="subtask-badges">
+                                                        <span class="subtask-status-badge {{ subtask.status }}">{{ subtask.get_status_display }}</span>
+                                                        <span class="subtask-priority priority-{{ subtask.priority }}">{{ subtask.get_priority_display }}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                             {% if subtask.description %}
-                                            <div class="subtask-description">{{ subtask.description }}</div>
+                                            <div class="subtask-description">
+                                                <strong>Description:</strong> {{ subtask.description }}
+                                            </div>
                                             {% endif %}
-                                            <span class="subtask-status {% if subtask.status == 'completed' %}completed{% elif subtask.status == 'in_progress' %}in-progress{% elif subtask.status == 'not_started' %}not-started{% endif %}">
-                                                {% if subtask.status == 'completed' %}✓ Completed{% elif subtask.status == 'in_progress' %}🔄 In Progress{% elif subtask.status == 'not_started' %}⏳ Not Started{% endif %}
-                                            </span>
+                                            <div class="subtask-details">
+                                                <span class="subtask-dates">
+                                                    <strong>Dates:</strong>
+                                                    {% if subtask.start_date and subtask.end_date %}
+                                                        {{ subtask.start_date|date:"M d, Y" }} - {{ subtask.end_date|date:"M d, Y" }}
+                                                    {% elif subtask.start_date %}
+                                                        Start: {{ subtask.start_date|date:"M d, Y" }}
+                                                    {% elif subtask.end_date %}
+                                                        End: {{ subtask.end_date|date:"M d, Y" }}
+                                                    {% else %}
+                                                        No dates set
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            <div class="subtask-timestamps">
+                                                <small class="text-muted">
+                                                    Created: {{ subtask.created_at|date:"M d, Y g:i A" }}
+                                                    {% if subtask.updated_at != subtask.created_at %}
+                                                    | Updated: {{ subtask.updated_at|date:"M d, Y g:i A" }}
+                                                    {% endif %}
+                                                </small>
+                                            </div>
                                         </div>
                                         <div class="subtask-actions">
                                             <div class="status-change-dropdown">
@@ -360,12 +377,12 @@
                                                     <button type="button" class="status-option" onclick="changeSubtaskStatus({{ task.id }}, {{ subtask.id }}, 'completed')">Completed</button>
                                                 </div>
                                             </div>
-                                            <button type="button" class="btn btn-xs btn-info" onclick="toggleEditSubtask(${task.id}, ${subtask.id})">Edit</button>
-                                            <button type="button" class="btn btn-xs btn-danger" onclick="deleteSubtask(${subtask.id})">Delete</button>
+                                            <button type="button" class="btn btn-xs btn-info" onclick="toggleEditSubtask({{ task.id }}, {{ subtask.id }})">Edit</button>
+                                            <button type="button" class="btn btn-xs btn-danger" onclick="deleteSubtask({{ subtask.id }})">Delete</button>
                                         </div>
                                         
                                                                                 <!-- Subtask Edit Form (Hidden by default) -->
-                                        <div class="subtask-edit-form" id="subtask-edit-${task.id}-${subtask.id}" style="display: none;">
+                                        <div class="subtask-edit-form" id="subtask-edit-{{ task.id }}-{{ subtask.id }}" style="display: none;">
                                             <form method="POST" action="{% url 'edit_subtask' project.id task.id subtask.id %}">
                                                 {% csrf_token %}
                                                 <div class="form-group">
@@ -412,19 +429,10 @@
                                                                value="{% if subtask.end_date %}{{ subtask.end_date|date:'Y-m-d' }}{% endif %}">
                                                     </div>
                                                 </div>
-                                                
-                                                <div class="form-group">
-                                                    <label class="checkbox-label">
-                                                        <input type="checkbox" id="subtask_is_completed_{{ task.id }}_{{ subtask.id }}" name="is_completed" 
-                                                               {% if subtask.status == 'completed' %}checked{% endif %}>
-                                                        <span class="checkmark"></span>
-                                                        Mark as Completed
-                                                    </label>
-                                                </div>
-                                                
+
                                                 <div class="form-actions">
-                                                    <button type="button" class="btn btn-secondary" onclick="toggleEditSubtask(${task.id}, ${subtask.id})">Cancel</button>
-                                                    <button type="button" class="btn btn-primary" onclick="submitSubtaskEdit(${task.id}, ${subtask.id})">Update Subtask</button>
+                                                    <button type="button" class="btn btn-secondary" onclick="toggleEditSubtask({{ task.id }}, {{ subtask.id }})">Cancel</button>
+                                                    <button type="button" class="btn btn-primary" onclick="submitSubtaskEdit({{ task.id }}, {{ subtask.id }})">Update Subtask</button>
                                                 </div>
                                             </form>
                                         </div>
@@ -437,6 +445,9 @@
                                 <div class="subtasks-header">
                                     <h5>Subtasks:</h5>
                                     <button type="button" class="btn btn-xs btn-success" onclick="openAddSubtaskModal({{ task.id }})">+ Add Subtask</button>
+                                </div>
+                                <div class="subtasks-list" style="display: none;">
+                                    <!-- Subtasks will be added here -->
                                 </div>
                                 <p class="no-subtasks">No subtasks yet. Add one to get started.</p>
                             </div>
@@ -654,15 +665,17 @@
         position: absolute;
         top: 100%;
         left: 0;
-        z-index: 9999;
+        z-index: 10000 !important;
         background: var(--white);
         border: 1px solid var(--gray-300);
         border-radius: var(--radius);
-        box-shadow: var(--shadow-lg);
-        min-width: 150px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        min-width: 200px;
         margin-top: 0.25rem;
         display: none;
         padding: 0.5rem 0;
+        max-height: 300px;
+        overflow-y: auto;
     }
 
     .status-option {
@@ -676,11 +689,19 @@
         cursor: pointer;
         transition: background-color 0.2s ease;
         font-size: 0.875rem;
+        white-space: nowrap;
+        pointer-events: auto;
+        position: relative;
+        z-index: 1;
     }
 
     .status-option:hover {
         background: var(--gray-100);
         color: var(--text-color);
+    }
+
+    .status-option:active {
+        background: var(--gray-200);
     }
 
     .status-option:first-child {
@@ -1216,6 +1237,8 @@
         border: none;
         border-bottom: 1px solid var(--gray-200);
         transition: all 0.3s ease;
+        position: relative;
+        overflow: visible;
     }
 
     .task-item:hover {
@@ -1378,6 +1401,8 @@
         font-size: 0.875rem;
         border: none;
         border-bottom: 1px solid var(--gray-100);
+        position: relative;
+        overflow: visible;
     }
 
     .subtask-item.completed {
@@ -2190,11 +2215,22 @@ function showMessage(message, type) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message message-${type}`;
     messageDiv.textContent = message;
-    
-    // Insert at the top of the page
-    const header = document.querySelector('.header');
-    header.parentNode.insertBefore(messageDiv, header);
-    
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        background-color: ${type === 'success' ? '#4CAF50' : '#f44336'};
+        color: white;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 10000;
+        font-size: 14px;
+    `;
+
+    // Insert at the top of the body
+    document.body.insertBefore(messageDiv, document.body.firstChild);
+
     // Remove after 5 seconds
     setTimeout(() => {
         messageDiv.remove();
@@ -2304,34 +2340,63 @@ function addSubtaskToPage(subtaskId, formData, taskId) {
     // Find the task that this subtask belongs to
     const taskItem = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
     if (!taskItem) return;
-    
+
     // Find the subtasks list
     const subtasksList = taskItem.querySelector('.subtasks-list');
     if (!subtasksList) return;
-    
+
+    // Get project ID
+    const projectId = {{ project.id }};
+
+    // Get status value
+    const status = formData.get('status') || 'not_started';
+
+    // Get current date/time for timestamps
+    const now = new Date();
+    const createdDate = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' +
+                        now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    // Format dates
+    const startDate = formData.get('start_date');
+    const endDate = formData.get('end_date');
+    let dateDisplay = 'No dates set';
+    if (startDate && endDate) {
+        dateDisplay = formatDateWithYear(startDate) + ' - ' + formatDateWithYear(endDate);
+    } else if (startDate) {
+        dateDisplay = 'Start: ' + formatDateWithYear(startDate);
+    } else if (endDate) {
+        dateDisplay = 'End: ' + formatDateWithYear(endDate);
+    }
+
     // Create new subtask HTML
     const subtaskHtml = `
         <div class="subtask-item" data-subtask-id="${subtaskId}">
             <div class="subtask-content">
                 <div class="subtask-header">
-                    <span class="subtask-title">${formData.get('title')}</span>
-                    <div class="subtask-meta">
-                        <span class="subtask-priority priority-${formData.get('priority') || 'medium'}">${getPriorityDisplay(formData.get('priority') || 'medium')}</span>
-                        ${formData.get('start_date') || formData.get('end_date') ? 
-                            `<span class="subtask-dates">
-                                ${formData.get('start_date') ? formatDate(formData.get('start_date')) : ''}
-                                ${formData.get('start_date') && formData.get('end_date') ? ' - ' : ''}
-                                ${formData.get('end_date') ? formatDate(formData.get('end_date')) : ''}
-                            </span>` : ''
-                        }
+                    <div class="subtask-info">
+                        <h5 class="subtask-title">${formData.get('title')}</h5>
+                        <div class="subtask-badges">
+                            <span class="subtask-status-badge ${status}">${getStatusDisplay(status)}</span>
+                            <span class="subtask-priority priority-${formData.get('priority') || 'medium'}">${getPriorityDisplay(formData.get('priority') || 'medium')}</span>
+                        </div>
                     </div>
                 </div>
-                ${formData.get('description') ? `<div class="subtask-description">${formData.get('description')}</div>` : ''}
+                ${formData.get('description') ? `<div class="subtask-description"><strong>Description:</strong> ${formData.get('description')}</div>` : ''}
+                <div class="subtask-details">
+                    <span class="subtask-dates">
+                        <strong>Dates:</strong> ${dateDisplay}
+                    </span>
+                </div>
+                <div class="subtask-timestamps">
+                    <small class="text-muted">
+                        Created: ${createdDate}
+                    </small>
+                </div>
             </div>
             <div class="subtask-actions">
                 <div class="status-change-dropdown">
                     <button type="button" class="btn btn-xs btn-outline dropdown-toggle" onclick="toggleSubtaskStatusDropdown(${taskId}, ${subtaskId})">
-                        <span class="status-text">${getStatusDisplay(formData.get('status') || 'not_started')}</span>
+                        <span class="status-text">${getStatusDisplay(status)}</span>
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="6,9 12,15 18,9"></polyline>
                         </svg>
@@ -2342,7 +2407,7 @@ function addSubtaskToPage(subtaskId, formData, taskId) {
                         <button type="button" class="status-option" onclick="changeSubtaskStatus(${taskId}, ${subtaskId}, 'completed')">Completed</button>
                     </div>
                 </div>
-                <button type="button" class="btn btn-xs btn-info" onclick="toggleEditSubtask(${taskId}, ${subtaskId})">Edit</button>
+                <button type="button" class="btn btn-xs btn-info" onclick="window.location.href='/projects/${projectId}/edit-task/${taskId}/edit-subtask/${subtaskId}/'">Edit</button>
                 <button type="button" class="btn btn-xs btn-danger" onclick="deleteSubtask(${subtaskId})">Delete</button>
             </div>
         </div>
@@ -2401,6 +2466,12 @@ function formatDate(dateString) {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function formatDateWithYear(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function getUserDisplay(userIds) {
@@ -2612,8 +2683,19 @@ function toggleSubtaskStatusDropdown(taskId, subtaskId) {
 
 function changeTaskStatus(taskId, newStatus) {
     console.log('changeTaskStatus called:', taskId, newStatus);
+
+    // Close dropdown immediately - directly set display to none
+    const dropdown = document.getElementById(`status-dropdown-${taskId}`);
+    console.log('Closing dropdown:', dropdown);
+    if (dropdown) {
+        dropdown.style.display = 'none';
+        console.log('Dropdown closed!');
+    } else {
+        console.warn('Dropdown not found:', `status-dropdown-${taskId}`);
+    }
+
     const projectId = {{ project.id }};
-    
+
     // Get CSRF token from any available source
     let csrfToken = document.getElementById('csrf-token')?.value;
     if (!csrfToken) {
@@ -2622,9 +2704,9 @@ function changeTaskStatus(taskId, newStatus) {
     if (!csrfToken) {
         csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]')?.value;
     }
-    
+
     console.log('CSRF token found:', csrfToken);
-    
+
     if (!csrfToken) {
         showMessage('CSRF token not found. Please refresh the page.', 'error');
         return;
@@ -2693,10 +2775,7 @@ function changeTaskStatus(taskId, newStatus) {
             } else {
                 console.error('Task item not found for ID:', taskId);
             }
-            
-            // Close dropdown
-            toggleStatusDropdown(taskId);
-            
+
             showMessage(`Task status updated to ${getStatusDisplay(newStatus)}`, 'success');
         } else {
             console.error('Error response:', data);
@@ -2710,8 +2789,18 @@ function changeTaskStatus(taskId, newStatus) {
 }
 
 function changeSubtaskStatus(taskId, subtaskId, newStatus) {
+    // Close dropdown immediately - directly set display to none
+    const dropdown = document.getElementById(`subtask-status-dropdown-${taskId}-${subtaskId}`);
+    console.log('Closing dropdown:', dropdown);
+    if (dropdown) {
+        dropdown.style.display = 'none';
+        console.log('Dropdown closed!');
+    } else {
+        console.warn('Dropdown not found:', `subtask-status-dropdown-${taskId}-${subtaskId}`);
+    }
+
     const projectId = {{ project.id }};
-    
+
     // Get CSRF token from any available source
     let csrfToken = document.getElementById('csrf-token')?.value;
     if (!csrfToken) {
@@ -2720,7 +2809,7 @@ function changeSubtaskStatus(taskId, subtaskId, newStatus) {
     if (!csrfToken) {
         csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]')?.value;
     }
-    
+
     if (!csrfToken) {
         showMessage('CSRF token not found. Please refresh the page.', 'error');
         return;
@@ -2795,9 +2884,8 @@ function changeSubtaskStatus(taskId, subtaskId, newStatus) {
                 subtaskItem.offsetHeight; // Trigger reflow
                 subtaskItem.style.animation = 'fadeIn 0.3s ease';
             }
-            
-            // Close dropdown
-            toggleSubtaskStatusDropdown(taskId, subtaskId);
+
+            showMessage('Subtask status updated successfully!', 'success');
         } else {
             showMessage('Error updating subtask status: ' + (data.error || 'Unknown error'), 'error');
         }
@@ -2809,14 +2897,38 @@ function changeSubtaskStatus(taskId, subtaskId, newStatus) {
 }
 
 // Close dropdowns when clicking outside
+// Handle status option clicks with event delegation
 document.addEventListener('click', function(event) {
+    // Handle status option clicks
+    if (event.target.classList.contains('status-option')) {
+        console.log('Status option clicked!', event.target);
+        const onclick = event.target.getAttribute('onclick');
+        console.log('Onclick attribute:', onclick);
+        if (onclick) {
+            try {
+                // Execute the onclick handler
+                console.log('Executing onclick handler...');
+                eval(onclick);
+                console.log('Onclick handler executed successfully');
+            } catch (error) {
+                console.error('Error executing onclick:', error);
+                showMessage('Error: ' + error.message, 'error');
+            }
+        } else {
+            console.warn('No onclick attribute found');
+        }
+        event.stopPropagation();
+        return;
+    }
+
+    // Close dropdowns when clicking outside
     if (!event.target.closest('.status-change-dropdown')) {
         const allDropdowns = document.querySelectorAll('.status-dropdown-menu');
         allDropdowns.forEach(dropdown => {
             dropdown.style.display = 'none';
         });
     }
-    
+
     // Close users dropdown when clicking outside
     if (!event.target.closest('.users-dropdown-container')) {
         const usersDropdown = document.getElementById('usersDropdown');

@@ -198,311 +198,101 @@ class GoogleCloudEmailService:
             }
     
     def _create_report_html(self, report_data, custom_message):
-        """Create HTML formatted report"""
-        html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>E-Click Project Management Report</title>
-            <style>
-                body {{
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                    line-height: 1.6;
-                    color: #000000;
-                    max-width: 800px;
-                    margin: 0 auto;
-                    padding: 20px;
-                    background-color: #f8f9fa;
-                }}
-                .container {{
-                    background-color: white;
-                    padding: 30px;
-                    border-radius: 10px;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                }}
-                .header {{
-                    text-align: center;
-                    border-bottom: 3px solid #dc2626;
-                    padding-bottom: 20px;
-                    margin-bottom: 30px;
-                }}
-                .header h1 {{
-                    color: #dc2626;
-                    margin: 0;
-                    font-size: 28px;
-                }}
-                .header p {{
-                    color: #6b7280;
-                    margin: 10px 0 0 0;
-                }}
-                .donut-chart {{
-                    text-align: center;
-                    margin: 30px 0;
-                }}
-                .donut-container {{
-                    position: relative;
-                    display: inline-block;
-                    width: 150px;
-                    height: 150px;
-                }}
-                .donut-svg {{
-                    width: 150px;
-                    height: 150px;
-                    transform: rotate(-90deg);
-                }}
-                .donut-circle {{
-                    fill: none;
-                    stroke-width: 12;
-                }}
-                .donut-progress {{
-                    stroke: #dc2626;
-                    stroke-linecap: round;
-                    transition: stroke-dasharray 0.3s ease;
-                }}
-                .donut-remaining {{
-                    stroke: #000000;
-                    stroke-linecap: round;
-                }}
-                .donut-center {{
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    text-align: center;
-                }}
-                .donut-percentage {{
-                    font-size: 24px;
-                    font-weight: bold;
-                    color: #000000;
-                    margin: 0;
-                }}
-                .donut-label {{
-                    font-size: 12px;
-                    color: #6b7280;
-                    margin: 0;
-                }}
-                .stats-grid {{
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                    gap: 20px;
-                    margin-bottom: 30px;
-                }}
-                .stat-card {{
-                    background: #ffffff;
-                    border: 2px solid #dc2626;
-                    color: #000000;
-                    padding: 20px;
-                    border-radius: 8px;
-                    text-align: center;
-                }}
-                .stat-card h3 {{
-                    margin: 0 0 10px 0;
-                    font-size: 24px;
-                    color: #dc2626;
-                }}
-                .stat-card p {{
-                    margin: 0;
-                    color: #000000;
-                }}
-                .section {{
-                    margin-bottom: 30px;
-                }}
-                .section h2 {{
-                    color: #dc2626;
-                    border-bottom: 2px solid #dc2626;
-                    padding-bottom: 10px;
-                    margin-bottom: 20px;
-                }}
-                .insight {{
-                    background-color: #ffffff;
-                    border: 1px solid #000000;
-                    padding: 15px;
-                    border-radius: 8px;
-                    margin: 10px 0;
-                    border-left: 4px solid #dc2626;
-                }}
-                .recommendation {{
-                    background-color: #ffffff;
-                    border: 1px solid #000000;
-                    padding: 15px;
-                    border-radius: 8px;
-                    margin: 10px 0;
-                    border-left: 4px solid #dc2626;
-                }}
-                .footer {{
-                    text-align: center;
-                    margin-top: 40px;
-                    padding-top: 20px;
-                    border-top: 1px solid #dc2626;
-                    color: #dc2626;
-                    font-size: 14px;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>📊 E-Click Project Management Report</h1>
-                    <p>Generated on {report_data.get('generated_date', 'Recent')}</p>
-                </div>
-                
-                {f'<div class="insight"><strong>💬 Custom Message:</strong><br>{custom_message}</div>' if custom_message else ''}
-                
-                <!-- DONUT CHART -->
-                <div class="donut-chart">
-                    <div class="donut-container">
-                        <svg class="donut-svg">
-                            <circle class="donut-circle donut-remaining" cx="75" cy="75" r="60" stroke-dasharray="377 377"></circle>
-                            <circle class="donut-circle donut-progress" cx="75" cy="75" r="60" stroke-dasharray="{377 * report_data.get('task_completion_rate', 0) / 100} 377"></circle>
-                        </svg>
-                        <div class="donut-center">
-                            <div class="donut-percentage">{report_data.get('task_completion_rate', 0):.1f}%</div>
-                            <div class="donut-label">Completed</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <span style="color: #000000; font-size: 14px;">
-                            <span style="display: inline-block; width: 12px; height: 12px; background: #dc2626; border-radius: 50%; margin-right: 8px;"></span>
-                            Completed: {report_data.get('task_completion_rate', 0):.1f}%
-                        </span>
-                        <span style="margin-left: 20px; color: #000000; font-size: 14px;">
-                            <span style="display: inline-block; width: 12px; height: 12px; background: #000000; border-radius: 50%; margin-right: 8px;"></span>
-                            Remaining: {100 - report_data.get('task_completion_rate', 0):.1f}%
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>{report_data.get('total_projects', 0)}</h3>
-                        <p>Total Projects</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>{report_data.get('projects_completed', 0)}</h3>
-                        <p>Completed Projects</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>{report_data.get('total_tasks', 0)}</h3>
-                        <p>Total Tasks</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>{report_data.get('completed_tasks', 0)}</h3>
-                        <p>Completed Tasks</p>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h2>📈 Performance Metrics</h2>
-                    
-                    <div class="insight">
-                        <strong>Project Completion Rate:</strong>
-                        <div style="background-color: #e5e7eb; border-radius: 10px; height: 20px; margin: 10px 0; overflow: hidden;">
-                            <div style="height: 100%; background: #dc2626; border-radius: 10px; width: {report_data.get('project_completion_rate', 0)}%;"></div>
-                        </div>
-                        <p>{report_data.get('project_completion_rate', 0):.1f}%</p>
-                    </div>
-                    
-                    <div class="insight">
-                        <strong>Task Completion Rate:</strong>
-                        <div style="background-color: #e5e7eb; border-radius: 10px; height: 20px; margin: 10px 0; overflow: hidden;">
-                            <div style="height: 100%; background: #dc2626; border-radius: 10px; width: {report_data.get('task_completion_rate', 0)}%;"></div>
-                        </div>
-                        <p>{report_data.get('task_completion_rate', 0):.1f}%</p>
-                    </div>
-                    
-                    <div class="insight">
-                        <strong>User Engagement Rate:</strong>
-                        <div style="background-color: #e5e7eb; border-radius: 10px; height: 20px; margin: 10px 0; overflow: hidden;">
-                            <div style="height: 100%; background: #dc2626; border-radius: 10px; width: {report_data.get('user_engagement_rate', 0)}%;"></div>
-                        </div>
-                        <p>{report_data.get('user_engagement_rate', 0):.1f}%</p>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h2>🎯 Key Insights</h2>
-                    {self._generate_insights_html(report_data)}
-                </div>
-                
-                <div class="section">
-                    <h2>💡 Recommendations</h2>
-                    {self._generate_recommendations_html(report_data)}
-                </div>
-                
-                <div class="footer">
-                    <p>This report was generated automatically by the E-Click Project Management System.</p>
-                    <p>For questions or support, please contact your system administrator.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
+        """Create HTML formatted report - Simple and professional"""
+        html = f"""<html>
+<body style="font-family: Arial, sans-serif;">
+    <p><strong>E-Click Project Management Report</strong></p>
+    <p>Generated on {report_data.get('generated_date', 'Recent')}</p>
+
+    {f'<p><strong>Custom Message:</strong><br>{custom_message}</p>' if custom_message else ''}
+
+    <p><strong>Summary Statistics:</strong></p>
+    <p>Total Projects: {report_data.get('total_projects', 0)}</p>
+    <p>Completed Projects: {report_data.get('projects_completed', 0)}</p>
+    <p>Total Tasks: {report_data.get('total_tasks', 0)}</p>
+    <p>Completed Tasks: {report_data.get('completed_tasks', 0)}</p>
+    <p>Task Completion Rate: {report_data.get('task_completion_rate', 0):.1f}%</p>
+
+    <p><strong>Performance Metrics:</strong></p>
+    <p>Project Completion Rate: {report_data.get('project_completion_rate', 0):.1f}%</p>
+    <p>Task Completion Rate: {report_data.get('task_completion_rate', 0):.1f}%</p>
+    <p>User Engagement Rate: {report_data.get('user_engagement_rate', 0):.1f}%</p>
+
+    <p><strong>Key Insights:</strong></p>
+    {self._generate_insights_html(report_data)}
+
+    <p><strong>Recommendations:</strong></p>
+    {self._generate_recommendations_html(report_data)}
+
+    <hr>
+    <p>This report was generated automatically by the E-Click Project Management System.</p>
+    <p>For questions or support, please contact your system administrator.</p>
+</body>
+</html>"""
         return html
     
     def _generate_insights_html(self, report_data):
-        """Generate insights HTML based on report data"""
+        """Generate insights HTML based on report data - Simple and professional"""
         insights = []
-        
+
         project_completion_rate = report_data.get('project_completion_rate', 0)
         task_completion_rate = report_data.get('task_completion_rate', 0)
         user_engagement_rate = report_data.get('user_engagement_rate', 0)
-        
+
         if project_completion_rate >= 80:
-            insights.append("🏆 <strong>Excellent Project Performance:</strong> Your project completion rate is outstanding!")
+            insights.append("<strong>Excellent Project Performance:</strong> Your project completion rate is outstanding!")
         elif project_completion_rate >= 60:
-            insights.append("✅ <strong>Good Project Performance:</strong> Your projects are progressing well.")
+            insights.append("<strong>Good Project Performance:</strong> Your projects are progressing well.")
         else:
-            insights.append("⚠️ <strong>Project Performance Needs Attention:</strong> Consider focusing on project completion.")
-        
+            insights.append("<strong>Project Performance Needs Attention:</strong> Consider focusing on project completion.")
+
         if task_completion_rate >= 75:
-            insights.append("⚡ <strong>High Task Efficiency:</strong> Your team is completing tasks efficiently.")
+            insights.append("<strong>High Task Efficiency:</strong> Your team is completing tasks efficiently.")
         elif task_completion_rate >= 50:
-            insights.append("📊 <strong>Moderate Task Efficiency:</strong> Task completion is progressing steadily.")
+            insights.append("<strong>Moderate Task Efficiency:</strong> Task completion is progressing steadily.")
         else:
-            insights.append("⏳ <strong>Task Efficiency Needs Improvement:</strong> Consider task prioritization strategies.")
-        
+            insights.append("<strong>Task Efficiency Needs Improvement:</strong> Consider task prioritization strategies.")
+
         if user_engagement_rate >= 85:
-            insights.append("👥 <strong>Strong Team Engagement:</strong> Your team is highly active and engaged.")
+            insights.append("<strong>Strong Team Engagement:</strong> Your team is highly active and engaged.")
         elif user_engagement_rate >= 60:
-            insights.append("👍 <strong>Good Team Engagement:</strong> Team participation is at a healthy level.")
+            insights.append("<strong>Good Team Engagement:</strong> Team participation is at a healthy level.")
         else:
-            insights.append("📉 <strong>Low Team Engagement:</strong> Consider strategies to increase user participation.")
-        
+            insights.append("<strong>Low Team Engagement:</strong> Consider strategies to increase user participation.")
+
         insights_html = ""
         for insight in insights:
-            insights_html += f'<div class="insight">{insight}</div>'
-        
+            insights_html += f'<p>{insight}</p>'
+
         return insights_html
     
     def _generate_recommendations_html(self, report_data):
-        """Generate recommendations HTML based on report data"""
+        """Generate recommendations HTML based on report data - Simple and professional"""
         recommendations = []
-        
+
         project_completion_rate = report_data.get('project_completion_rate', 0)
         task_completion_rate = report_data.get('task_completion_rate', 0)
         user_engagement_rate = report_data.get('user_engagement_rate', 0)
-        
+
         if project_completion_rate < 60:
-            recommendations.append("🚀 <strong>Accelerate Project Delivery:</strong> Focus on completing projects in progress to improve overall completion rate.")
-        
+            recommendations.append("<strong>Accelerate Project Delivery:</strong> Focus on completing projects in progress to improve overall completion rate.")
+
         if task_completion_rate < 50:
-            recommendations.append("⚡ <strong>Implement Task Prioritization:</strong> Develop a framework to prioritize and track task completion.")
-        
+            recommendations.append("<strong>Implement Task Prioritization:</strong> Develop a framework to prioritize and track task completion.")
+
         if user_engagement_rate < 70:
-            recommendations.append("👥 <strong>Enhance User Engagement:</strong> Develop strategies to increase team participation and system usage.")
-        
+            recommendations.append("<strong>Enhance User Engagement:</strong> Develop strategies to increase team participation and system usage.")
+
         if project_completion_rate >= 80 and task_completion_rate >= 75:
-            recommendations.append("🏆 <strong>Maintain Excellence:</strong> Your current performance is excellent. Continue with current practices.")
-        
+            recommendations.append("<strong>Maintain Excellence:</strong> Your current performance is excellent. Continue with current practices.")
+
         if not recommendations:
-            recommendations.append("📈 <strong>Continuous Monitoring:</strong> Track key metrics regularly to identify improvement opportunities.")
-        
+            recommendations.append("<strong>Continuous Monitoring:</strong> Track key metrics regularly to identify improvement opportunities.")
+
         recommendations_html = ""
         for rec in recommendations:
-            recommendations_html += f'<div class="recommendation">{rec}</div>'
-        
+            recommendations_html += f'<p>{rec}</p>'
+
         return recommendations_html
 
 # Create a global instance - DISABLED

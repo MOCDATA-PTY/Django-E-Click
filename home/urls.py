@@ -80,8 +80,10 @@ urlpatterns = [
     path('client/logout/', views.client_logout, name='client_logout'),
     path('client/setup-password/', views.client_setup_password, name='client_setup_password'),
     path('client/change-password/', views.client_change_password, name='client_change_password'),
+    path('client/forgot-password/', views.client_forgot_password, name='client_forgot_password'),
+    path('client/reset-password/', views.client_reset_password, name='client_reset_password'),
     path('send-client-otp/', views.send_client_otp, name='send_client_otp'),
-    
+
     # User password setup
     path('user/setup-password/', views.user_setup_password, name='user_setup_password'),
     path('user/reset-password/', views.user_reset_password, name='user_reset_password'),

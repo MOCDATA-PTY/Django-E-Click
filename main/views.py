@@ -221,68 +221,48 @@ def contact(request):
             full_name = f"{first_name} {last_name}"
             email_subject = f"Contact Form: {subject}"
             
-            # Create HTML email body
-            html_body = f"""
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>New Contact Form Submission</title>
-                <style>
-                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                    .header {{ background: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }}
-                    .content {{ background: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px; }}
-                    .field {{ margin-bottom: 15px; }}
-                    .label {{ font-weight: bold; color: #dc2626; }}
-                    .value {{ margin-left: 10px; }}
-                    .message-box {{ background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #dc2626; }}
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="header">
-                        <h2>New Contact Form Submission</h2>
-                        <p>E-Click Website Contact Form</p>
-                    </div>
-                    <div class="content">
-                        <div class="field">
-                            <span class="label">Name:</span>
-                            <span class="value">{full_name}</span>
-                        </div>
-                        <div class="field">
-                            <span class="label">Email:</span>
-                            <span class="value">{email}</span>
-                        </div>
-                        <div class="field">
-                            <span class="label">Phone:</span>
-                            <span class="value">{phone if phone else 'Not provided'}</span>
-                        </div>
-                        <div class="field">
-                            <span class="label">Subject:</span>
-                            <span class="value">{subject}</span>
-                        </div>
-                        <div class="field">
-                            <span class="label">Message:</span>
-                            <div class="message-box">{message}</div>
-                        </div>
-                        <div style="margin-top: 20px; padding: 15px; background: #e5f3ff; border-radius: 5px; border-left: 4px solid #0066cc;">
-                            <p><strong>Submission Details:</strong></p>
-                            <p>Submitted on: {request.META.get('HTTP_HOST', 'Unknown')}</p>
-                            <p>IP Address: {request.META.get('REMOTE_ADDR', 'Unknown')}</p>
-                            <p>User Agent: {request.META.get('HTTP_USER_AGENT', 'Unknown')}</p>
-                        </div>
-                        <div class="contact-info">
-                            <h3>Need immediate assistance?</h3>
-                            <p><strong>Phone:</strong> +27 76 740 1777</p>
-                            <p><strong>Email:</strong> info@eclick.co.za</p>
-                            <p><strong>Office Hours:</strong> Monday - Friday: 8:00 AM - 6:00 PM SAST</p>
-                        </div>
-                    </div>
-                </div>
-            </body>
-            </html>
-            """
+            # Create HTML email body - Simple and professional
+            html_body = f"""<html>
+<body style="font-family: Arial, sans-serif;">
+    <p><strong>New Contact Form Submission - E-Click Website</strong></p>
+
+    <p><strong>Name:</strong> {full_name}</p>
+    <p><strong>Email:</strong> {email}</p>
+    <p><strong>Phone:</strong> {phone if phone else 'Not provided'}</p>
+    <p><strong>Subject:</strong> {subject}</p>
+
+    <p><strong>Message:</strong></p>
+    <p>{message}</p>
+
+    <hr>
+    <p><strong>Submission Details:</strong></p>
+    <p>Submitted on: {request.META.get('HTTP_HOST', 'Unknown')}</p>
+    <p>IP Address: {request.META.get('REMOTE_ADDR', 'Unknown')}</p>
+    <p>User Agent: {request.META.get('HTTP_USER_AGENT', 'Unknown')}</p>
+
+    <p>Best regards,<br>E-Click Contact Form System</p>
+</body>
+</html>"""
+
+            # Create user confirmation email - Simple and professional
+            user_confirmation_html = f"""<html>
+<body style="font-family: Arial, sans-serif;">
+    <p>Dear {full_name},</p>
+
+    <p>Thank you for contacting E-Click. We have received your message and will respond to you as soon as possible.</p>
+
+    <p><strong>Your message details:</strong></p>
+    <p><strong>Subject:</strong> {subject}</p>
+    <p><strong>Message:</strong> {message}</p>
+
+    <p><strong>Need immediate assistance?</strong></p>
+    <p>Phone: +27 76 740 1777<br>
+    Email: info@eclick.co.za<br>
+    Office Hours: Monday - Friday: 8:00 AM - 6:00 PM SAST</p>
+
+    <p>Best regards,<br>E-Click Project Management Team</p>
+</body>
+</html>"""
             
             # Create plain text version
             text_body = f"""

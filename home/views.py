@@ -162,16 +162,29 @@ def login_view(request):
         try:
             client = Client.objects.get(username=username, is_active=True)
             if client.password:
-                # Hash the provided password and compare
-                password_hash = hashlib.sha256(password.encode()).hexdigest()
-                if client.password == password_hash:
-                    # Client login successful
-                    request.session['client_id'] = client.id
-                    request.session['client_username'] = client.username
-                    messages.success(request, f'Welcome back, {client.username}!')
-                    return redirect('client_dashboard')
+                # Check if password uses Django hashing (starts with pbkdf2_sha256)
+                if client.password.startswith('pbkdf2_sha256'):
+                    # Use Django's check_password for proper hashing
+                    from django.contrib.auth.hashers import check_password
+                    if check_password(password, client.password):
+                        # Client login successful
+                        request.session['client_id'] = client.id
+                        request.session['client_username'] = client.username
+                        messages.success(request, f'Welcome back, {client.username}!')
+                        return redirect('client_dashboard')
+                    else:
+                        messages.error(request, 'Invalid password')
                 else:
-                    messages.error(request, 'Invalid password')
+                    # Legacy SHA256 hashing (for backward compatibility)
+                    password_hash = hashlib.sha256(password.encode()).hexdigest()
+                    if client.password == password_hash:
+                        # Client login successful
+                        request.session['client_id'] = client.id
+                        request.session['client_username'] = client.username
+                        messages.success(request, f'Welcome back, {client.username}!')
+                        return redirect('client_dashboard')
+                    else:
+                        messages.error(request, 'Invalid password')
             else:
                 messages.error(request, 'Account not set up. Please contact administrator')
         except Client.DoesNotExist:
@@ -686,14 +699,18 @@ def add_project(request):
                             to_email=client_email,
                             subject=f"Set Your Password - {name} Project",
                             body=f"""<html>
-<body>
-<p><img src=\"https://drive.google.com/uc?id=1v_KeFPd25pTVK57IJdE9LhFniHnjKD-A\" alt=\"E-Click Logo\" width=\"140\"></p>
-<p>Dear {client_username},</p>
-<p>Welcome to the {name} project! Please use the One-Time Password (OTP) below to set your password:</p>
-<p>OTP: {otp}</p>
-<p>You can set your password here: <a href=\"{site_url}/client/setup-password/?username={client_username}\">Set Up New Password</a></p>
-<p>This OTP is valid for 10 minutes.</p>
-<p>Best regards,<br>E-Click Project Management Team</p>
+<body style="font-family: Arial, sans-serif;">
+    <p>Dear {client_username},</p>
+
+    <p>Welcome to the {name} project. Please use the One-Time Password (OTP) below to set your password:</p>
+
+    <p><strong>OTP: {otp}</strong></p>
+
+    <p>You can set your password here: {site_url}/client/setup-password/?username={client_username}</p>
+
+    <p>This OTP is valid for 10 minutes.</p>
+
+    <p>Best regards,<br>E-Click Project Management Team</p>
 </body>
 </html>""",
                             from_email=None  # Will use default from settings
@@ -4568,15 +4585,20 @@ def admin_control(request):
                     to_email=user.email,
                     subject="Password Reset - E-Click",
                     body=f"""<html>
-<body>
-<p><img src="https://drive.google.com/uc?id=1v_KeFPd25pTVK57IJdE9LhFniHnjKD-A" alt="E-Click Logo" width="140"></p>
-<p>Dear {user.username},</p>
-<p>Your password has been reset by an administrator. Use the One-Time Password (OTP) below to set a new password:</p>
-<p>OTP: {otp}</p>
-<p>Reset your password here: <a href="{site_url}/user/setup-password/?username={user.username}">Set Up New Password</a></p>
-<p>This OTP is valid for 10 minutes.</p>
-<p>If you did not request this password reset, please contact our support team immediately.</p>
-<p>Best regards,<br>E-Click Team</p>
+<body style="font-family: Arial, sans-serif;">
+    <p>Dear {user.username},</p>
+
+    <p>Your password has been reset by an administrator. Use the One-Time Password (OTP) below to set a new password:</p>
+
+    <p><strong>OTP: {otp}</strong></p>
+
+    <p>Reset your password here: {site_url}/user/setup-password/?username={user.username}</p>
+
+    <p>This OTP is valid for 10 minutes.</p>
+
+    <p>If you did not request this password reset, please contact our support team immediately.</p>
+
+    <p>Best regards,<br>E-Click Team</p>
 </body>
 </html>""",
                     from_email=None
@@ -4675,18 +4697,19 @@ def admin_control(request):
                 email_result = email_service.send_email(
                     to_email=user.email,
                     subject="Password Reset OTP - E-Click",
-                    body=f"""
-                    Dear {user.username},
+                    body=f"""<html>
+<body style="font-family: Arial, sans-serif;">
+    <p>Dear {user.username},</p>
 
-                    You have requested a password reset. Please use the following OTP:
+    <p>You have requested a password reset. Please use the following OTP:</p>
 
-                    🔐 Your OTP: {otp}
+    <p><strong>Your OTP: {otp}</strong></p>
 
-                    This OTP will expire in 10 minutes.
+    <p>This OTP will expire in 10 minutes.</p>
 
-                    Best regards,
-                    E-Click Team
-                    """,
+    <p>Best regards,<br>E-Click Team</p>
+</body>
+</html>""",
                     from_email=None  # Will use default from settings
                 )
                 print(f"DEBUG: Email result: {email_result}")
@@ -4801,7 +4824,109 @@ def admin_control(request):
             except Exception as e:
                 messages.error(request, f'Error updating user: {str(e)}')
                 return redirect('admin_control')
-        
+
+        elif action == 'add_client':
+            # Handle adding new client
+            username = request.POST.get('client_username', '').strip()
+            email = request.POST.get('client_email', '').strip()
+            full_name = request.POST.get('client_full_name', '').strip()
+            phone = request.POST.get('client_phone', '').strip()
+            company = request.POST.get('client_company', '').strip()
+
+            # Validation
+            if not all([username, email]):
+                messages.error(request, 'Username and email are required.')
+            elif Client.objects.filter(username=username).exists():
+                messages.error(request, f'Client username "{username}" already exists.')
+            elif Client.objects.filter(email=email).exists():
+                messages.error(request, f'Client email "{email}" already exists.')
+            else:
+                try:
+                    # Create new client (only fields that exist in the model)
+                    client = Client.objects.create(
+                        username=username,
+                        email=email,
+                        is_active=True
+                    )
+
+                    # Generate OTP for the new client
+                    otp = client.generate_otp()
+
+                    # Use full name in email if provided, otherwise use username
+                    greeting_name = full_name if full_name else username
+
+                    # Send password setup email using SimpleEmailService with Microsoft SMTP
+                    site_url = request.build_absolute_uri('/').rstrip('/')
+                    from .email_service import SimpleEmailService
+                    email_service = SimpleEmailService()
+                    email_result = email_service.send_email(
+                        to_email=email,
+                        subject="Set Your Password - E-Click",
+                        body=f"""<html>
+<body style="font-family: Arial, sans-serif;">
+    <p>Dear {greeting_name},</p>
+
+    <p>Welcome to E-Click. Your client account has been created.</p>
+
+    <p>Please use the following One-Time Password (OTP) to set your password:</p>
+
+    <p><strong>Your OTP: {otp}</strong></p>
+
+    <p>You can set your password here: {site_url}/client/setup-password/?username={username}</p>
+
+    <p>Please note: This OTP is valid for 10 minutes only.</p>
+
+    <p>If you did not request this account, please contact our support team immediately.</p>
+
+    <p>Best regards,<br>E-Click Project Management Team</p>
+</body>
+</html>""",
+                        from_email=None  # Will use default from settings
+                    )
+
+                    if email_result['success']:
+                        messages.success(request, f'Client "{username}" created successfully. Password setup email sent to {email}.')
+                    else:
+                        messages.warning(request, f'Client "{username}" created successfully. Email sending failed: {email_result.get("error", "Unknown error")}. Please use the password reset feature.')
+
+                except Exception as e:
+                    messages.error(request, f'Error creating client: {str(e)}')
+
+            return redirect('admin_control')
+
+        elif action == 'reset_client_password':
+            # Handle client password reset - send OTP email
+            client_id = request.POST.get('client_id')
+
+            try:
+                client = Client.objects.get(id=client_id)
+
+                # Generate OTP for password reset
+                otp = client.generate_otp()
+
+                # Send password reset OTP email
+                site_url = request.build_absolute_uri('/').rstrip('/')
+                from .email_service import email_service
+
+                email_result = email_service.send_password_reset_otp_email(
+                    to_email=client.email,
+                    otp=otp,
+                    username=client.username,
+                    site_url=site_url
+                )
+
+                if email_result['success']:
+                    messages.success(request, f'Password reset OTP has been sent to {client.email}.')
+                else:
+                    messages.error(request, f'Failed to send password reset email: {email_result.get("error", "Unknown error")}')
+
+            except Client.DoesNotExist:
+                messages.error(request, 'Client not found.')
+            except Exception as e:
+                messages.error(request, f'Error sending password reset email: {str(e)}')
+
+            return redirect('admin_control')
+
         return redirect('admin_control')
     
     # Get all users with their profiles
@@ -8797,3 +8922,115 @@ def ai_knowledge_management(request):
     }
     
     return render(request, 'home/ai_knowledge_management.html', context)
+def client_forgot_password(request):
+    """Client forgot password - Request OTP for password reset"""
+    if request.method == 'POST':
+        username_or_email = request.POST.get('username_or_email', '').strip()
+
+        if not username_or_email:
+            messages.error(request, 'Please enter your username or email.')
+            return render(request, 'home/client_forgot_password.html')
+
+        try:
+            # Try to find client by username or email
+            from django.db.models import Q
+            client = Client.objects.filter(
+                Q(username=username_or_email) | Q(email=username_or_email)
+            ).first()
+
+            if not client:
+                messages.error(request, 'No client account found with that username or email.')
+                return render(request, 'home/client_forgot_password.html')
+
+            # Generate OTP
+            otp = client.generate_otp()
+
+            # Send OTP email
+            from .email_service import email_service
+            site_url = request.build_absolute_uri('/')[:-1]
+
+            email_result = email_service.send_password_reset_otp_email(
+                to_email=client.email,
+                otp=otp,
+                username=client.username,
+                site_url=site_url
+            )
+
+            if email_result['success']:
+                messages.success(request, f'A password reset OTP has been sent to {client.email}. Please check your email.')
+                return redirect('client_reset_password')
+            else:
+                messages.error(request, f'Failed to send OTP email: {email_result.get("error", "Unknown error")}')
+                return render(request, 'home/client_forgot_password.html')
+
+        except Exception as e:
+            messages.error(request, f'An error occurred: {str(e)}')
+            return render(request, 'home/client_forgot_password.html')
+
+    return render(request, 'home/client_forgot_password.html')
+
+
+def client_reset_password(request):
+    """Client password reset using OTP"""
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        otp = request.POST.get('otp')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if not all([username, otp, new_password, confirm_password]):
+            messages.error(request, 'All fields are required.')
+            return render(request, 'home/client_reset_password.html', {'username': username})
+
+        if new_password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+            return render(request, 'home/client_reset_password.html', {'username': username})
+
+        if len(new_password) < 8:
+            messages.error(request, 'Password must be at least 8 characters long.')
+            return render(request, 'home/client_reset_password.html', {'username': username})
+
+        try:
+            client = Client.objects.get(username=username)
+
+            # Verify OTP
+            try:
+                from .models import ClientOTP
+                otp_obj = ClientOTP.objects.filter(
+                    client=client,
+                    otp=otp,
+                    is_used=False
+                ).first()
+
+                if not otp_obj:
+                    messages.error(request, 'Invalid OTP code.')
+                    return render(request, 'home/client_reset_password.html', {'username': username})
+
+                if not otp_obj.is_valid():
+                    messages.error(request, 'OTP has expired or is invalid.')
+                    return render(request, 'home/client_reset_password.html', {'username': username})
+
+                # Mark OTP as used
+                otp_obj.is_used = True
+                otp_obj.save()
+
+                # Set client password
+                from django.contrib.auth.hashers import make_password
+                client.password = make_password(new_password)
+                client.has_changed_password = True
+                client.save()
+
+                messages.success(request, 'Password reset successfully! You can now log in with your new password.')
+                return redirect('login')
+
+            except ClientOTP.DoesNotExist:
+                messages.error(request, 'Invalid OTP code.')
+                return render(request, 'home/client_reset_password.html', {'username': username})
+
+        except Client.DoesNotExist:
+            messages.error(request, 'Client not found.')
+            return render(request, 'home/client_reset_password.html', {'username': username})
+
+    # GET request - show form
+    username = request.GET.get('username', '')
+    return render(request, 'home/client_reset_password.html', {'username': username})

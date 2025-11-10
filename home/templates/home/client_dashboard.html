@@ -462,43 +462,127 @@
             gap: 1.5rem;
         }
 
-        .task-card {
+        /* Task List Styles */
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-item {
             background: var(--background-secondary);
             border: 1px solid var(--border-light);
-            border-radius: 6px;
-            padding: 1.5rem;
+            border-radius: 8px;
+            padding: 1.25rem;
             transition: all 0.3s ease;
         }
 
-        .task-card:hover {
-            border-color: var(--border-medium);
-            transform: translateY(-2px);
+        .task-item:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+            transform: translateX(4px);
         }
 
-        .task-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .task-title {
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .task-project {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .task-footer {
+        .task-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem;
+        }
+
+        .task-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 0.5rem 0;
+            line-height: 1.4;
+        }
+
+        .task-proj {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .task-proj::before {
+            content: '\f07c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 400;
+            opacity: 0.6;
+        }
+
+        .task-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+
+        .status-pill {
+            padding: 0.375rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+            white-space: nowrap;
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-progress {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .status-hold {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-planned {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .task-updated {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .task-updated i {
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .task-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .task-meta {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
         }
 
         .task-date {
@@ -1414,25 +1498,27 @@
                         <i class="fas fa-tasks section-icon"></i>
                         Recent Task Updates
                     </h3>
-                    <div class="tasks-grid">
+                    <div class="tasks-list">
                         {% for task_data in recent_tasks %}
-                        <div class="task-card">
-                            <div class="task-header">
-                                <div>
-                                    <div class="task-title">{{ task_data.task.title }}</div>
-                                    <div class="task-project">{{ task_data.project.name }}</div>
+                        <div class="task-item">
+                            <div class="task-content">
+                                <div class="task-main">
+                                    <h4 class="task-name">{{ task_data.task.title }}</h4>
+                                    <p class="task-proj">{{ task_data.project.name }}</p>
                                 </div>
-
-                            </div>
-                            <div class="task-footer">
-                                <span class="status-badge 
-                                    {% if task_data.task.status == 'completed' %}completed
-                                    {% elif task_data.task.status == 'in_progress' %}in-progress
-                                    {% elif task_data.task.status == 'on_hold' %}danger
-                                    {% else %}planned{% endif %}">
-                                    {{ task_data.task.get_status_display }}
-                                </span>
-                                <span class="task-date">{{ task_data.task.updated_at|date:"M d" }}</span>
+                                <div class="task-meta">
+                                    <span class="status-pill
+                                        {% if task_data.task.status == 'completed' %}status-completed
+                                        {% elif task_data.task.status == 'in_progress' %}status-progress
+                                        {% elif task_data.task.status == 'on_hold' %}status-hold
+                                        {% else %}status-planned{% endif %}">
+                                        {{ task_data.task.get_status_display }}
+                                    </span>
+                                    <span class="task-updated">
+                                        <i class="far fa-clock"></i>
+                                        {{ task_data.task.updated_at|date:"M d" }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
@@ -1698,13 +1784,21 @@
             });
 
             // Enhanced hover effects for cards
-            const cards = document.querySelectorAll('.stat-card, .project-card, .task-card');
+            const cards = document.querySelectorAll('.stat-card, .project-card, .task-item');
             cards.forEach(card => {
                 card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-4px)';
+                    if (card.classList.contains('task-item')) {
+                        this.style.transform = 'translateX(4px)';
+                    } else {
+                        this.style.transform = 'translateY(-4px)';
+                    }
                 });
                 card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
+                    if (card.classList.contains('task-item')) {
+                        this.style.transform = 'translateX(0)';
+                    } else {
+                        this.style.transform = 'translateY(0)';
+                    }
                 });
             });
 

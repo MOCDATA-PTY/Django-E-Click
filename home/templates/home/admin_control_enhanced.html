@@ -318,6 +318,11 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                                 </svg>
                             </button>
+                            <button class="action-btn warning" onclick="resetClientPassword('{{ client.id }}')" title="Reset Password">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+                                </svg>
+                            </button>
                             <button class="action-btn danger" onclick="deleteClient('{{ client.id }}')" title="Delete Client">
                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -1143,6 +1148,11 @@
     .action-btn.danger:hover {
         border-color: var(--danger);
         color: var(--danger);
+    }
+
+    .action-btn.warning:hover {
+        border-color: #f59e0b;
+        color: #f59e0b;
     }
 
     .action-btn.disabled {
@@ -4265,21 +4275,62 @@
         }
     }
 
+    function resetClientPassword(clientId) {
+        console.log('resetClientPassword called with clientId:', clientId);
+        if (confirm('Send a password reset OTP email to this client?')) {
+            // Get the CSRF token from the form
+            const csrfToken = getCSRFToken();
+            if (!csrfToken) return;
+
+            console.log('CSRF token obtained, submitting reset password request...');
+
+            // Create form data
+            const formData = new FormData();
+            formData.append('action', 'reset_client_password');
+            formData.append('client_id', clientId);
+            formData.append('csrfmiddlewaretoken', csrfToken);
+
+            // Submit the request
+            fetch('{% url "admin_control" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => {
+                console.log('Reset password response status:', response.status);
+                if (response.ok) {
+                    console.log('Password reset email sent successfully, reloading page...');
+                    // Reload the page to show updated data
+                    window.location.reload();
+                } else {
+                    console.error('Reset password failed with status:', response.status);
+                    alert('Error sending password reset email. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error sending password reset email. Please try again.');
+            });
+        }
+    }
+
     function deleteClient(clientId) {
         console.log('deleteClient called with clientId:', clientId);
         if (confirm('Are you sure you want to delete this client? This action cannot be undone.')) {
             // Get the CSRF token from the form
             const csrfToken = getCSRFToken();
             if (!csrfToken) return;
-            
+
             console.log('CSRF token obtained, submitting delete request...');
-            
+
             // Create form data
             const formData = new FormData();
             formData.append('action', 'delete_client');
             formData.append('client_id', clientId);
             formData.append('csrfmiddlewaretoken', csrfToken);
-            
+
             // Submit the delete request
             fetch('{% url "admin_control" %}', {
                 method: 'POST',
