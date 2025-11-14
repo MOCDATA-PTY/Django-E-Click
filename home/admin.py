@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Q
 from .models import Project, Task, SubTask, UserProfile, Client, ClientOTP, UserOTP, Notification, TaskUpdate, SystemLog, TaskComment, SubTaskComment
 
 # Register your models here.
@@ -9,7 +10,7 @@ class ProjectAdmin(admin.ModelAdmin):
     list_display = ['name', 'client', 'status', 'start_date', 'end_date', 'created_at']
     list_filter = ['status', 'created_at']
     search_fields = ['name', 'client', 'client_email']
-    filter_horizontal = ['assigned_users']
+    filter_horizontal = ['assigned_users', 'clients']  # Added clients for multiple client/investor support
     date_hierarchy = 'created_at'
 
 
@@ -46,19 +47,19 @@ class ClientAdmin(admin.ModelAdmin):
     def cleanup_orphaned_clients(self, request, queryset):
         """Clean up clients that are not associated with any projects"""
         from .models import Project
-        
+
         cleaned_count = 0
         for client in queryset:
-            # Check if this client is associated with any active projects
+            # Check if this client is associated with any active projects (old or new method)
             has_active_projects = Project.objects.filter(
-                client_email=client.email
+                Q(client_email=client.email) | Q(clients=client)
             ).exists()
-            
+
             if not has_active_projects:
                 # Delete related OTPs first
                 from .models import ClientOTP
                 ClientOTP.objects.filter(client=client).delete()
-                
+
                 # Delete the client
                 client.delete()
                 cleaned_count += 1

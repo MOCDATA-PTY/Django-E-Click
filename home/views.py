@@ -927,7 +927,15 @@ def edit_project(request, project_id):
                 project.assigned_users.set(assigned_users)
             else:
                 project.assigned_users.clear()
-            
+
+            # Update assigned clients/investors
+            assigned_client_ids = request.POST.getlist('assigned_clients')
+            if assigned_client_ids:
+                assigned_clients = Client.objects.filter(id__in=assigned_client_ids)
+                project.clients.set(assigned_clients)
+            else:
+                project.clients.clear()
+
             # Store new data for logging
             new_data = {
                 'name': project.name,
@@ -956,10 +964,14 @@ def edit_project(request, project_id):
     
     # Get all users for assignment dropdown
     all_users = User.objects.all().order_by('username')
-    
+
+    # Get all clients for assignment dropdown
+    all_clients = Client.objects.filter(is_active=True).order_by('username')
+
     return render(request, 'home/edit_project.html', {
         'project': project,
-        'all_users': all_users
+        'all_users': all_users,
+        'all_clients': all_clients
     })
 
 @login_required
@@ -6280,8 +6292,10 @@ def client_dashboard(request):
     client_id = request.session['client_id']
     try:
         client = Client.objects.get(id=client_id, is_active=True)
-        # Get projects where this client is involved
-        projects = Project.objects.filter(client_email=client.email).order_by('-created_at')
+        # Get projects where this client is involved (supports both old and new methods)
+        projects = Project.objects.filter(
+            Q(client_email=client.email) | Q(clients=client)
+        ).distinct().order_by('-created_at')
         
         # Calculate project statistics
         total_projects = projects.count()
@@ -6339,7 +6353,13 @@ def client_project_detail(request, project_id):
     client_id = request.session['client_id']
     try:
         client = Client.objects.get(id=client_id, is_active=True)
-        project = get_object_or_404(Project, id=project_id, client_email=client.email)
+        # Get project where this client is involved (supports both old and new methods)
+        project = Project.objects.filter(
+            Q(id=project_id) & (Q(client_email=client.email) | Q(clients=client))
+        ).first()
+
+        if not project:
+            return redirect('client_dashboard')
         
         # Get all tasks for this project with their subtasks
         tasks = project.tasks.all().order_by('start_date', 'created_at')
@@ -6384,7 +6404,10 @@ def client_gantt_data(request):
     client_id = request.session['client_id']
     try:
         client = Client.objects.get(id=client_id, is_active=True)
-        projects = Project.objects.filter(client_email=client.email).order_by('-created_at')
+        # Get projects where this client is involved (supports both old and new methods)
+        projects = Project.objects.filter(
+            Q(client_email=client.email) | Q(clients=client)
+        ).distinct().order_by('-created_at')
 
         gantt_data = []
         for project in projects:

@@ -159,7 +159,57 @@
                             </div>
                             <small>Click to select/deselect users</small>
                         </div>
-                        
+
+                        <div class="form-group">
+                            <label for="assigned_clients">Assign Clients (Optional)</label>
+                            <div class="users-dropdown-container">
+                                <button type="button" class="users-dropdown-toggle" onclick="toggleClientsDropdown()">
+                                    <span class="selected-clients-text">
+                                        {% if project.clients.all %}
+                                            {{ project.clients.count }} client(s) selected
+                                        {% else %}
+                                            Select clients...
+                                        {% endif %}
+                                    </span>
+                                    <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6,9 12,15 18,9"></polyline>
+                                    </svg>
+                                </button>
+                                <div class="users-dropdown-menu" id="clientsDropdown">
+                                    <div class="users-dropdown-header">
+                                        <input type="text" class="user-search-input" placeholder="Search clients..." onkeyup="filterClients(this.value)">
+                                    </div>
+                                    <div class="users-dropdown-list" id="clientsDropdownList">
+                                        {% for client in all_clients %}
+                                            <label class="user-dropdown-option client-option">
+                                                <div class="user-info">
+                                                    <span class="user-name">{{ client.username }}</span>
+                                                    <span class="user-email">({{ client.email }})</span>
+                                                </div>
+                                                <input type="checkbox" name="assigned_clients" value="{{ client.id }}" class="client-checkbox" style="display: none;"
+                                                       {% if client in project.clients.all %}checked{% endif %}>
+                                                <span class="client-dot {% if client in project.clients.all %}selected{% endif %}"></span>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="selected-users-display" id="selectedClientsDisplay">
+                                {% if project.clients.all %}
+                                    <div class="selected-users-list">
+                                        <strong>Assigned Clients:</strong>
+                                        {% for client in project.clients.all %}
+                                            <span class="selected-user-badge">
+                                                {{ client.username }}
+                                                <span class="admin-indicator">({{ client.email }})</span>
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <small>Click to select/deselect clients who can access this project</small>
+                        </div>
+
                         <div class="form-actions">
                             <button type="button" class="btn btn-secondary" onclick="window.location.href='{% url 'projects_page' %}'">Cancel</button>
                             <button type="submit" class="btn btn-primary">Update Project</button>
@@ -1990,6 +2040,33 @@
         align-self: flex-start;
     }
 
+    .user-email {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        margin-left: 0.375rem;
+        font-weight: 400;
+    }
+
+    .client-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--border-medium);
+        border: 2px solid var(--border-light);
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .client-dot.selected {
+        background: var(--primary);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .client-option:hover .client-dot {
+        transform: scale(1.15);
+    }
+
     .selected-users-text {
         color: var(--text-color);
     }
@@ -2934,9 +3011,18 @@ document.addEventListener('click', function(event) {
         const usersDropdown = document.getElementById('usersDropdown');
         if (usersDropdown) {
             usersDropdown.classList.remove('show');
-            const toggle = document.querySelector('.users-dropdown-toggle');
-            if (toggle) {
-                toggle.classList.remove('active');
+            const toggles = document.querySelectorAll('.users-dropdown-toggle');
+            if (toggles[0]) {
+                toggles[0].classList.remove('active');
+            }
+        }
+
+        // Also close clients dropdown
+        const clientsDropdown = document.getElementById('clientsDropdown');
+        if (clientsDropdown) {
+            clientsDropdown.classList.remove('show');
+            if (toggles[1]) {
+                toggles[1].classList.remove('active');
             }
         }
     }
@@ -3008,6 +3094,89 @@ function updateSelectedUsersDisplay() {
             displayHTML += '</span>';
         });
         
+        displayHTML += '</div>';
+        displayDiv.innerHTML = displayHTML;
+        displayDiv.classList.add('show');
+    } else {
+        displayDiv.classList.remove('show');
+        displayDiv.innerHTML = '';
+    }
+}
+
+// Client dropdown functions (similar to users dropdown)
+function toggleClientsDropdown() {
+    const dropdown = document.getElementById('clientsDropdown');
+    const toggle = document.querySelectorAll('.users-dropdown-toggle')[1]; // Second toggle button
+
+    if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+        toggle.classList.remove('active');
+    } else {
+        dropdown.classList.add('show');
+        toggle.classList.add('active');
+    }
+}
+
+function filterClients(searchTerm) {
+    const clientOptions = document.querySelectorAll('.client-option');
+    const searchLower = searchTerm.toLowerCase();
+
+    clientOptions.forEach(option => {
+        const clientName = option.querySelector('.user-name').textContent.toLowerCase();
+        const clientEmail = option.querySelector('.user-email').textContent.toLowerCase();
+        if (clientName.includes(searchLower) || clientEmail.includes(searchLower)) {
+            option.style.display = 'flex';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+}
+
+// Update selected clients count when checkboxes change
+document.addEventListener('change', function(event) {
+    if (event.target.classList.contains('client-checkbox')) {
+        // Toggle the dot's selected class
+        const dot = event.target.nextElementSibling;
+        if (dot && dot.classList.contains('client-dot')) {
+            if (event.target.checked) {
+                dot.classList.add('selected');
+            } else {
+                dot.classList.remove('selected');
+            }
+        }
+        updateSelectedClientsCount();
+        updateSelectedClientsDisplay();
+    }
+});
+
+function updateSelectedClientsCount() {
+    const selectedCheckboxes = document.querySelectorAll('.client-checkbox:checked');
+    const selectedText = document.querySelector('.selected-clients-text');
+
+    if (selectedCheckboxes.length > 0) {
+        selectedText.textContent = `${selectedCheckboxes.length} client(s) selected`;
+    } else {
+        selectedText.textContent = 'Select clients...';
+    }
+}
+
+function updateSelectedClientsDisplay() {
+    const selectedCheckboxes = document.querySelectorAll('.client-checkbox:checked');
+    const displayDiv = document.getElementById('selectedClientsDisplay');
+
+    if (selectedCheckboxes.length > 0) {
+        let displayHTML = '<div class="selected-users-list"><strong>Assigned Clients:</strong>';
+
+        selectedCheckboxes.forEach(checkbox => {
+            const clientOption = checkbox.closest('.client-option');
+            const clientName = clientOption.querySelector('.user-name').textContent;
+            const clientEmail = clientOption.querySelector('.user-email').textContent;
+
+            displayHTML += `<span class="selected-user-badge">${clientName}`;
+            displayHTML += `<span class="admin-indicator">${clientEmail}</span>`;
+            displayHTML += '</span>';
+        });
+
         displayHTML += '</div>';
         displayDiv.innerHTML = displayHTML;
         displayDiv.classList.add('show');

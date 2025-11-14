@@ -103,9 +103,9 @@
                 </div>
                 
 
-                
+
                 <div class="detail-item">
-                    <span class="label">Assigned To</span>
+                    <span class="label">Team Assigned to Project</span>
                     <div class="assigned-users-section">
                         {% if project.assigned_users.all %}
                             <div class="assigned-users-list">
@@ -114,10 +114,29 @@
                                 {% endfor %}
                             </div>
                         {% else %}
-                            <span class="value">No users assigned</span>
+                            <span class="value">No team members assigned</span>
                         {% endif %}
-                        
+                    </div>
+                </div>
 
+                <div class="detail-item">
+                    <span class="label">Clients</span>
+                    <div class="assigned-users-section">
+                        {% if project.clients.all %}
+                            <div class="assigned-users-list">
+                                {% for client in project.clients.all %}
+                                    <span class="user-badge client-badge">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                        {{ client.username }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <span class="value">No clients assigned</span>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -1049,6 +1068,14 @@
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .client-badge {
+        background: #eff6ff;
+        color: #1e40af;
+        border-color: #bfdbfe;
     }
 
     .btn-outline {

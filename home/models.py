@@ -24,6 +24,10 @@ class Project(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='planned')
     assigned_users = models.ManyToManyField(User, blank=True, related_name='assigned_projects', help_text='Users assigned to this project')
     client_username = models.CharField(max_length=100, blank=True, help_text="Client's username for login")
+
+    # Multiple clients/investors can be associated with one project
+    clients = models.ManyToManyField('Client', blank=True, related_name='projects', help_text='Clients/investors associated with this project')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
