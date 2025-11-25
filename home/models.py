@@ -316,6 +316,7 @@ class Client(models.Model):
     profile_picture = models.ImageField(upload_to='client_profile_pictures/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
     has_changed_password = models.BooleanField(default=False)
+    last_login = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

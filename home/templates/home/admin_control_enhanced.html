@@ -282,6 +282,7 @@
                     <div class="table-cell">Email</div>
                     <div class="table-cell">Status</div>
                     <div class="table-cell">Password Changed</div>
+                    <div class="table-cell">Last Login</div>
                     <div class="table-cell">Created</div>
                     <div class="table-cell">Actions</div>
                 </div>
@@ -303,6 +304,13 @@
                         <span class="status-badge {% if client.has_changed_password %}success{% else %}warning{% endif %}">
                             {% if client.has_changed_password %}Yes{% else %}No{% endif %}
                         </span>
+                    </div>
+                    <div class="table-cell">
+                        {% if client.last_login %}
+                            {{ client.last_login|date:"M d, Y H:i" }}
+                        {% else %}
+                            <span class="text-slate-400">Never</span>
+                        {% endif %}
                     </div>
                     <div class="table-cell">{{ client.created_at|date:"M d, Y" }}</div>
                     <div class="table-cell">
@@ -1257,6 +1265,11 @@
     }
 
     .clients-table .table-header {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr 1fr 1fr 1.2fr 1fr 1.5fr;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        align-items: center;
         background: var(--background-secondary);
         font-weight: 600;
         color: var(--text-primary);
@@ -1265,7 +1278,7 @@
 
     .clients-table .table-row {
         display: grid;
-        grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1.5fr;
+        grid-template-columns: 1fr 1.5fr 1fr 1fr 1.2fr 1fr 1.5fr;
         gap: 1rem;
         padding: 1rem 1.5rem;
         align-items: center;
@@ -1560,13 +1573,16 @@
         box-sizing: border-box;
     }
 
-    /* Fix for any potential overflow issues */
+    /* Fix for modal scrolling */
     .modal-content {
-        overflow: visible;
+        display: flex;
+        flex-direction: column;
     }
 
     .modal-body {
-        overflow: visible;
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex: 1;
     }
 
     /* Ensure proper form validation display */
@@ -1859,13 +1875,16 @@
         box-sizing: border-box;
     }
 
-    /* Fix for any potential overflow issues */
+    /* Fix for modal scrolling */
     .modal-content {
-        overflow: visible;
+        display: flex;
+        flex-direction: column;
     }
 
     .modal-body {
-        overflow: visible;
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex: 1;
     }
 
     /* Ensure proper form validation display */
@@ -2409,13 +2428,16 @@
         box-sizing: border-box;
     }
 
-    /* Fix for any potential overflow issues */
+    /* Fix for modal scrolling */
     .modal-content {
-        overflow: visible;
+        display: flex;
+        flex-direction: column;
     }
 
     .modal-body {
-        overflow: visible;
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex: 1;
     }
 
     /* Responsive Design - Enhanced for all devices */
@@ -3743,13 +3765,16 @@
         }
     }
 
-    /* Fix for any potential overflow issues */
+    /* Fix for modal scrolling */
     .modal-content {
-        overflow: visible;
+        display: flex;
+        flex-direction: column;
     }
 
     .modal-body {
-        overflow: visible;
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex: 1;
     }
 
     /* Dropdown Styling for Light and Dark Modes */

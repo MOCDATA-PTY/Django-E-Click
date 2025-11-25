@@ -168,6 +168,8 @@ def login_view(request):
                     from django.contrib.auth.hashers import check_password
                     if check_password(password, client.password):
                         # Client login successful
+                        client.last_login = timezone.now()
+                        client.save(update_fields=['last_login'])
                         request.session['client_id'] = client.id
                         request.session['client_username'] = client.username
                         messages.success(request, f'Welcome back, {client.username}!')
@@ -179,6 +181,8 @@ def login_view(request):
                     password_hash = hashlib.sha256(password.encode()).hexdigest()
                     if client.password == password_hash:
                         # Client login successful
+                        client.last_login = timezone.now()
+                        client.save(update_fields=['last_login'])
                         request.session['client_id'] = client.id
                         request.session['client_username'] = client.username
                         messages.success(request, f'Welcome back, {client.username}!')

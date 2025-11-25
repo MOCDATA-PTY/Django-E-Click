@@ -38,10 +38,10 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ['username', 'email', 'is_active', 'has_changed_password', 'created_at']
+    list_display = ['username', 'email', 'is_active', 'has_changed_password', 'last_login', 'created_at']
     list_filter = ['is_active', 'has_changed_password', 'created_at']
     search_fields = ['username', 'email']
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['last_login', 'created_at', 'updated_at']
     actions = ['cleanup_orphaned_clients']
     
     def cleanup_orphaned_clients(self, request, queryset):
