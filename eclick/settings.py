@@ -19,20 +19,15 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '167.88.43.168', '77.37.12
 # Login URL for @login_required decorator
 LOGIN_URL = '/login/'
 
-# Email Configuration - Using your eclick.co.za email server
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mail.eclick.co.za'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'sender@eclick.co.za'
-EMAIL_HOST_PASSWORD = 'EClickSender@1'
-DEFAULT_FROM_EMAIL = 'sender@eclick.co.za'
+# Email Configuration - Microsoft Graph API
+# Using Microsoft Graph API for info@eclick.co.za
+EMAIL_BACKEND = 'eclick.graph_email_backend.GraphEmailBackend'
+DEFAULT_FROM_EMAIL = 'info@eclick.co.za'
 
-# Alternative: Use Gmail SMTP if you prefer
-# EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-# EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
-# EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
+# Microsoft Graph API Credentials
+GRAPH_CLIENT_ID = '2b89897f-049e-467e-9413-9d13a7a9259b'
+GRAPH_CLIENT_SECRET = 'p4n8Q~X3z4JW~6kwY8dz~jRuFOXbOpMtBUkHTaCY'
+GRAPH_TENANT_ID = 'e1aca71e-e160-4d3d-a40f-5738d03de05e'
 
 # Google Cloud API Configuration - DISABLED
 # GOOGLE_CLOUD_API_KEY = 'AIzaSyBAHeuA83Rl--GvorBIZlY8UOratOu-X2U'

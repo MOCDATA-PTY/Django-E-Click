@@ -172,10 +172,9 @@ def login_view(request):
                         client.save(update_fields=['last_login'])
                         request.session['client_id'] = client.id
                         request.session['client_username'] = client.username
-                        messages.success(request, f'Welcome back, {client.username}!')
                         return redirect('client_dashboard')
                     else:
-                        messages.error(request, 'Invalid password')
+                        pass
                 else:
                     # Legacy SHA256 hashing (for backward compatibility)
                     password_hash = hashlib.sha256(password.encode()).hexdigest()
@@ -185,14 +184,13 @@ def login_view(request):
                         client.save(update_fields=['last_login'])
                         request.session['client_id'] = client.id
                         request.session['client_username'] = client.username
-                        messages.success(request, f'Welcome back, {client.username}!')
                         return redirect('client_dashboard')
                     else:
-                        messages.error(request, 'Invalid password')
+                        pass
             else:
-                messages.error(request, 'Account not set up. Please contact administrator')
+                pass
         except Client.DoesNotExist:
-            messages.error(request, 'Invalid username or password')
+            pass
     
     return render(request, 'home/login.html')
 
@@ -6346,7 +6344,6 @@ def client_dashboard(request):
             'overall_progress': overall_progress
         })
     except Client.DoesNotExist:
-        messages.error(request, 'Client not found.')
         return redirect('login')
 
 def client_project_detail(request, project_id):
@@ -6394,10 +6391,8 @@ def client_project_detail(request, project_id):
             'task_updates': task_updates
         })
     except Client.DoesNotExist:
-        messages.error(request, 'Client not found.')
         return redirect('login')
     except Project.DoesNotExist:
-        messages.error(request, 'Project not found.')
         return redirect('client_dashboard')
 
 def client_gantt_data(request):
@@ -6467,7 +6462,6 @@ def client_logout(request):
         del request.session['client_id']
     if 'client_username' in request.session:
         del request.session['client_username']
-    messages.success(request, 'You have been logged out successfully.')
     return redirect('login')
 
 def client_settings(request):
@@ -6480,10 +6474,25 @@ def client_settings(request):
         client = Client.objects.get(id=client_id, is_active=True)
         
         if request.method == 'POST':
+            # Handle AJAX profile picture upload
+            if request.POST.get('upload_only') == 'true':
+                if 'profile_picture' in request.FILES:
+                    try:
+                        profile_picture = request.FILES['profile_picture']
+                        # Delete old profile picture if it exists
+                        if client.profile_picture:
+                            client.profile_picture.delete(save=False)
+                        client.profile_picture = profile_picture
+                        client.save()
+                        return JsonResponse({'success': True})
+                    except Exception as e:
+                        return JsonResponse({'success': False, 'error': str(e)})
+                return JsonResponse({'success': False, 'error': 'No file provided'})
+
             # Handle profile updates
             username = request.POST.get('username')
             email = request.POST.get('email')
-            
+
             if username and email:
                 # Check if username or email already exists for other clients
                 existing_client = Client.objects.filter(
@@ -6493,35 +6502,24 @@ def client_settings(request):
                 
                 if existing_client:
                     if existing_client.username == username:
-                        messages.error(request, 'Username already exists.')
+                        pass
                     else:
-                        messages.error(request, 'Email already exists.')
+                        pass
                 else:
-                    # Update client profile
+                    # Update client profile (username and email only)
                     old_username = client.username
                     old_email = client.email
-                    
+
                     client.username = username
                     client.email = email
-                    
-                    # Handle profile picture upload
-                    if 'profile_picture' in request.FILES:
-                        profile_picture = request.FILES['profile_picture']
-                        # Delete old profile picture if it exists
-                        if client.profile_picture:
-                            client.profile_picture.delete(save=False)
-                        client.profile_picture = profile_picture
-                    
                     client.save()
 
-                    messages.success(request, 'Profile updated successfully!')
                     return redirect('client_settings')
-        
+
         return render(request, 'home/client_settings.html', {
             'client': client
         })
     except Client.DoesNotExist:
-        messages.error(request, 'Client not found.')
         return redirect('login')
 
 def send_client_otp(request):
@@ -6622,17 +6620,14 @@ def client_setup_password(request):
         otp = request.POST.get('otp')
         new_password = request.POST.get('new_password')
         confirm_password = request.POST.get('confirm_password')
-        
+
         if not all([username, otp, new_password, confirm_password]):
-            messages.error(request, 'All fields are required.')
             return render(request, 'home/client_setup_password.html', {'username': username})
-        
+
         if new_password != confirm_password:
-            messages.error(request, 'Passwords do not match.')
             return render(request, 'home/client_setup_password.html', {'username': username})
-        
+
         if len(new_password) < 8:
-            messages.error(request, 'Password must be at least 8 characters long.')
             return render(request, 'home/client_setup_password.html', {'username': username})
         
         try:
@@ -6647,31 +6642,26 @@ def client_setup_password(request):
                 ).first()
                 
                 if not otp_obj:
-                    messages.error(request, 'Invalid OTP code.')
                     return render(request, 'home/client_setup_password.html')
-                
+
                 if not otp_obj.is_valid():
-                    messages.error(request, 'OTP has expired or is invalid.')
                     return render(request, 'home/client_setup_password.html')
-                
+
                 # Mark OTP as used
                 otp_obj.is_used = True
                 otp_obj.save()
-                
+
                 # Set client password
                 client.password = new_password
                 client.has_changed_password = True
                 client.save()
-                
-                messages.success(request, 'Password set successfully! You can now log in.')
+
                 return redirect('client_dashboard')
-                
+
             except ClientOTP.DoesNotExist:
-                messages.error(request, 'Invalid OTP code.')
                 return render(request, 'home/client_setup_password.html')
-                
+
         except Client.DoesNotExist:
-            messages.error(request, 'Client not found.')
             return render(request, 'home/client_setup_password.html')
     
     # GET request - show form
@@ -6750,43 +6740,37 @@ def client_change_password(request):
     # Check if client is logged in
     client_id = request.session.get('client_id')
     if not client_id:
-        messages.error(request, 'Please login first.')
         return redirect('login')
-    
+
     try:
         client = Client.objects.get(id=client_id, is_active=True)
     except Client.DoesNotExist:
-        messages.error(request, 'Client not found.')
         return redirect('login')
-    
+
     if request.method == 'POST':
         old_password = request.POST.get('old_password')
         new_password = request.POST.get('new_password')
         confirm_password = request.POST.get('confirm_password')
-        
+
         # Verify old password
         old_password_hash = hashlib.sha256(old_password.encode()).hexdigest()
         if client.password != old_password_hash:
-            messages.error(request, 'Current password is incorrect.')
             return render(request, 'home/client_change_password.html')
-        
+
         # Validate new password
         if new_password != confirm_password:
-            messages.error(request, 'New passwords do not match.')
             return render(request, 'home/client_change_password.html')
-        
+
         if len(new_password) < 6:
-            messages.error(request, 'Password must be at least 6 characters long.')
             return render(request, 'home/client_change_password.html')
-        
+
         # Update password and mark as changed
         client.password = hashlib.sha256(new_password.encode()).hexdigest()
         client.has_changed_password = True
         client.save()
-        
-        messages.success(request, 'Password changed successfully!')
+
         return redirect('client_dashboard')
-    
+
     return render(request, 'home/client_change_password.html')
 
 def user_reset_password(request):
@@ -8946,7 +8930,6 @@ def client_forgot_password(request):
         username_or_email = request.POST.get('username_or_email', '').strip()
 
         if not username_or_email:
-            messages.error(request, 'Please enter your username or email.')
             return render(request, 'home/client_forgot_password.html')
 
         try:
@@ -8957,7 +8940,6 @@ def client_forgot_password(request):
             ).first()
 
             if not client:
-                messages.error(request, 'No client account found with that username or email.')
                 return render(request, 'home/client_forgot_password.html')
 
             # Generate OTP
@@ -8975,14 +8957,11 @@ def client_forgot_password(request):
             )
 
             if email_result['success']:
-                messages.success(request, f'A password reset OTP has been sent to {client.email}. Please check your email.')
                 return redirect('client_reset_password')
             else:
-                messages.error(request, f'Failed to send OTP email: {email_result.get("error", "Unknown error")}')
                 return render(request, 'home/client_forgot_password.html')
 
         except Exception as e:
-            messages.error(request, f'An error occurred: {str(e)}')
             return render(request, 'home/client_forgot_password.html')
 
     return render(request, 'home/client_forgot_password.html')
@@ -8997,15 +8976,12 @@ def client_reset_password(request):
         confirm_password = request.POST.get('confirm_password')
 
         if not all([username, otp, new_password, confirm_password]):
-            messages.error(request, 'All fields are required.')
             return render(request, 'home/client_reset_password.html', {'username': username})
 
         if new_password != confirm_password:
-            messages.error(request, 'Passwords do not match.')
             return render(request, 'home/client_reset_password.html', {'username': username})
 
         if len(new_password) < 8:
-            messages.error(request, 'Password must be at least 8 characters long.')
             return render(request, 'home/client_reset_password.html', {'username': username})
 
         try:
@@ -9021,11 +8997,9 @@ def client_reset_password(request):
                 ).first()
 
                 if not otp_obj:
-                    messages.error(request, 'Invalid OTP code.')
                     return render(request, 'home/client_reset_password.html', {'username': username})
 
                 if not otp_obj.is_valid():
-                    messages.error(request, 'OTP has expired or is invalid.')
                     return render(request, 'home/client_reset_password.html', {'username': username})
 
                 # Mark OTP as used
@@ -9038,15 +9012,12 @@ def client_reset_password(request):
                 client.has_changed_password = True
                 client.save()
 
-                messages.success(request, 'Password reset successfully! You can now log in with your new password.')
                 return redirect('login')
 
             except ClientOTP.DoesNotExist:
-                messages.error(request, 'Invalid OTP code.')
                 return render(request, 'home/client_reset_password.html', {'username': username})
 
         except Client.DoesNotExist:
-            messages.error(request, 'Client not found.')
             return render(request, 'home/client_reset_password.html', {'username': username})
 
     # GET request - show form

@@ -254,38 +254,6 @@
             position: relative;
         }
 
-        /* Messages */
-        .messages {
-            margin-bottom: 2rem;
-        }
-
-        .message {
-            padding: 1rem 1.5rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-            font-weight: 400;
-            border: 1px solid;
-        }
-
-        .message-success {
-            background: var(--success-light);
-            border-color: var(--success);
-            color: var(--success-dark);
-        }
-
-        .message-error {
-            background: var(--danger-light);
-            border-color: var(--danger);
-            color: var(--danger-dark);
-        }
-
-        .message-info {
-            background: var(--info-light);
-            border-color: var(--info);
-            color: var(--info-dark);
-        }
-
         /* Project Header Card */
         .project-header {
             display: flex;
@@ -1405,17 +1373,6 @@
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Messages -->
-            {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                <div class="message {% if message.tags %}message-{{ message.tags }}{% endif %}">
-                    {{ message }}
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-
             <!-- Dashboard Content -->
             <div id="dashboard-content">
                 <!-- Welcome Section -->
