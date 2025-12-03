@@ -508,7 +508,9 @@ def analytics(request):
     # Client project distribution
     client_project_data = []
     for client in Client.objects.filter(is_active=True):
-        client_projects = Project.objects.filter(client_username=client.username)
+        client_projects = Project.objects.filter(
+            Q(clients=client) | Q(client_username=client.username)
+        ).distinct()
         if client_projects.exists():
             client_project_data.append({
                 'client': client.username,
@@ -4010,7 +4012,9 @@ def generate_client_specific_pdf_report(client_id, days_filter=30):
     
     # Get the client and their projects
     client = get_object_or_404(Client, id=client_id)
-    client_projects = Project.objects.filter(client_username=client.username)
+    client_projects = Project.objects.filter(
+        Q(clients=client) | Q(client_username=client.username)
+    ).distinct()
     
     # Get client-specific data
     total_projects = client_projects.count()
@@ -5999,7 +6003,9 @@ def send_project_report(request, project_id):
     
     if client:
         # Get all projects for this client
-        client_projects = Project.objects.filter(client_username=client.username)
+        client_projects = Project.objects.filter(
+            Q(clients=client) | Q(client_username=client.username)
+        ).distinct()
         total_projects = client_projects.count()
         completed_projects = client_projects.filter(status='completed').count()
         in_progress_projects = client_projects.filter(status='in_progress').count()
@@ -6075,8 +6081,11 @@ def send_client_report(request):
             # Get the client and their projects
             try:
                 client = get_object_or_404(Client, id=client_id)
-                client_projects = Project.objects.filter(client_username=client.username)
-                
+                # Support both new ManyToMany relationship and legacy client_username field
+                client_projects = Project.objects.filter(
+                    Q(clients=client) | Q(client_username=client.username)
+                ).distinct()
+
                 if not client_projects.exists():
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                         return JsonResponse({'success': False, 'error': f'No projects found for client {client.username}.'})

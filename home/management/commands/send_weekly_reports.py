@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.conf import settings
+from django.db.models import Q
 from home.models import Client, Project, Task
 from home.email_service import email_service
 from datetime import timedelta
@@ -117,9 +118,11 @@ class Command(BaseCommand):
 
     def _generate_client_report_data(self, client, week_start, current_date):
         """Generate weekly report data for a specific client"""
-        
-        # Get client's projects
-        client_projects = Project.objects.filter(client_username=client.username)
+
+        # Get client's projects using both new ManyToMany relationship and legacy client_username
+        client_projects = Project.objects.filter(
+            Q(clients=client) | Q(client_username=client.username)
+        ).distinct()
         
         # Project statistics
         total_projects = client_projects.count()
