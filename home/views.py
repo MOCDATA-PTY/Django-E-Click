@@ -1224,9 +1224,13 @@ def reports(request):
     # Get clients with their projects
     clients_with_projects = []
     for client in Client.objects.filter(is_active=True).order_by('username'):
-        # Get projects for this client
-        client_projects = Project.objects.filter(client_username=client.username)
-        client.projects = client_projects
+        # Get projects for this client using the new ManyToMany relationship
+        # Also include projects that have this client in their client_username field (legacy)
+        client_projects = Project.objects.filter(
+            Q(clients=client) | Q(client_username=client.username)
+        ).distinct()
+        # Store count separately to avoid overriding the ManyToMany 'projects' attribute
+        client.project_list = client_projects
         client.projects_count = client_projects.count()
         clients_with_projects.append(client)
     
