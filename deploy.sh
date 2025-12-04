@@ -7,7 +7,7 @@ echo "Starting E-Click deployment..."
 echo "========================================="
 
 # Navigate to project directory
-cd /root/Django-E-Click || exit 1
+cd /var/www/Django-E-Click || exit 1
 
 # Activate virtual environment
 echo "Activating virtual environment..."
