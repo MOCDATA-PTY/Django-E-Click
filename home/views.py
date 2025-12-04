@@ -4706,7 +4706,7 @@ def admin_control(request):
                     user=user,
                     otp=otp,
                     is_used=False,
-                    expires_at=timezone.now() + timedelta(minutes=10)
+                    expires_at=timezone.now() + timedelta(hours=1)
                 )
                 
                 print(f"DEBUG: OTP record created for user {user.username}")
