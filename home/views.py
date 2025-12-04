@@ -6142,12 +6142,17 @@ def send_client_report(request):
                     for project in client_projects
                 ]
             }
-            
+
             print(f"Sending client report to: {client_email}")
-            # Send client report email using SimpleEmailService with Microsoft SMTP
-            from .email_service import SimpleEmailService
-            email_service = SimpleEmailService()
-            # Build polished HTML email body for client - EXACTLY like the image
+
+            # Generate matplotlib donut chart
+            from .chart_utils import generate_donut_chart
+            from email.mime.image import MIMEImage
+            from django.core.mail import EmailMultiAlternatives
+
+            chart_buffer = generate_donut_chart(report_data['task_completion_rate'])
+
+            # Build polished HTML email body for client with inline chart
             email_body = f"""
 <html>
   <body style="margin:0;padding:0;background:#f8fafc;font-family:Segoe UI, Roboto, Helvetica, Arial, sans-serif;color:#111827;">
@@ -6159,33 +6164,22 @@ def send_client_report(request):
         </div>
         <div style="padding:24px;">
           <p style="margin:0 0 12px 0;color:#000000;font-weight:bold;">Dear {client_username},</p>
-          
-          <!-- DONUT CHART - SVG-based for proper donut appearance -->
+
+          <!-- DONUT CHART - Matplotlib generated inline image -->
+          <div style="text-align:center;margin:30px 0;">
+            <img src="cid:progress_chart" alt="Progress Chart" style="max-width:400px;height:auto;"/>
+          </div>
+
+          <!-- Legend -->
           <div style="text-align:center;margin:20px 0;">
-            <div style="position:relative;display:inline-block;width:150px;height:150px;">
-              <svg width="150" height="150" style="transform:rotate(-90deg);">
-                <!-- Background circle (remaining) -->
-                <circle cx="75" cy="75" r="60" fill="none" stroke="#000000" stroke-width="12" stroke-linecap="round"/>
-                <!-- Progress circle (completed) -->
-                <circle cx="75" cy="75" r="60" fill="none" stroke="#dc2626" stroke-width="12" stroke-linecap="round" 
-                        stroke-dasharray="{2 * 3.14159 * 60 * report_data['task_completion_rate'] / 100} {2 * 3.14159 * 60}"/>
-              </svg>
-              <!-- Center percentage -->
-              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;background:white;width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1;">
-                <span style="font-size:20px;font-weight:bold;color:#000000;">{report_data['task_completion_rate']:.1f}%</span>
-              </div>
-            </div>
-            <!-- Legend -->
-            <div style="margin-top:15px;">
-              <span style="color:#000000;font-size:14px;">
-                <span style="display:inline-block;width:12px;height:12px;background:#dc2626;border-radius:50%;margin-right:8px;"></span>
-                Completed: {report_data['task_completion_rate']:.1f}%
-              </span>
-              <span style="margin-left:20px;color:#000000;font-size:14px;">
-                <span style="display:inline-block;width:12px;height:12px;background:#000000;border-radius:50%;margin-right:8px;"></span>
-                Remaining: {100 - report_data['task_completion_rate']:.1f}%
-              </span>
-            </div>
+            <span style="display:inline-block;margin:0 15px;">
+              <span style="display:inline-block;width:15px;height:15px;background:#dc2626;border-radius:50%;vertical-align:middle;"></span>
+              <span style="margin-left:5px;color:#000000;">Completed: {report_data['task_completion_rate']:.1f}%</span>
+            </span>
+            <span style="display:inline-block;margin:0 15px;">
+              <span style="display:inline-block;width:15px;height:15px;background:#e5e7eb;border-radius:50%;vertical-align:middle;border:1px solid #ccc;"></span>
+              <span style="margin-left:5px;color:#000000;">Remaining: {100 - report_data['task_completion_rate']:.1f}%</span>
+            </span>
           </div>
           
           <p style="margin:0 0 16px 0;color:#000000;">Please find your summary below. A detailed, presentation-ready PDF is attached for your records.</p>
@@ -6257,13 +6251,31 @@ def send_client_report(request):
             # Generate client-specific PDF and attach it
             pdf_path = generate_client_specific_pdf_report(client_id)
 
-            result = email_service.send_email(
-                to_email=client_email,
+            # Create email with HTML and attachments
+            from django.conf import settings
+            email = EmailMultiAlternatives(
                 subject=f"Client Report - {client_username} - E-Click",
-                body=email_body,
-                from_email=None,  # Will use default from settings
-                attachments=[pdf_path]
+                body='Please view this email in HTML mode.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[client_email]
             )
+            email.attach_alternative(email_body, "text/html")
+
+            # Attach progress chart as inline image
+            chart_img = MIMEImage(chart_buffer.read(), 'png')
+            chart_img.add_header('Content-ID', '<progress_chart>')
+            chart_img.add_header('Content-Disposition', 'inline', filename='progress_chart.png')
+            email.attach(chart_img)
+
+            # Attach PDF report
+            if pdf_path:
+                email.attach_file(pdf_path)
+
+            try:
+                email.send()
+                result = {'success': True, 'message': 'Email sent successfully'}
+            except Exception as e:
+                result = {'success': False, 'error': str(e)}
 
             # Cleanup temporary PDF
             try:
