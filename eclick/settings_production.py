@@ -162,14 +162,14 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
 # Email Configuration
-# Uses FallbackEmailBackend: tries Microsoft/Outlook first, falls back to SendGrid
-EMAIL_BACKEND = 'eclick.email_backend.FallbackEmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.office365.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'info@eclick.co.za')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'E-Click123#')
+# Using Microsoft Graph API for info@eclick.co.za
+EMAIL_BACKEND = 'eclick.graph_email_backend.GraphEmailBackend'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'info@eclick.co.za')
+
+# Microsoft Graph API credentials
+GRAPH_CLIENT_ID = os.environ.get('GRAPH_CLIENT_ID', '2b89897f-049e-467e-9413-9d13a7a9259b')
+GRAPH_CLIENT_SECRET = os.environ.get('GRAPH_CLIENT_SECRET', 'p4n8Q~X3z4JW~6kwY8dz~jRuFOXbOpMtBUkHTaCY')
+GRAPH_TENANT_ID = os.environ.get('GRAPH_TENANT_ID', 'e1aca71e-e160-4d3d-a40f-5738d03de05e')
 
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
