@@ -21,9 +21,9 @@ git pull origin master || exit 1
 echo "Installing Python dependencies..."
 pip install -r requirements.txt || exit 1
 
-# Run database migrations
-echo "Running database migrations..."
-python3 manage.py migrate || exit 1
+# Run database migrations (skip if not needed)
+# echo "Running database migrations..."
+# python3 manage.py migrate || exit 1
 
 # Collect static files
 echo "Collecting static files..."
