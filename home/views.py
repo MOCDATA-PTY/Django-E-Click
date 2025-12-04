@@ -8282,6 +8282,7 @@ def send_project_report_ajax(request):
             from .chart_utils import generate_donut_chart
             from email.mime.image import MIMEImage
             from django.core.mail import EmailMultiAlternatives
+            from django.conf import settings
             import os
 
             chart_buffer = generate_donut_chart(task_completion_rate)
@@ -8426,7 +8427,6 @@ def send_project_report_ajax(request):
             subject = f"Project Report: {project.name}"
 
             # Create email with HTML and attachments
-            from django.conf import settings
             email = EmailMultiAlternatives(
                 subject=subject,
                 body='Please view this email in HTML mode.',
