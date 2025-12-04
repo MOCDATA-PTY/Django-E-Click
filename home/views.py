@@ -6149,8 +6149,14 @@ def send_client_report(request):
             from .chart_utils import generate_donut_chart
             from email.mime.image import MIMEImage
             from django.core.mail import EmailMultiAlternatives
+            import os
 
             chart_buffer = generate_donut_chart(report_data['task_completion_rate'])
+
+            # Load E-Click logo
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'E Click Logo (1).png')
+            with open(logo_path, 'rb') as f:
+                logo_data = f.read()
 
             # Build polished HTML email body for client with inline chart
             email_body = f"""
@@ -6158,9 +6164,14 @@ def send_client_report(request):
   <body style="margin:0;padding:0;background:#f8fafc;font-family:Segoe UI, Roboto, Helvetica, Arial, sans-serif;color:#111827;">
     <div style="max-width:720px;margin:0 auto;padding:24px;">
       <div style="background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
-        <div style="padding:24px 24px 8px 24px;border-bottom:1px solid #f3f4f6;">
-          <h1 style="margin:0 0 6px 0;font-size:22px;color:#dc2626;">Your E-Click Client Progress Report</h1>
-          <p style="margin:0;color:#6b7280;font-size:13px;">Generated on {report_data['generated_date']}</p>
+        <div style="padding:24px 24px 8px 24px;border-bottom:1px solid #f3f4f6;position:relative;">
+          <div style="display:flex;align-items:center;position:relative;">
+            <img src="cid:eclick_logo" alt="E-Click Logo" style="max-width:60px;height:auto;margin-right:15px;"/>
+            <div style="flex:1;">
+              <h1 style="margin:0 0 6px 0;font-size:22px;color:#dc2626;">Your E-Click Client Progress Report</h1>
+              <p style="margin:0;color:#6b7280;font-size:13px;">Generated on {report_data['generated_date']}</p>
+            </div>
+          </div>
         </div>
         <div style="padding:24px;">
           <p style="margin:0 0 12px 0;color:#000000;font-weight:bold;">Dear {client_username},</p>
@@ -6260,6 +6271,12 @@ def send_client_report(request):
                 to=[client_email]
             )
             email.attach_alternative(email_body, "text/html")
+
+            # Attach E-Click logo as inline image
+            logo_img = MIMEImage(logo_data, 'png')
+            logo_img.add_header('Content-ID', '<eclick_logo>')
+            logo_img.add_header('Content-Disposition', 'inline', filename='eclick_logo.png')
+            email.attach(logo_img)
 
             # Attach progress chart as inline image
             chart_img = MIMEImage(chart_buffer.read(), 'png')
@@ -8260,10 +8277,20 @@ def send_project_report_ajax(request):
             }
             
             print(f"Sending comprehensive project report to: {client_email}")
-            
-            # Send simple email with "test" message - DISABLED
-            # gmail_service = GoogleCloudEmailService()
-            
+
+            # Generate matplotlib donut chart and load logo
+            from .chart_utils import generate_donut_chart
+            from email.mime.image import MIMEImage
+            from django.core.mail import EmailMultiAlternatives
+            import os
+
+            chart_buffer = generate_donut_chart(task_completion_rate)
+
+            # Load E-Click logo
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'E Click Logo (1).png')
+            with open(logo_path, 'rb') as f:
+                logo_data = f.read()
+
             # Create styled email body with project information
             email_body = f"""<html>
 <head>
@@ -8271,31 +8298,35 @@ def send_project_report_ajax(request):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body style="margin: 0; padding: 0; background-color: #f5f5f5;">
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; background-color: #ffffff; color: #000000; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-    <div style="background-color: #2d3748; color: #ffffff; padding: 20px; text-align: center;">
-        <h1 style="margin: 0; font-size: 24px; font-weight: bold; color: #dc2626;">Your E-Click Client Progress Report</h1>
-        <p style="margin: 10px 0 0 0; font-size: 14px; color: #9ca3af;">Generated on {timezone.now().strftime("%B %d, %Y at %I:%M %p")}</p>
+<div style="font-family: Arial, sans-serif; max-width: 720px; margin: 20px auto; background-color: #ffffff; color: #000000; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div style="background-color: #ffffff; padding: 20px; border-bottom: 1px solid #f3f4f6;">
+        <div style="display: flex; align-items: center;">
+            <img src="cid:eclick_logo" alt="E-Click Logo" style="max-width: 60px; height: auto; margin-right: 15px;"/>
+            <div style="flex: 1;">
+                <h1 style="margin: 0 0 6px 0; font-size: 22px; font-weight: bold; color: #dc2626;">Your E-Click Client Progress Report</h1>
+                <p style="margin: 0; font-size: 13px; color: #6b7280;">Generated on {timezone.now().strftime("%B %d, %Y at %I:%M %p")}</p>
+            </div>
+        </div>
     </div>
-    
+
     <div style="padding: 20px; background-color: #ffffff;">
         <p style="color: #000000; font-size: 16px; margin-bottom: 10px; font-weight: bold;">Dear {client_username},</p>
-        
-        <!-- DONUT CHART - SVG for email compatibility -->
+
+        <!-- DONUT CHART - Matplotlib generated inline image -->
+        <div style="text-align:center;margin:30px 0;">
+            <img src="cid:progress_chart" alt="Progress Chart" style="max-width:400px;height:auto;"/>
+        </div>
+
+        <!-- Legend -->
         <div style="text-align:center;margin:20px 0;">
-            <svg width="120" height="120" viewBox="0 0 120 120" style="display:inline-block;">
-                <!-- Background circle (black for remaining) -->
-                <circle cx="60" cy="60" r="50" fill="none" stroke="#000000" stroke-width="20"/>
-                <!-- Progress circle (red for completed) -->
-                <circle cx="60" cy="60" r="50" fill="none" stroke="#dc2626" stroke-width="20" 
-                  stroke-dasharray="{task_completion_rate*3.14:.1f} 314.16" 
-                  stroke-dashoffset="78.54" transform="rotate(-90 60 60)"/>
-                <!-- Center white circle -->
-                <circle cx="60" cy="60" r="30" fill="white"/>
-                <!-- Percentage text -->
-                <text x="60" y="67" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#000000">
-                  {task_completion_rate:.1f}%
-                </text>
-            </svg>
+            <span style="display:inline-block;margin:0 15px;">
+                <span style="display:inline-block;width:15px;height:15px;background:#dc2626;border-radius:50%;vertical-align:middle;"></span>
+                <span style="margin-left:5px;color:#000000;">Completed: {task_completion_rate:.1f}%</span>
+            </span>
+            <span style="display:inline-block;margin:0 15px;">
+                <span style="display:inline-block;width:15px;height:15px;background:#e5e7eb;border-radius:50%;vertical-align:middle;border:1px solid #ccc;"></span>
+                <span style="margin-left:5px;color:#000000;">Remaining: {100 - task_completion_rate:.1f}%</span>
+            </span>
         </div>
         
         <p style="color: #000000; font-size: 14px; margin-bottom: 20px;">Please find your summary below. A detailed, presentation-ready PDF is attached for your records.</p>
@@ -8393,17 +8424,38 @@ def send_project_report_ajax(request):
             
             # Send email with simple subject
             subject = f"Project Report: {project.name}"
-            
-            # Send email using SimpleEmailService with Microsoft SMTP
-            from .email_service import SimpleEmailService
-            email_service = SimpleEmailService()
-            result = email_service.send_email(
-                to_email=client_email,
+
+            # Create email with HTML and attachments
+            from django.conf import settings
+            email = EmailMultiAlternatives(
                 subject=subject,
-                body=email_body,
-                from_email=None,  # Will use default from settings
-                attachments=[pdf_path]
+                body='Please view this email in HTML mode.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[client_email]
             )
+            email.attach_alternative(email_body, "text/html")
+
+            # Attach E-Click logo as inline image
+            logo_img = MIMEImage(logo_data, 'png')
+            logo_img.add_header('Content-ID', '<eclick_logo>')
+            logo_img.add_header('Content-Disposition', 'inline', filename='eclick_logo.png')
+            email.attach(logo_img)
+
+            # Attach progress chart as inline image
+            chart_img = MIMEImage(chart_buffer.read(), 'png')
+            chart_img.add_header('Content-ID', '<progress_chart>')
+            chart_img.add_header('Content-Disposition', 'inline', filename='progress_chart.png')
+            email.attach(chart_img)
+
+            # Attach PDF report
+            if pdf_path:
+                email.attach_file(pdf_path)
+
+            try:
+                email.send()
+                result = {'success': True, 'message': 'Email sent successfully'}
+            except Exception as e:
+                result = {'success': False, 'error': str(e)}
             
             # Clean up temporary PDF file
             try:
