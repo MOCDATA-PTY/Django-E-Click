@@ -8300,14 +8300,8 @@ def send_project_report_ajax(request):
 </head>
 <body style="margin: 0; padding: 0; background-color: #f5f5f5;">
 <div style="font-family: Arial, sans-serif; max-width: 720px; margin: 20px auto; background-color: #ffffff; color: #000000; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-    <div style="background-color: #ffffff; padding: 20px; border-bottom: 1px solid #f3f4f6;">
-        <div style="display: flex; align-items: center;">
-            <img src="cid:eclick_logo" alt="E-Click Logo" style="max-width: 60px; height: auto; margin-right: 15px;"/>
-            <div style="flex: 1;">
-                <h1 style="margin: 0 0 6px 0; font-size: 22px; font-weight: bold; color: #dc2626;">Your E-Click Client Progress Report</h1>
-                <p style="margin: 0; font-size: 13px; color: #6b7280;">Generated on {timezone.now().strftime("%B %d, %Y at %I:%M %p")}</p>
-            </div>
-        </div>
+    <div style="background-color: #ffffff; padding: 20px; border-bottom: 1px solid #f3f4f6; text-align: center;">
+        <img src="cid:eclick_logo" alt="E-Click Logo" style="max-width: 150px; height: auto;"/>
     </div>
 
     <div style="padding: 20px; background-color: #ffffff;">
