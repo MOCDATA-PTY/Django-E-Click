@@ -57,12 +57,30 @@ class GraphEmailBackend(BaseEmailBackend):
         for message in email_messages:
             try:
                 # Prepare the email message for Graph API
+                # Check if there's an HTML alternative
+                html_body = None
+                if hasattr(message, 'alternatives') and message.alternatives:
+                    for content, mimetype in message.alternatives:
+                        if mimetype == 'text/html':
+                            html_body = content
+                            break
+
+                # Use HTML body if available, otherwise use plain text
+                if html_body:
+                    body_content = html_body
+                    body_type = "HTML"
+                    logger.info(f"[GRAPH API] Using HTML body ({len(html_body)} chars)")
+                else:
+                    body_content = message.body
+                    body_type = "Text"
+                    logger.info(f"[GRAPH API] Using plain text body")
+
                 graph_message = {
                     "message": {
                         "subject": message.subject,
                         "body": {
-                            "contentType": "Text" if message.content_subtype == "plain" else "HTML",
-                            "content": message.body
+                            "contentType": body_type,
+                            "content": body_content
                         },
                         "toRecipients": [
                             {"emailAddress": {"address": addr}} for addr in message.to
@@ -81,6 +99,37 @@ class GraphEmailBackend(BaseEmailBackend):
                     graph_message["message"]["bccRecipients"] = [
                         {"emailAddress": {"address": addr}} for addr in message.bcc
                     ]
+
+                # Add attachments if present
+                if hasattr(message, 'attachments') and message.attachments:
+                    import base64
+                    graph_message["message"]["attachments"] = []
+                    logger.info(f"[GRAPH API] Processing {len(message.attachments)} attachments")
+
+                    for idx, attachment in enumerate(message.attachments):
+                        logger.info(f"[GRAPH API] Attachment {idx}: type={type(attachment)}")
+
+                        if hasattr(attachment, 'get_payload'):
+                            # MIMEImage or similar MIME object
+                            content = attachment.get_payload(decode=True)
+                            filename = attachment.get_filename() or f"attachment{idx}"
+                            content_type = attachment.get_content_type()
+                            content_id = attachment.get('Content-ID', '').strip('<>')
+
+                            logger.info(f"[GRAPH API]   filename={filename}, content_type={content_type}, content_id={content_id}")
+
+                            att_data = {
+                                "@odata.type": "#microsoft.graph.fileAttachment",
+                                "name": filename,
+                                "contentType": content_type,
+                                "contentBytes": base64.b64encode(content).decode(),
+                                "isInline": bool(content_id)
+                            }
+                            if content_id:
+                                att_data["contentId"] = content_id
+
+                            graph_message["message"]["attachments"].append(att_data)
+                            logger.info(f"[GRAPH API]   Added attachment successfully")
 
                 # Determine which email to send from
                 from_address = message.from_email or self.from_email
