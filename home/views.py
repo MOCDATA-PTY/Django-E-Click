@@ -8141,7 +8141,8 @@ def send_project_report_ajax(request):
     from django.utils import timezone
     from django.db.models import Q, Count, Avg
     from datetime import timedelta
-    
+    from django.conf import settings
+
     if request.method == 'POST':
         try:
             project_id = request.POST.get('project_id')
@@ -8282,7 +8283,6 @@ def send_project_report_ajax(request):
             from .chart_utils import generate_donut_chart
             from email.mime.image import MIMEImage
             from django.core.mail import EmailMultiAlternatives
-            from django.conf import settings
             import os
 
             chart_buffer = generate_donut_chart(task_completion_rate)
