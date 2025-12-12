@@ -45,14 +45,14 @@ urlpatterns = [
     
     path('logout/', views.logout_view, name='logout'),
     
-    # Planner functionality - commented out until views are implemented
+    # Planner functionality
     path('planner/', views.user_planner, name='user_planner'),
     path('team-dashboard/', views.team_dashboard, name='team_dashboard'),
-    # path('tasks/<int:task_id>/update/', views.update_task_status, name='update_task_status'),
+    path('tasks/<int:task_id>/update/', views.update_task_status, name='update_task_status'),
+    path('subtasks/<int:subtask_id>/update/', views.update_subtask_status, name='update_subtask_status'),
     # path('tasks/<int:task_id>/update-with-notification/', views.update_task_with_notification, name='update_task_with_notification'),
     # path('tasks/<int:task_id>/extend/', views.extend_task_duration, name='extend_task_duration'),
     # path('tasks/<int:task_id>/comment/', views.add_task_comment, name='add_task_comment'),
-    # path('subtasks/<int:subtask_id>/update/', views.update_subtask_status, name='update_subtask_status'),
     # path('subtasks/<int:subtask_id>/comment/', views.add_subtask_comment, name='add_subtask_comment'),
     # path('subtasks/<int:subtask_id>/extend/', views.extend_subtask_deadline, name='extend_subtask_deadline'),
     # path('notifications/enhanced/', views.admin_notifications_enhanced, name='admin_notifications_enhanced'),
