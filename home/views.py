@@ -7104,58 +7104,6 @@ def update_subtask_status(request, subtask_id):
     return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
 @login_required
-def delete_task(request, task_id):
-    """Delete a task"""
-    if request.method == 'POST':
-        try:
-            task = Task.objects.get(id=task_id)
-
-            # Check if user is assigned to this project or is staff
-            if not (request.user.is_staff or request.user in task.project.assigned_users.all()):
-                return JsonResponse({'success': False, 'message': 'You do not have permission to delete this task'})
-
-            task_title = task.title
-            task.delete()
-
-            return JsonResponse({
-                'success': True,
-                'message': f'Task "{task_title}" deleted successfully'
-            })
-
-        except Task.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Task not found'})
-        except Exception as e:
-            return JsonResponse({'success': False, 'message': f'Error: {str(e)}'})
-
-    return JsonResponse({'success': False, 'message': 'Invalid request method'})
-
-@login_required
-def delete_subtask(request, subtask_id):
-    """Delete a subtask"""
-    if request.method == 'POST':
-        try:
-            subtask = SubTask.objects.get(id=subtask_id)
-
-            # Check if user is assigned to this project or is staff
-            if not (request.user.is_staff or request.user in subtask.task.project.assigned_users.all()):
-                return JsonResponse({'success': False, 'message': 'You do not have permission to delete this subtask'})
-
-            subtask_title = subtask.title
-            subtask.delete()
-
-            return JsonResponse({
-                'success': True,
-                'message': f'Subtask "{subtask_title}" deleted successfully'
-            })
-
-        except SubTask.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Subtask not found'})
-        except Exception as e:
-            return JsonResponse({'success': False, 'message': f'Error: {str(e)}'})
-
-    return JsonResponse({'success': False, 'message': 'Invalid request method'})
-
-@login_required
 def add_subtask_comment(request, subtask_id):
     """Add comment to subtask"""
     if request.method == 'POST':

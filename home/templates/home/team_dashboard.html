@@ -719,9 +719,6 @@
                                         Extend Deadline
                                     </button>
                                     {% endif %}
-                                    <button class="btn btn-danger" onclick="confirmDelete('task', {{ task.id }}, '{{ task.title }}')">
-                                        Delete
-                                    </button>
                                 </div>
 
                                 <!-- Subtasks -->
@@ -747,9 +744,6 @@
                                                 Extend Deadline
                                             </button>
                                             {% endif %}
-                                            <button class="btn btn-sm btn-danger" onclick="confirmDelete('subtask', {{ subtask.id }}, '{{ subtask.title }}')">
-                                                Delete
-                                            </button>
                                         </div>
                                         
                                         <!-- Show subtask comments and admin responses -->
@@ -1187,35 +1181,5 @@
         return cookieValue;
     }
 
-    function confirmDelete(type, id, title) {
-        if (confirm(`Are you sure you want to delete this ${type}: "${title}"?\n\nThis action cannot be undone.`)) {
-            deleteItem(type, id);
-        }
-    }
-
-    function deleteItem(type, id) {
-        const endpoint = type === 'subtask' ? `/subtasks/${id}/delete/` : `/tasks/${id}/delete/`;
-
-        fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully!`);
-                location.reload();
-            } else {
-                alert('Error: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while deleting the ' + type);
-        });
-    }
 </script>
 {% endblock %}
