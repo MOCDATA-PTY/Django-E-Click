@@ -7045,10 +7045,10 @@ def update_task_status(request, task_id):
 def update_subtask_status(request, subtask_id):
     """Update subtask status"""
     print(f"DEBUG: update_subtask_status called for subtask {subtask_id} by user {request.user.username}")
-    
+
     if request.method == 'POST':
         try:
-            subtask = Subtask.objects.get(id=subtask_id)
+            subtask = SubTask.objects.get(id=subtask_id)
             
             # Check if user is assigned to this subtask's task's project
             if request.user not in subtask.task.project.assigned_users.all():
@@ -7091,12 +7091,12 @@ def update_subtask_status(request, subtask_id):
                 print(f"DEBUG: Error creating system notification: {str(e)}")
             
             return JsonResponse({
-                'success': True, 
+                'success': True,
                 'message': 'Subtask status updated successfully',
                 'new_status': subtask.get_status_display()
             })
-            
-        except Subtask.DoesNotExist:
+
+        except SubTask.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Subtask not found'})
         except Exception as e:
             return JsonResponse({'success': False, 'message': f'Error: {str(e)}'})
