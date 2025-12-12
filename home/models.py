@@ -577,17 +577,21 @@ class TaskUpdate(models.Model):
         ('delayed', 'Delayed'),
         ('on_hold', 'On Hold'),
         ('in_progress', 'In Progress'),
+        ('in_progress_guidance_required', 'In Progress (Guidance Required)'),
         ('not_started', 'Not Started'),
+        ('completed_review_pending', 'Completed (Review Pending)'),
+        ('completed_data_discrepancy_addressing', 'Completed (Data Discrepancy Addressing)'),
+        ('cancelled', 'Cancelled'),
         ('status_changed', 'Status Changed'),
         ('priority_changed', 'Priority Changed'),
         ('deadline_extended', 'Deadline Extended'),
         ('assigned', 'Assigned'),
         ('reassigned', 'Reassigned'),
     ]
-    
+
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='updates')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='task_updates', help_text='User who made the update')
-    update_type = models.CharField(max_length=20, choices=UPDATE_TYPES)
+    update_type = models.CharField(max_length=50, choices=UPDATE_TYPES)
     reason = models.TextField(blank=True, help_text='Reason for delay or status change')
     estimated_completion = models.DateField(blank=True, null=True, help_text='New estimated completion date if delayed')
     old_value = models.CharField(max_length=100, blank=True, help_text='Previous value before the change')
