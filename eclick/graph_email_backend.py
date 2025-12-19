@@ -65,11 +65,15 @@ class GraphEmailBackend(BaseEmailBackend):
                             html_body = content
                             break
 
-                # Use HTML body if available, otherwise use plain text
+                # Determine content type - check alternatives first, then content_subtype
                 if html_body:
                     body_content = html_body
                     body_type = "HTML"
-                    logger.info(f"[GRAPH API] Using HTML body ({len(html_body)} chars)")
+                    logger.info(f"[GRAPH API] Using HTML body from alternatives ({len(html_body)} chars)")
+                elif hasattr(message, 'content_subtype') and message.content_subtype == 'html':
+                    body_content = message.body
+                    body_type = "HTML"
+                    logger.info(f"[GRAPH API] Using HTML body from content_subtype")
                 else:
                     body_content = message.body
                     body_type = "Text"
