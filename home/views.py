@@ -712,7 +712,7 @@ def add_project(request):
 
     <p>You can set your password here: {site_url}/client/setup-password/?username={client_username}</p>
 
-    <p>This OTP is valid for 10 minutes.</p>
+    <p>This OTP is valid for 24 hours.</p>
 
     <p>Best regards,<br>E-Click Project Management Team</p>
 </body>
@@ -4463,7 +4463,7 @@ def admin_control(request):
 <p>Welcome to E-Click! Please use the One-Time Password (OTP) below to set your password:</p>
 <p>OTP: {otp}</p>
 <p>You can set your password here: <a href="{site_url}/user/setup-password/?username={username}">Set Up New Password</a></p>
-<p>This OTP is valid for 10 minutes.</p>
+<p>This OTP is valid for 24 hours.</p>
 <p>Best regards,<br>E-Click Team</p>
 </body>
 </html>""",
@@ -4616,7 +4616,7 @@ def admin_control(request):
 
     <p>Reset your password here: {site_url}/user/setup-password/?username={user.username}</p>
 
-    <p>This OTP is valid for 10 minutes.</p>
+    <p>This OTP is valid for 24 hours.</p>
 
     <p>If you did not request this password reset, please contact our support team immediately.</p>
 
@@ -4706,7 +4706,7 @@ def admin_control(request):
                     user=user,
                     otp=otp,
                     is_used=False,
-                    expires_at=timezone.now() + timedelta(hours=1)
+                    expires_at=timezone.now() + timedelta(hours=24)
                 )
                 
                 print(f"DEBUG: OTP record created for user {user.username}")
@@ -4727,7 +4727,7 @@ def admin_control(request):
 
     <p><strong>Your OTP: {otp}</strong></p>
 
-    <p>This OTP will expire in 10 minutes.</p>
+    <p>This OTP will expire in 24 hours.</p>
 
     <p>Best regards,<br>E-Click Team</p>
 </body>
@@ -4896,7 +4896,7 @@ def admin_control(request):
 
     <p>You can set your password here: {site_url}/client/setup-password/?username={username}</p>
 
-    <p>Please note: This OTP is valid for 10 minutes only.</p>
+    <p>Please note: This OTP is valid for 24 hours.</p>
 
     <p>If you did not request this account, please contact our support team immediately.</p>
 
@@ -6634,9 +6634,9 @@ def send_client_otp(request):
     
     <p>You can set your password here:</p>
     <p><a href="{site_url}/client/setup-password/?username={client_username}" style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Set Up New Password</a></p>
-    
-    <p style="color: #dc2626; font-weight: bold;">⚠️ Please note: This OTP is valid for 10 minutes only.</p>
-    
+
+    <p style="color: #dc2626; font-weight: bold;">⚠️ Please note: This OTP is valid for 24 hours.</p>
+
     <p>Best regards,<br>E-Click Project Management Team</p>
 </body>
 </html>""",

@@ -159,7 +159,7 @@ class SimpleEmailService:
 
     <p><strong>Your OTP Code: {otp}</strong></p>
 
-    <p>This code will expire in 10 minutes.</p>
+    <p>This code will expire in 24 hours.</p>
 
     <p><a href="{reset_url}" style="color: #2563eb; text-decoration: none; font-weight: bold;">Reset</a> your password using this link.</p>
 
@@ -224,7 +224,7 @@ class SimpleEmailService:
 
     <p><strong>Important Security Notes:</strong></p>
     <ul>
-        <li>This OTP will expire in 10 minutes</li>
+        <li>This OTP will expire in 24 hours</li>
         <li>Do not share this code with anyone</li>
         <li>If you didn't request this, please ignore this email</li>
     </ul>
@@ -259,7 +259,7 @@ To access your project portal, please use this verification code:
 
 Your OTP Code: {otp}
 
-This code will expire in 10 minutes.
+This code will expire in 24 hours.
 
 Set up your password here:
 {setup_url}
@@ -288,7 +288,7 @@ To complete your account setup, please use this verification code:
 
 Your OTP Code: {otp}
 
-This code will expire in 10 minutes.
+This code will expire in 24 hours.
 
 You can set up your password here:
 {setup_url}
@@ -317,7 +317,7 @@ To reset your password, please use this verification code:
 
 Your OTP Code: {otp}
 
-This code will expire in 10 minutes.
+This code will expire in 24 hours.
 
 Reset your password here:
 {reset_url}

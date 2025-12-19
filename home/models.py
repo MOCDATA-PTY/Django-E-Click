@@ -326,7 +326,7 @@ class Client(models.Model):
     def generate_otp(self):
         """Generate a 6-digit OTP for the client"""
         otp = ''.join(random.choices(string.digits, k=6))
-        expires_at = timezone.now() + timedelta(hours=1)
+        expires_at = timezone.now() + timedelta(hours=24)
         
         # Mark all existing OTPs for this client as used
         ClientOTP.objects.filter(client=self).update(is_used=True)
@@ -401,9 +401,9 @@ def generate_user_otp(user):
     import random
     import string
     from datetime import timedelta
-    
+
     otp = ''.join(random.choices(string.digits, k=6))
-    expires_at = timezone.now() + timedelta(hours=1)
+    expires_at = timezone.now() + timedelta(hours=24)
     
     # Mark all existing OTPs for this user as used
     UserOTP.objects.filter(user=user).update(is_used=True)
