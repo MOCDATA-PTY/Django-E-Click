@@ -6149,6 +6149,7 @@ def send_client_report(request):
             from .chart_utils import generate_donut_chart
             from email.mime.image import MIMEImage
             from django.core.mail import EmailMultiAlternatives
+            from django.conf import settings
             import os
 
             chart_buffer = generate_donut_chart(report_data['task_completion_rate'])
@@ -6263,7 +6264,6 @@ def send_client_report(request):
             pdf_path = generate_client_specific_pdf_report(client_id)
 
             # Create email with HTML and attachments
-            from django.conf import settings
             email = EmailMultiAlternatives(
                 subject=f"Client Report - {client_username} - E-Click",
                 body='Please view this email in HTML mode.',
