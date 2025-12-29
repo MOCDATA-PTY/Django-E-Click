@@ -429,6 +429,13 @@ function initChatbot() {
             const botResponse = await generateBotResponse(userInput);
             hideTypingIndicator();
             addMessage(botResponse, true);
+
+            // Show satisfaction prompt every 6 messages
+            if (conversationCount % 6 === 0 && conversationCount > 0) {
+                setTimeout(() => {
+                    askForSatisfaction();
+                }, 1500);
+            }
         } catch (error) {
             console.error('Error getting bot response:', error);
             hideTypingIndicator();
