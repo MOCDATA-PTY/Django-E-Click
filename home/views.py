@@ -5260,6 +5260,12 @@ def toggle_subtask(request):
             
             subtask = get_object_or_404(SubTask, id=subtask_id)
             subtask.is_completed = is_completed
+            # Sync status field with is_completed field to prevent inconsistency
+            if is_completed:
+                subtask.status = 'completed'
+            else:
+                # If uncompleting, set to in_progress (or could use previous status if tracked)
+                subtask.status = 'in_progress'
             subtask.save()
             
             return JsonResponse({'success': True})
@@ -5439,7 +5445,8 @@ def dashboard_gantt_data(request):
                             {
                                 'id': subtask.id,
                                 'title': subtask.title,
-                                'is_completed': subtask.is_completed,
+                                'status': subtask.status,
+                                'priority': subtask.priority,
                                 'start_date': subtask.start_date.isoformat() if subtask.start_date else None,
                                 'end_date': subtask.end_date.isoformat() if subtask.end_date else None
                             } for subtask in task.subtasks.all().order_by('created_at')
@@ -5463,7 +5470,8 @@ def dashboard_gantt_data(request):
                             {
                                 'id': subtask.id,
                                 'title': subtask.title,
-                                'is_completed': subtask.is_completed,
+                                'status': subtask.status,
+                                'priority': subtask.priority,
                                 'start_date': subtask.start_date.isoformat() if subtask.start_date else None,
                                 'end_date': subtask.end_date.isoformat() if subtask.end_date else None
                             } for subtask in task.subtasks.all().order_by('created_at')
@@ -7063,6 +7071,8 @@ def update_subtask_status(request, subtask_id):
             # Update subtask status
             old_status = subtask.status
             subtask.status = new_status
+            # Sync is_completed field with status field to prevent inconsistency
+            subtask.is_completed = (new_status == 'completed')
             subtask.save()
             
             # Log the status change
