@@ -133,7 +133,7 @@ function initChatbot() {
 
         satisfactionDiv.innerHTML = `
             <div class="p-3 max-w-[90%]">
-                <p class="text-sm ${textClass} mb-3 font-semibold">How was your experience? 😊</p>
+                <p class="text-sm ${textClass} mb-3 font-semibold">Before we start, how would you rate our website so far? 😊</p>
                 <div class="flex gap-2 mb-2 justify-center">
                     ${emojiOptions.map(option => `
                         <button onclick="window.submitSatisfaction(${option.rating})"
@@ -429,13 +429,6 @@ function initChatbot() {
             const botResponse = await generateBotResponse(userInput);
             hideTypingIndicator();
             addMessage(botResponse, true);
-
-            // Show satisfaction prompt every 6 messages
-            if (conversationCount % 6 === 0 && conversationCount > 0) {
-                setTimeout(() => {
-                    askForSatisfaction();
-                }, 1500);
-            }
         } catch (error) {
             console.error('Error getting bot response:', error);
             hideTypingIndicator();
