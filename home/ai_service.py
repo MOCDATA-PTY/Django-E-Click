@@ -87,15 +87,15 @@ class LocalAIService:
             return None
     
     def _generate_learning_response(self, question: str) -> str:
-        """Generate a response when no good match is found"""
+        """Generate a professional response when no good match is found"""
         responses = [
-            "I'm still learning about that topic. Could you tell me more?",
-            "That's an interesting question! I'm adding it to my knowledge base.",
-            "I don't have enough information about that yet. Let me learn from you!",
-            "Great question! I'm making note of this for future reference.",
-            "I'm expanding my knowledge with your question. Can you provide more details?"
+            "I don't have specific information about that right now. For detailed assistance, please contact our team at info@eclick.co.za or call +27 76 740 1777.",
+            "That's a great question! For personalized answers, I recommend reaching out to our team directly at info@eclick.co.za or +27 76 740 1777.",
+            "I'd like to give you the most accurate information. Please contact our team at info@eclick.co.za or call +27 76 740 1777, and they'll be happy to help!",
+            "For specific details about that, our team can provide the best assistance. Reach us at info@eclick.co.za or +27 76 740 1777.",
+            "I want to make sure you get the right information. Please contact our team at info@eclick.co.za or call +27 76 740 1777 for detailed assistance."
         ]
-        
+
         # Use question hash to consistently pick response
         import hashlib
         hash_value = int(hashlib.md5(question.encode()).hexdigest(), 16)

@@ -1595,3 +1595,81 @@ class AILearningMetrics(models.Model):
     
     def __str__(self):
         return f"AI Metrics - {self.total_conversations} conversations"
+
+
+class ChatbotFeedback(models.Model):
+    """Model to store chatbot feedback and satisfaction ratings"""
+    SATISFACTION_CHOICES = [
+        (1, 'Very Dissatisfied'),
+        (2, 'Dissatisfied'),
+        (3, 'Neutral'),
+        (4, 'Satisfied'),
+        (5, 'Very Satisfied'),
+    ]
+
+    # Session tracking
+    session_id = models.CharField(max_length=255, db_index=True, help_text="Unique session identifier")
+
+    # Feedback content
+    feedback_type = models.CharField(
+        max_length=50,
+        choices=[
+            ('general', 'General Feedback'),
+            ('bug', 'Bug Report'),
+            ('feature', 'Feature Request'),
+            ('satisfaction', 'Satisfaction Rating'),
+        ],
+        default='general'
+    )
+    feedback_text = models.TextField(blank=True, help_text="User's feedback message")
+    satisfaction_rating = models.IntegerField(
+        choices=SATISFACTION_CHOICES,
+        null=True,
+        blank=True,
+        help_text="Satisfaction rating from 1-5"
+    )
+
+    # User information (optional)
+    user_email = models.EmailField(blank=True, null=True, help_text="User email if provided")
+    user_name = models.CharField(max_length=200, blank=True, null=True, help_text="User name if provided")
+
+    # Metadata
+    conversation_context = models.JSONField(default=dict, blank=True, help_text="Last few messages for context")
+    user_agent = models.TextField(blank=True, help_text="Browser/device information")
+    ip_address = models.GenericIPAddressField(null=True, blank=True, help_text="User IP address")
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Status
+    is_resolved = models.BooleanField(default=False, help_text="Has feedback been addressed")
+    admin_notes = models.TextField(blank=True, help_text="Internal notes from admin")
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Chatbot Feedback'
+        verbose_name_plural = 'Chatbot Feedback'
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['session_id']),
+            models.Index(fields=['satisfaction_rating']),
+        ]
+
+    def __str__(self):
+        if self.satisfaction_rating:
+            return f"Satisfaction: {self.get_satisfaction_rating_display()} - {self.created_at.strftime('%Y-%m-%d')}"
+        return f"{self.get_feedback_type_display()} - {self.created_at.strftime('%Y-%m-%d')}"
+
+    @classmethod
+    def get_average_satisfaction(cls):
+        """Calculate average satisfaction rating"""
+        from django.db.models import Avg
+        result = cls.objects.filter(satisfaction_rating__isnull=False).aggregate(Avg('satisfaction_rating'))
+        return round(result['satisfaction_rating__avg'] or 0, 2)
+
+    @classmethod
+    def get_satisfaction_distribution(cls):
+        """Get distribution of satisfaction ratings"""
+        from django.db.models import Count
+        return cls.objects.filter(satisfaction_rating__isnull=False).values('satisfaction_rating').annotate(count=Count('id')).order_by('satisfaction_rating')

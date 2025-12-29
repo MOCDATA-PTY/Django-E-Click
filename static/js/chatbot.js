@@ -1,11 +1,11 @@
-// Chatbot JavaScript
+// Enhanced Chatbot JavaScript with Feedback and Satisfaction Tracking
 
 document.addEventListener('DOMContentLoaded', function() {
     initChatbot();
 });
 
 function initChatbot() {
-    console.log('Initializing chatbot...');
+    console.log('Initializing enhanced chatbot with feedback system...');
     const chatbotButton = document.getElementById('chatbot-button');
     const chatbotWindow = document.getElementById('chatbot-window');
     const chatbotClose = document.getElementById('chatbot-close');
@@ -13,69 +13,33 @@ function initChatbot() {
     const chatbotInput = document.getElementById('chatbot-input');
     const chatbotMessages = document.getElementById('chatbot-messages');
     const initialTimestamp = document.getElementById('initial-timestamp');
-    
-    console.log('Chatbot elements found:', {
-        button: !!chatbotButton,
-        window: !!chatbotWindow,
-        close: !!chatbotClose,
-        form: !!chatbotForm,
-        input: !!chatbotInput,
-        messages: !!chatbotMessages
-    });
-    
+
     if (!chatbotButton || !chatbotWindow) {
         console.error('Required chatbot elements not found');
         return;
     }
-    
+
     let isOpen = false;
     let messages = [];
-    
-    // Bot response patterns
-    const botResponses = {
-        service: [
-            "E-click offers custom software development, cloud solutions, business automation, enterprise integration, and technical consultancy services.",
-            "Our services include tailored software solutions, cloud infrastructure, process automation, system integration, and expert technical advice."
-        ],
-        automation: [
-            "Our automation services help businesses streamline workflows, reduce manual tasks, and increase efficiency through intelligent process automation.",
-            "We create custom automation solutions that digitize your business processes, saving time and reducing human error."
-        ],
-        price: [
-            "Our pricing varies based on project requirements. We'd be happy to provide a custom quote - please contact our team at contact@eclick.com.",
-            "We offer competitive pricing tailored to your specific needs. Reach out through our contact form for a detailed estimate."
-        ],
-        contact: [
-            "You can reach us through the contact form on our website, by email at contact@eclick.com, or by phone at (555) 123-4567.",
-            "Our team is available Monday to Friday, 9am-5pm. Feel free to use the contact section on this website!"
-        ],
-        default: [
-            "I don't have that information right now. Would you like to speak with a member of our team?",
-            "Great question! For more detailed information, I recommend reaching out to our team through the contact form.",
-            "I'm a simple bot with limited knowledge. For more specific assistance, please contact our human team."
-        ]
-    };
-    
-    // Keywords for matching user queries (removed theme keywords)
-    const keywords = {
-        service: ['service', 'offer', 'provide'],
-        automation: ['automat', 'workflow', 'process'],
-        price: ['price', 'cost', 'much'],
-        contact: ['contact', 'reach', 'talk']
-    };
-    
+    let sessionId = generateSessionId();
+    let conversationCount = 0;
+    let hasShownWelcome = false;
+
+    // Generate unique session ID
+    function generateSessionId() {
+        return 'session-' + Date.now() + '-' + Math.random().toString(36).substring(2, 11);
+    }
+
     // Initialize timestamp
     if (initialTimestamp) {
         initialTimestamp.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     }
-    
+
     // Toggle chatbot
     function toggleChatbot() {
-        console.log('Toggling chatbot, current state:', isOpen);
         isOpen = !isOpen;
-        
+
         if (isOpen) {
-            console.log('Opening chatbot...');
             chatbotWindow.classList.add('chatbot-open');
             chatbotWindow.style.opacity = '1';
             chatbotWindow.style.visibility = 'visible';
@@ -83,10 +47,17 @@ function initChatbot() {
             chatbotWindow.style.pointerEvents = 'auto';
             chatbotButton.style.transform = 'scale(0)';
             chatbotButton.style.opacity = '0';
-            
-            // Focus input
+
             setTimeout(() => {
                 if (chatbotInput) chatbotInput.focus();
+
+                // Show satisfaction on first open
+                if (!hasShownWelcome) {
+                    hasShownWelcome = true;
+                    setTimeout(() => {
+                        askForSatisfaction();
+                    }, 500);
+                }
             }, 300);
         } else {
             chatbotWindow.classList.remove('chatbot-open');
@@ -98,32 +69,37 @@ function initChatbot() {
             chatbotButton.style.opacity = '1';
         }
     }
-    
+
     // Add message to chat
-    function addMessage(text, isBot = false) {
+    function addMessage(text, isBot = false, isSpecial = false) {
         const message = {
             text: text,
             isBot: isBot,
+            isSpecial: isSpecial,
             timestamp: new Date()
         };
-        
+
         messages.push(message);
         renderMessage(message);
         scrollToBottom();
+
+        if (!isBot) {
+            conversationCount++;
+        }
     }
-    
+
     // Render a single message
     function renderMessage(message) {
         if (!chatbotMessages) return;
-        
+
         const isDark = document.documentElement.classList.contains('dark');
         const messageDiv = document.createElement('div');
         messageDiv.className = `mb-2 flex ${message.isBot ? 'justify-start' : 'justify-end'}`;
-        
-        const bubbleClass = message.isBot 
+
+        const bubbleClass = message.isBot
             ? (isDark ? 'bg-gray-700 border border-gray-600 text-gray-100' : 'bg-white border border-gray-200 text-gray-800')
             : (isDark ? 'bg-accent text-white' : 'bg-red-600 text-white');
-        
+
         messageDiv.innerHTML = `
             <div class="max-w-[80%] rounded-lg p-2.5 ${bubbleClass}">
                 <p class="text-sm leading-snug">${message.text}</p>
@@ -132,10 +108,177 @@ function initChatbot() {
                 </p>
             </div>
         `;
-        
+
         chatbotMessages.appendChild(messageDiv);
     }
-    
+
+    // Ask for satisfaction rating
+    function askForSatisfaction() {
+        // Don't show if one is already visible
+        if (document.getElementById('satisfaction-prompt')) return;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const satisfactionDiv = document.createElement('div');
+        satisfactionDiv.className = 'mb-4 flex justify-start';
+        satisfactionDiv.id = 'satisfaction-prompt';
+
+        const textClass = isDark ? 'text-gray-100' : 'text-gray-800';
+
+        const emojiOptions = [
+            { rating: 1, emoji: '😞', label: 'Very Unsatisfied' },
+            { rating: 2, emoji: '😐', label: 'Unsatisfied' },
+            { rating: 3, emoji: '😊', label: 'Satisfied' },
+            { rating: 4, emoji: '😄', label: 'Very Satisfied' }
+        ];
+
+        satisfactionDiv.innerHTML = `
+            <div class="p-3 max-w-[90%]">
+                <p class="text-sm ${textClass} mb-3 font-semibold">How was your experience? 😊</p>
+                <div class="flex gap-2 mb-2 justify-center">
+                    ${emojiOptions.map(option => `
+                        <button onclick="window.submitSatisfaction(${option.rating})"
+                                class="satisfaction-btn flex flex-col items-center px-3 py-2 transition-all hover:scale-110 ${
+                                    isDark ? 'text-white hover:bg-red-600 hover:bg-opacity-20' : 'hover:bg-red-600 hover:bg-opacity-10'
+                                }"
+                                title="${option.label}">
+                            <span class="text-2xl">${option.emoji}</span>
+                            <span class="text-xs mt-1">${option.rating}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        chatbotMessages.appendChild(satisfactionDiv);
+        scrollToBottom();
+    }
+
+    // Submit satisfaction rating
+    window.submitSatisfaction = async function(rating) {
+        const satisfactionPrompt = document.getElementById('satisfaction-prompt');
+        if (satisfactionPrompt) satisfactionPrompt.remove();
+
+        try {
+            const response = await fetch('/chatbot/satisfaction/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rating: rating,
+                    session_id: sessionId,
+                    conversation_context: getConversationContext()
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                const emojiMap = { 1: '😞', 2: '😐', 3: '😊', 4: '😄' };
+                addMessage(`Thank you for your feedback ${emojiMap[rating]}! This helps us improve our service. 🙏`, true);
+
+                // Ask for additional feedback
+                setTimeout(() => {
+                    askForTextFeedback();
+                }, 1500);
+            }
+        } catch (error) {
+            console.error('Error submitting satisfaction:', error);
+        }
+    };
+
+
+    // Ask for text feedback
+    function askForTextFeedback() {
+        const isDark = document.documentElement.classList.contains('dark');
+        const feedbackDiv = document.createElement('div');
+        feedbackDiv.className = 'mb-4 flex justify-start';
+        feedbackDiv.id = 'feedback-prompt';
+
+        const bgClass = isDark ? 'bg-gray-700 border border-gray-600' : 'bg-white border border-gray-200';
+        const textClass = isDark ? 'text-gray-100' : 'text-gray-800';
+        const inputBgClass = isDark ? 'bg-gray-800 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900';
+
+        feedbackDiv.innerHTML = `
+            <div class="${bgClass} rounded-lg p-3 max-w-[85%]">
+                <p class="text-sm ${textClass} mb-2">Would you like to share any additional feedback? 💭</p>
+                <textarea id="feedback-text"
+                          class="w-full p-2 rounded-lg border ${inputBgClass} text-sm resize-none"
+                          rows="3"
+                          placeholder="Your feedback helps us improve..."></textarea>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="window.submitTextFeedback()"
+                            class="px-3 py-1 rounded-lg text-sm font-semibold transition-all ${
+                                isDark ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'
+                            }">
+                        Submit
+                    </button>
+                    <button onclick="window.skipTextFeedback()"
+                            class="px-3 py-1 rounded-lg text-sm font-semibold transition-all ${
+                                isDark ? 'bg-gray-600 hover:bg-gray-700 text-white' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'
+                            }">
+                        Skip
+                    </button>
+                </div>
+            </div>
+        `;
+
+        chatbotMessages.appendChild(feedbackDiv);
+        scrollToBottom();
+    }
+
+    // Submit text feedback
+    window.submitTextFeedback = async function() {
+        const feedbackText = document.getElementById('feedback-text')?.value || '';
+        const feedbackPrompt = document.getElementById('feedback-prompt');
+        if (feedbackPrompt) feedbackPrompt.remove();
+
+        if (!feedbackText.trim()) {
+            addMessage("Thank you anyway! Feel free to chat anytime. 😊", true);
+            return;
+        }
+
+        try {
+            const response = await fetch('/chatbot/feedback/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    feedback_type: 'general',
+                    feedback_text: feedbackText,
+                    session_id: sessionId,
+                    conversation_context: getConversationContext()
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                addMessage("Thank you for your valuable feedback! We'll use it to improve our service. 🙏", true);
+            }
+        } catch (error) {
+            console.error('Error submitting feedback:', error);
+            addMessage("Thanks for your feedback! We appreciate your input. 😊", true);
+        }
+    };
+
+    // Skip text feedback
+    window.skipTextFeedback = function() {
+        const feedbackPrompt = document.getElementById('feedback-prompt');
+        if (feedbackPrompt) feedbackPrompt.remove();
+        addMessage("No problem! Thanks for chatting with me! 😊", true);
+    };
+
+    // Get conversation context (last 5 messages)
+    function getConversationContext() {
+        return messages.slice(-5).map(m => ({
+            text: m.text,
+            isBot: m.isBot,
+            timestamp: m.timestamp.toISOString()
+        }));
+    }
+
     // Handle theme switching
     function handleThemeInput(input) {
         const normalizedInput = input.toLowerCase().trim();
@@ -146,8 +289,7 @@ function initChatbot() {
             normalizedInput.includes('i want dark') ||
             normalizedInput.includes('switch to dark') ||
             normalizedInput.includes('make it dark')) {
-          
-          // Set theme with localStorage and apply it
+
           localStorage.setItem('theme', 'dark');
           document.documentElement.classList.add('dark');
           return 'Switching to dark mode! 🌙 Enjoy the darker interface.';
@@ -159,42 +301,72 @@ function initChatbot() {
             normalizedInput.includes('i want light') ||
             normalizedInput.includes('switch to light') ||
             normalizedInput.includes('make it light')) {
-          
-          // Set theme with localStorage and apply it
+
           localStorage.setItem('theme', 'light');
           document.documentElement.classList.remove('dark');
           return 'Switching to light mode! ☀️ Enjoy the brighter interface.';
         }
 
-        return null; // No theme change requested
+        return null;
     }
-    
-    // Generate bot response
-    function generateBotResponse(query) {
+
+    // Check if user wants to give feedback
+    function checkFeedbackIntent(query) {
+        const lowerQuery = query.toLowerCase();
+        if (lowerQuery.includes('feedback') ||
+            lowerQuery.includes('complain') ||
+            lowerQuery.includes('suggest') ||
+            lowerQuery.includes('improve')) {
+            return true;
+        }
+        return false;
+    }
+
+    // Generate bot response using AI service
+    async function generateBotResponse(query) {
         // First check if it's a theme request
         const themeResponse = handleThemeInput(query);
         if (themeResponse) {
             return themeResponse;
         }
-        
-        // Otherwise, use regular keyword matching
-        const lowercaseQuery = query.toLowerCase();
-        let responseType = 'default';
-        
-        // Check for keywords
-        for (const [category, words] of Object.entries(keywords)) {
-            if (words.some(word => lowercaseQuery.includes(word))) {
-                responseType = category;
-                break;
-            }
+
+        // Check if user wants to give feedback
+        if (checkFeedbackIntent(query)) {
+            setTimeout(() => {
+                askForTextFeedback();
+            }, 1000);
+            return "I'd love to hear your feedback! Let me help you share that with our team.";
         }
-        
-        // Get random response from category
-        const responses = botResponses[responseType] || botResponses.default;
-        const randomIndex = Math.floor(Math.random() * responses.length);
-        return responses[randomIndex];
+
+        // Use AI service for intelligent responses
+        try {
+            const response = await fetch('/ai/chat/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    question: query,
+                    user_id: '',
+                    session_id: sessionId
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.answer) {
+                return data.answer;
+            } else {
+                // Fallback response if AI fails
+                return "I'm here to help! Could you tell me more about what you're looking for?";
+            }
+        } catch (error) {
+            console.error('AI service error:', error);
+            // Fallback to basic response on error
+            return "I'm having a bit of trouble right now, but I'm here to help! Please try again or visit our contact page.";
+        }
     }
-    
+
     // Scroll to bottom
     function scrollToBottom() {
         if (chatbotMessages) {
@@ -203,19 +375,19 @@ function initChatbot() {
             }, 100);
         }
     }
-    
+
     // Show typing indicator
     function showTypingIndicator() {
         if (!chatbotMessages) return;
-        
+
         const typingDiv = document.createElement('div');
         typingDiv.id = 'typing-indicator';
         typingDiv.className = 'flex justify-start mb-4';
-        
+
         const isDark = document.documentElement.classList.contains('dark');
         const bgClass = isDark ? 'bg-gray-700 border border-gray-600' : 'bg-white border border-gray-200';
         const dotClass = isDark ? 'bg-gray-500' : 'bg-gray-300';
-        
+
         typingDiv.innerHTML = `
             <div class="${bgClass} rounded-lg p-3">
                 <div class="flex space-x-2">
@@ -225,11 +397,11 @@ function initChatbot() {
                 </div>
             </div>
         `;
-        
+
         chatbotMessages.appendChild(typingDiv);
         scrollToBottom();
     }
-    
+
     // Hide typing indicator
     function hideTypingIndicator() {
         const typingIndicator = document.getElementById('typing-indicator');
@@ -237,29 +409,40 @@ function initChatbot() {
             typingIndicator.remove();
         }
     }
-    
+
     // Handle form submission
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault();
-        
+
         const userInput = chatbotInput.value.trim();
         if (!userInput) return;
-        
+
         // Add user message
         addMessage(userInput, false);
         chatbotInput.value = '';
-        
+
         // Show typing indicator
         showTypingIndicator();
-        
-        // Generate and show bot response after delay
-        setTimeout(() => {
+
+        // Generate and show bot response using AI service
+        try {
+            const botResponse = await generateBotResponse(userInput);
             hideTypingIndicator();
-            const botResponse = generateBotResponse(userInput);
             addMessage(botResponse, true);
-        }, 1000 + Math.random() * 1000);
+
+            // Show satisfaction prompt every 6 messages
+            if (conversationCount % 6 === 0 && conversationCount > 0) {
+                setTimeout(() => {
+                    askForSatisfaction();
+                }, 1500);
+            }
+        } catch (error) {
+            console.error('Error getting bot response:', error);
+            hideTypingIndicator();
+            addMessage("I apologize, but I'm having trouble responding right now. Please try again!", true);
+        }
     }
-    
+
     // Update input state
     function updateInputState() {
         const submitButton = chatbotForm?.querySelector('button[type="submit"]');
@@ -267,20 +450,20 @@ function initChatbot() {
             submitButton.disabled = !chatbotInput.value.trim();
         }
     }
-    
+
     // Bind event listeners
     if (chatbotButton) {
         chatbotButton.addEventListener('click', toggleChatbot);
     }
-    
+
     if (chatbotClose) {
         chatbotClose.addEventListener('click', toggleChatbot);
     }
-    
+
     if (chatbotForm) {
         chatbotForm.addEventListener('submit', handleSubmit);
     }
-    
+
     if (chatbotInput) {
         chatbotInput.addEventListener('input', updateInputState);
         chatbotInput.addEventListener('keypress', (e) => {
@@ -290,14 +473,14 @@ function initChatbot() {
             }
         });
     }
-    
+
     // Close chatbot when clicking outside
     document.addEventListener('click', (e) => {
         if (isOpen && !chatbotWindow.contains(e.target) && !chatbotButton.contains(e.target)) {
             toggleChatbot();
         }
     });
-    
+
     // Initialize input state
     updateInputState();
 }

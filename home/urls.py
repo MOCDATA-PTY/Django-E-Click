@@ -9,6 +9,13 @@ urlpatterns = [
     path('services/', views.services, name='services'),
     path('clients/', views.clients, name='clients'),
     path('login/', views.login_view, name='login'),
+
+    # Password reset URLs
+    path('password-reset/', views.password_reset_request, name='password_reset'),
+    path('password-reset-done/', views.password_reset_done, name='password_reset_done'),
+    path('password-reset-confirm/<uidb64>/<token>/', views.password_reset_confirm, name='password_reset_confirm'),
+    path('password-reset-complete/', views.password_reset_complete, name='password_reset_complete'),
+
     path('dashboard/', views.dashboard, name='dashboard'),
     path('dashboard/gantt-data/', views.dashboard_gantt_data, name='dashboard_gantt_data'),
     path('analytics/', views.analytics, name='analytics'),
@@ -93,4 +100,9 @@ urlpatterns = [
     path('ai/feedback/', views.ai_feedback, name='ai_feedback'),
     path('ai/stats/', views.ai_stats, name='ai_stats'),
     path('ai/knowledge/', views.ai_knowledge_management, name='ai_knowledge_management'),
+
+    # Chatbot feedback endpoints
+    path('chatbot/feedback/', views.chatbot_feedback, name='chatbot_feedback'),
+    path('chatbot/satisfaction/', views.chatbot_satisfaction, name='chatbot_satisfaction'),
+    path('chatbot/stats/', views.chatbot_stats, name='chatbot_stats'),
 ]

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 
@@ -9105,3 +9106,336 @@ def client_reset_password(request):
     # GET request - show form
     username = request.GET.get('username', '')
     return render(request, 'home/client_reset_password.html', {'username': username})
+
+
+# =======================
+# Chatbot Feedback Views
+# =======================
+
+@csrf_exempt
+def chatbot_feedback(request):
+    """Handle chatbot feedback and satisfaction ratings"""
+    if request.method == 'POST':
+        try:
+            import json
+            from .models import ChatbotFeedback
+            
+            data = json.loads(request.body)
+            
+            # Get session ID (generate if not provided)
+            session_id = data.get('session_id', request.session.session_key or f'anon-{timezone.now().timestamp()}')
+            
+            # Get IP address
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            ip_address = x_forwarded_for.split(',')[0] if x_forwarded_for else request.META.get('REMOTE_ADDR')
+            
+            # Create feedback record
+            feedback = ChatbotFeedback.objects.create(
+                session_id=session_id,
+                feedback_type=data.get('feedback_type', 'general'),
+                feedback_text=data.get('feedback_text', ''),
+                satisfaction_rating=data.get('satisfaction_rating'),
+                user_email=data.get('user_email'),
+                user_name=data.get('user_name'),
+                conversation_context=data.get('conversation_context', {}),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                ip_address=ip_address
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Thank you for your feedback!',
+                'feedback_id': feedback.id
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=400)
+    
+    return JsonResponse({'error': 'POST request required'}, status=405)
+
+
+@csrf_exempt  
+def chatbot_satisfaction(request):
+    """Handle satisfaction rating submission"""
+    if request.method == 'POST':
+        try:
+            import json
+            from .models import ChatbotFeedback
+            
+            data = json.loads(request.body)
+            rating = data.get('rating')
+            
+            if not rating or not (1 <= int(rating) <= 5):
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Invalid rating. Must be between 1 and 5'
+                }, status=400)
+            
+            # Get session ID
+            session_id = data.get('session_id', request.session.session_key or f'anon-{timezone.now().timestamp()}')
+            
+            # Get IP address
+            x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+            ip_address = x_forwarded_for.split(',')[0] if x_forwarded_for else request.META.get('REMOTE_ADDR')
+            
+            # Create satisfaction feedback
+            feedback = ChatbotFeedback.objects.create(
+                session_id=session_id,
+                feedback_type='satisfaction',
+                satisfaction_rating=int(rating),
+                conversation_context=data.get('conversation_context', {}),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                ip_address=ip_address
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Thank you! You rated {rating} out of 5',
+                'feedback_id': feedback.id
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=400)
+    
+    return JsonResponse({'error': 'POST request required'}, status=405)
+
+
+def chatbot_stats(request):
+    """Get chatbot satisfaction statistics (for admin)"""
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'Admin access required'}, status=403)
+    
+    from .models import ChatbotFeedback
+    from django.db.models import Count, Avg
+    
+    # Get average satisfaction
+    avg_satisfaction = ChatbotFeedback.get_average_satisfaction()
+    
+    # Get distribution
+    distribution = list(ChatbotFeedback.get_satisfaction_distribution())
+    
+    # Get total feedback count
+    total_feedback = ChatbotFeedback.objects.count()
+    total_ratings = ChatbotFeedback.objects.filter(satisfaction_rating__isnull=False).count()
+    
+    # Get recent feedback
+    recent_feedback = ChatbotFeedback.objects.filter(
+        feedback_text__isnull=False
+    ).exclude(feedback_text='').values(
+        'id', 'feedback_type', 'feedback_text', 'satisfaction_rating', 'created_at'
+    ).order_by('-created_at')[:10]
+    
+    return JsonResponse({
+        'success': True,
+        'stats': {
+            'average_satisfaction': avg_satisfaction,
+            'distribution': distribution,
+            'total_feedback': total_feedback,
+            'total_ratings': total_ratings,
+            'recent_feedback': list(recent_feedback)
+        }
+    })
+
+
+# Password Reset Views
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.template.loader import render_to_string
+from django.core.mail import send_mail
+
+def password_reset_request(request):
+    """Handle password reset request"""
+    if request.method == 'POST':
+        username_or_email = request.POST.get('username_or_email', '').strip()
+
+        if not username_or_email:
+            messages.error(request, 'Please enter your username or email address.')
+            return render(request, 'home/password_reset.html')
+
+        # Try to find user by username or email (both User and Client)
+        user = None
+        is_client = False
+        user_email = None
+
+        # Check Django users first - try username then email
+        try:
+            user = User.objects.get(username=username_or_email)
+            user_email = user.email
+        except User.DoesNotExist:
+            try:
+                user = User.objects.get(email=username_or_email)
+                user_email = user.email
+            except User.DoesNotExist:
+                # Check clients - try username then email
+                try:
+                    user = Client.objects.get(username=username_or_email)
+                    user_email = user.email
+                    is_client = True
+                except Client.DoesNotExist:
+                    try:
+                        user = Client.objects.get(email=username_or_email)
+                        user_email = user.email
+                        is_client = True
+                    except Client.DoesNotExist:
+                        pass
+
+        if user and user_email:
+            # Generate token
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            # Build reset URL
+            reset_url = request.build_absolute_uri(
+                f'/password-reset-confirm/{uid}/{token}/'
+            )
+
+            # Build logo URL (URL-encoded)
+            logo_url = request.build_absolute_uri('/static/images/E%20Click%20Logo%20(1).png')
+
+            # Get user's name
+            user_name = getattr(user, 'first_name', None) or getattr(user, 'username', 'User')
+
+            # Send simple email
+            from django.core.mail import EmailMultiAlternatives
+
+            subject = 'Password Reset Request - E-Click Technologies'
+
+            # Plain text version
+            text_content = f"""E-CLICK TECHNOLOGIES
+
+Dear {user_name},
+
+We received a request to reset your password for your E-Click Technologies account.
+
+To reset your password, please click the following link:
+{reset_url}
+
+This link will expire in 24 hours for security purposes.
+
+If you did not request a password reset, please disregard this email and your password will remain unchanged. For security concerns, please contact us immediately.
+
+Best regards,
+E-Click Technologies Team
+
+---
+Need assistance? Contact us:
+Email: info@eclick.co.za
+Phone: +27 76 740 1777"""
+
+            # Simple HTML version (just makes "Reset Password" clickable instead of showing URL)
+            html_content = f"""<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <img src="{logo_url}" alt="E-Click Technologies" style="height: 50px; width: auto;">
+    </div>
+
+    <p>Dear {user_name},</p>
+
+    <p>We received a request to reset your password for your E-Click Technologies account.</p>
+
+    <p>To reset your password, please click: <a href="{reset_url}" style="color: #dc2626; text-decoration: none; font-weight: bold;">Reset Password</a></p>
+
+    <p style="color: #666; font-size: 14px;"><strong>Important:</strong> This link will expire in 24 hours for security purposes.</p>
+
+    <p>If you did not request a password reset, please disregard this email and your password will remain unchanged. For security concerns, please contact us immediately.</p>
+
+    <p>Best regards,<br>
+    <strong>E-Click Technologies Team</strong></p>
+
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+
+    <p style="font-size: 12px; color: #666;">
+        <strong>Need assistance?</strong><br>
+        Email: <a href="mailto:info@eclick.co.za" style="color: #dc2626; text-decoration: none;">info@eclick.co.za</a><br>
+        Phone: <a href="tel:+27767401777" style="color: #dc2626; text-decoration: none;">+27 76 740 1777</a>
+    </p>
+</body>
+</html>"""
+
+            try:
+                email = EmailMultiAlternatives(
+                    subject,
+                    text_content,
+                    django_settings.DEFAULT_FROM_EMAIL,
+                    [user_email]
+                )
+                email.attach_alternative(html_content, "text/html")
+                email.send(fail_silently=False)
+
+                messages.success(request, 'Password reset email sent! Please check your inbox.')
+                return redirect('password_reset_done')
+            except Exception as e:
+                messages.error(request, f'Error sending email: {str(e)}')
+                return render(request, 'home/password_reset.html')
+        else:
+            # Don't reveal if username/email exists or not (security best practice)
+            messages.success(request, 'If an account with that username or email exists, a password reset link has been sent.')
+            return redirect('password_reset_done')
+
+    return render(request, 'home/password_reset.html')
+
+def password_reset_done(request):
+    """Show confirmation that reset email was sent"""
+    return render(request, 'home/password_reset_done.html')
+
+def password_reset_confirm(request, uidb64, token):
+    """Handle password reset with token"""
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+
+        # Try User first
+        user = None
+        is_client = False
+        try:
+            user = User.objects.get(pk=uid)
+        except User.DoesNotExist:
+            try:
+                user = Client.objects.get(pk=uid)
+                is_client = True
+            except Client.DoesNotExist:
+                user = None
+
+        if user and default_token_generator.check_token(user, token):
+            if request.method == 'POST':
+                password1 = request.POST.get('password1')
+                password2 = request.POST.get('password2')
+
+                if password1 != password2:
+                    messages.error(request, 'Passwords do not match.')
+                    return render(request, 'home/password_reset_confirm.html')
+
+                if len(password1) < 8:
+                    messages.error(request, 'Password must be at least 8 characters long.')
+                    return render(request, 'home/password_reset_confirm.html')
+
+                # Set new password
+                if is_client:
+                    from django.contrib.auth.hashers import make_password
+                    user.password = make_password(password1)
+                    user.save()
+                else:
+                    user.set_password(password1)
+                    user.save()
+
+                messages.success(request, 'Password reset successful! You can now login with your new password.')
+                return redirect('password_reset_complete')
+
+            return render(request, 'home/password_reset_confirm.html')
+        else:
+            messages.error(request, 'Invalid or expired password reset link.')
+            return redirect('password_reset')
+
+    except Exception as e:
+        messages.error(request, 'Invalid password reset link.')
+        return redirect('password_reset')
+
+def password_reset_complete(request):
+    """Show confirmation that password was reset"""
+    return render(request, 'home/password_reset_complete.html')

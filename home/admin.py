@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db.models import Q
-from .models import Project, Task, SubTask, UserProfile, Client, ClientOTP, UserOTP, Notification, TaskUpdate, SystemLog, TaskComment, SubTaskComment
+from .models import Project, Task, SubTask, UserProfile, Client, ClientOTP, UserOTP, Notification, TaskUpdate, SystemLog, TaskComment, SubTaskComment, ChatbotFeedback
 
 # Register your models here.
 
@@ -151,9 +151,46 @@ class SystemLogAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'user__email', 'ip_address']
     readonly_fields = ['timestamp', 'ip_address', 'user_agent', 'os_info', 'browser_info', 'additional_info']
     ordering = ['-timestamp']
-    
+
     def has_add_permission(self, request):
         return False  # System logs should only be created automatically
-    
+
     def has_change_permission(self, request, obj=None):
         return False  # System logs should not be editable
+
+
+@admin.register(ChatbotFeedback)
+class ChatbotFeedbackAdmin(admin.ModelAdmin):
+    list_display = ['session_id', 'feedback_type', 'satisfaction_rating', 'user_email', 'is_resolved', 'created_at']
+    list_filter = ['feedback_type', 'satisfaction_rating', 'is_resolved', 'created_at']
+    search_fields = ['session_id', 'user_email', 'user_name', 'feedback_text']
+    readonly_fields = ['session_id', 'created_at', 'updated_at', 'user_agent', 'ip_address', 'conversation_context']
+    list_editable = ['is_resolved']
+    ordering = ['-created_at']
+
+    fieldsets = (
+        ('Session Information', {
+            'fields': ('session_id', 'user_email', 'user_name', 'ip_address', 'user_agent')
+        }),
+        ('Feedback Details', {
+            'fields': ('feedback_type', 'feedback_text', 'satisfaction_rating', 'conversation_context')
+        }),
+        ('Admin Management', {
+            'fields': ('is_resolved', 'admin_notes')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+
+    actions = ['mark_as_resolved', 'mark_as_unresolved']
+
+    def mark_as_resolved(self, request, queryset):
+        queryset.update(is_resolved=True)
+        self.message_user(request, f"{queryset.count()} feedback records marked as resolved.")
+    mark_as_resolved.short_description = "Mark selected feedback as resolved"
+
+    def mark_as_unresolved(self, request, queryset):
+        queryset.update(is_resolved=False)
+        self.message_user(request, f"{queryset.count()} feedback records marked as unresolved.")
+    mark_as_unresolved.short_description = "Mark selected feedback as unresolved"
