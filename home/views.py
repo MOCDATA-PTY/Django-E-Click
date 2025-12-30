@@ -9243,6 +9243,86 @@ def chatbot_stats(request):
     })
 
 
+@login_required
+def satisfaction_report(request):
+    """Satisfaction report page (Admin only)"""
+    # Check if user is admin
+    if not request.user.is_staff:
+        return redirect('home:index')
+
+    from .models import ChatbotFeedback
+    from django.db.models import Count, Avg, Q
+    from django.utils import timezone
+    from datetime import timedelta
+
+    # Get average satisfaction
+    avg_satisfaction = ChatbotFeedback.get_average_satisfaction()
+
+    # Get distribution
+    distribution = list(ChatbotFeedback.get_satisfaction_distribution())
+
+    # Get total feedback count
+    total_feedback = ChatbotFeedback.objects.count()
+    total_ratings = ChatbotFeedback.objects.filter(satisfaction_rating__isnull=False).count()
+
+    # Get recent feedback (last 30 days)
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    recent_count = ChatbotFeedback.objects.filter(created_at__gte=thirty_days_ago).count()
+
+    # Get feedback by day for the last 7 days
+    seven_days_ago = timezone.now() - timedelta(days=7)
+    daily_feedback = []
+    for i in range(7):
+        day = timezone.now() - timedelta(days=6-i)
+        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day.replace(hour=23, minute=59, second=59, microsecond=999999)
+
+        count = ChatbotFeedback.objects.filter(
+            created_at__gte=day_start,
+            created_at__lte=day_end
+        ).count()
+
+        avg_rating = ChatbotFeedback.objects.filter(
+            created_at__gte=day_start,
+            created_at__lte=day_end,
+            satisfaction_rating__isnull=False
+        ).aggregate(Avg('satisfaction_rating'))['satisfaction_rating__avg']
+
+        daily_feedback.append({
+            'date': day.strftime('%Y-%m-%d'),
+            'day_name': day.strftime('%a'),
+            'count': count,
+            'avg_rating': round(avg_rating, 2) if avg_rating else 0
+        })
+
+    # Get recent detailed feedback
+    recent_feedback = ChatbotFeedback.objects.filter(
+        Q(feedback_text__isnull=False) | Q(satisfaction_rating__isnull=False)
+    ).select_related().order_by('-created_at')[:20]
+
+    # Emoji mapping
+    emoji_map = {
+        1: '😞',
+        2: '😐',
+        3: '😊',
+        4: '😄',
+        5: '😄'
+    }
+
+    context = {
+        'avg_satisfaction': avg_satisfaction,
+        'distribution': distribution,
+        'total_feedback': total_feedback,
+        'total_ratings': total_ratings,
+        'recent_count': recent_count,
+        'daily_feedback': daily_feedback,
+        'recent_feedback': recent_feedback,
+        'emoji_map': emoji_map,
+    }
+
+    return render(request, 'home/satisfaction_report.html', context)
+
+
 # Password Reset Views
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode

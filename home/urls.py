@@ -105,4 +105,7 @@ urlpatterns = [
     path('chatbot/feedback/', views.chatbot_feedback, name='chatbot_feedback'),
     path('chatbot/satisfaction/', views.chatbot_satisfaction, name='chatbot_satisfaction'),
     path('chatbot/stats/', views.chatbot_stats, name='chatbot_stats'),
+
+    # Admin reports
+    path('reports/satisfaction/', views.satisfaction_report, name='satisfaction_report'),
 ]
