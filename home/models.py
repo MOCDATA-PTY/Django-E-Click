@@ -1673,3 +1673,82 @@ class ChatbotFeedback(models.Model):
         """Get distribution of satisfaction ratings"""
         from django.db.models import Count
         return cls.objects.filter(satisfaction_rating__isnull=False).values('satisfaction_rating').annotate(count=Count('id')).order_by('satisfaction_rating')
+
+
+class DevMessage(models.Model):
+    """Messages from clients and employees to developers about bugs, features, issues, etc."""
+
+    MESSAGE_TYPE_CHOICES = [
+        ('bug', 'Bug Report'),
+        ('feature', 'Feature Request'),
+        ('issue', 'Issue'),
+        ('question', 'Question'),
+        ('feedback', 'General Feedback'),
+    ]
+
+    STATUS_CHOICES = [
+        ('new', 'New'),
+        ('read', 'Read'),
+        ('in_progress', 'In Progress'),
+        ('resolved', 'Resolved'),
+        ('closed', 'Closed'),
+    ]
+
+    PRIORITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('urgent', 'Urgent'),
+    ]
+
+    # User information
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='dev_messages', help_text="User who sent the message")
+
+    # Message details
+    message_type = models.CharField(max_length=20, choices=MESSAGE_TYPE_CHOICES, default='feedback', help_text="Type of message")
+    subject = models.CharField(max_length=1000, help_text="Brief subject line")
+    message = models.TextField(help_text="Detailed message content")
+
+    # Status and priority
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new', help_text="Current status")
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium', help_text="Message priority")
+
+    # Additional info
+    project = models.ForeignKey('Project', on_delete=models.SET_NULL, null=True, blank=True, related_name='dev_messages', help_text="Related project if any")
+
+    # Admin response
+    admin_response = models.TextField(blank=True, help_text="Response from admin/dev")
+    responded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='dev_message_responses', help_text="Admin who responded")
+    responded_at = models.DateTimeField(null=True, blank=True, help_text="When admin responded")
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Dev Message'
+        verbose_name_plural = 'Dev Messages'
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['status']),
+            models.Index(fields=['message_type']),
+            models.Index(fields=['priority']),
+        ]
+
+    def __str__(self):
+        return f"{self.get_message_type_display()} from {self.user.username} - {self.subject}"
+
+    def mark_as_read(self):
+        """Mark message as read"""
+        if self.status == 'new':
+            self.status = 'read'
+            self.save()
+
+    def mark_as_resolved(self, admin_user=None):
+        """Mark message as resolved"""
+        self.status = 'resolved'
+        if admin_user:
+            self.responded_by = admin_user
+            self.responded_at = timezone.now()
+        self.save()

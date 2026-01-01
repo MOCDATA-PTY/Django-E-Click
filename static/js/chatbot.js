@@ -50,14 +50,6 @@ function initChatbot() {
 
             setTimeout(() => {
                 if (chatbotInput) chatbotInput.focus();
-
-                // Show satisfaction on first open
-                if (!hasShownWelcome) {
-                    hasShownWelcome = true;
-                    setTimeout(() => {
-                        askForSatisfaction();
-                    }, 500);
-                }
             }, 300);
         } else {
             chatbotWindow.classList.remove('chatbot-open');
@@ -133,17 +125,16 @@ function initChatbot() {
 
         satisfactionDiv.innerHTML = `
             <div class="p-3 max-w-[90%]">
-                <p class="text-sm ${textClass} mb-3 font-semibold">Before we start, how would you rate our website so far? 😊</p>
-                <div class="flex gap-2 mb-2 justify-center">
+                <p class="text-sm ${textClass} mb-3 font-semibold">Before we start, how would you rate our website so far?</p>
+                <div class="flex gap-2 mb-2 justify-center" style="user-select: none;">
                     ${emojiOptions.map(option => `
-                        <button onclick="window.submitSatisfaction(${option.rating})"
-                                class="satisfaction-btn flex flex-col items-center px-3 py-2 transition-all hover:scale-110 ${
-                                    isDark ? 'text-white hover:bg-red-600 hover:bg-opacity-20' : 'hover:bg-red-600 hover:bg-opacity-10'
-                                }"
-                                title="${option.label}">
-                            <span class="text-2xl">${option.emoji}</span>
-                            <span class="text-xs mt-1">${option.rating}</span>
-                        </button>
+                        <div onclick="window.submitSatisfaction(${option.rating})"
+                             class="satisfaction-option"
+                             style="display: flex; flex-direction: column; align-items: center; padding: 0.375rem 0.5rem; cursor: pointer; ${isDark ? 'color: white;' : ''}"
+                             title="${option.label}">
+                            <span style="font-size: 1.5rem; line-height: 1; pointer-events: none;">${option.emoji}</span>
+                            <span style="font-size: 0.625rem; margin-top: 0.25rem; pointer-events: none;">${option.rating}</span>
+                        </div>
                     `).join('')}
                 </div>
             </div>
@@ -430,8 +421,8 @@ function initChatbot() {
             hideTypingIndicator();
             addMessage(botResponse, true);
 
-            // Show satisfaction prompt every 6 messages
-            if (conversationCount % 6 === 0 && conversationCount > 0) {
+            // Show satisfaction prompt after first message and then every 6 messages (1, 7, 13, 19...)
+            if ((conversationCount - 1) % 6 === 0 && conversationCount > 0) {
                 setTimeout(() => {
                     askForSatisfaction();
                 }, 1500);

@@ -108,4 +108,7 @@ urlpatterns = [
 
     # Admin reports
     path('reports/satisfaction/', views.satisfaction_report, name='satisfaction_report'),
+
+    # Eclick Chats
+    path('eclick-chats/', views.eclick_chats, name='eclick_chats'),
 ]

@@ -533,6 +533,26 @@
                 transform: translateY(-2px) scale(1.02);
             }
 
+            .satisfaction-option,
+            .satisfaction-option *,
+            .satisfaction-option:hover,
+            .satisfaction-option:hover *,
+            .satisfaction-option:focus,
+            .satisfaction-option:focus *,
+            .satisfaction-option:active,
+            .satisfaction-option:active * {
+                transition: none !important;
+                animation: none !important;
+                transform: none !important;
+                filter: none !important;
+                background-color: transparent !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                border: none !important;
+                outline: none !important;
+                opacity: 1 !important;
+            }
+
             .performance-bar:hover {
                 transform: scaleY(1.1);
                 filter: brightness(1.1);
