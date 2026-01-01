@@ -23,7 +23,8 @@ knowledge_data = [
         'category': 'greeting',
         'question': 'hi|hello|hey|good morning|good afternoon|good evening|greetings',
         'answer': 'Hello! Welcome to E-Click. How can I help you today? I can provide information about our services, pricing, and solutions.',
-        'keywords': 'greeting, hello, hi'
+        'tags': ['greeting', 'hello', 'hi'],
+        'confidence_score': 0.95
     },
 
     # Pricing - Web Development
@@ -31,7 +32,8 @@ knowledge_data = [
         'category': 'pricing',
         'question': 'how much does a website cost|website price|web development cost|website pricing',
         'answer': 'Our web development pricing varies based on complexity:\n\n• Basic Website: R15,000 - R25,000\n• Business Website: R25,000 - R50,000\n• E-commerce Site: R50,000 - R100,000+\n• Custom Enterprise: R100,000+\n\nAll packages include responsive design, SEO optimization, and 3 months support.',
-        'keywords': 'pricing, website, cost, web development'
+        'tags': ['pricing', 'website', 'cost', 'web development'],
+        'confidence_score': 0.95
     },
 
     # Pricing - Mobile Apps
@@ -39,7 +41,8 @@ knowledge_data = [
         'category': 'pricing',
         'question': 'mobile app cost|app development price|how much for an app',
         'answer': 'Mobile app development pricing:\n\n• Simple App: R50,000 - R100,000\n• Medium Complexity: R100,000 - R250,000\n• Complex App: R250,000 - R500,000+\n• Enterprise Solution: R500,000+\n\nIncludes iOS & Android development, API integration, and 6 months support.',
-        'keywords': 'pricing, mobile app, cost'
+        'tags': ['pricing', 'mobile app', 'cost'],
+        'confidence_score': 0.95
     },
 
     # Services - General
@@ -47,7 +50,8 @@ knowledge_data = [
         'category': 'services',
         'question': 'what services do you offer|what do you do|services',
         'answer': 'E-Click offers comprehensive software solutions:\n\n• Custom Software Development\n• Web & Mobile Applications\n• Cloud Infrastructure\n• Database Solutions\n• API Development\n• DevOps & Automation\n• Performance Optimization\n• Consulting & Support\n\nWe specialize in enterprise-grade solutions.',
-        'keywords': 'services, what we do, offerings'
+        'tags': ['services', 'offerings'],
+        'confidence_score': 0.95
     },
 
     # Services - Custom Development
@@ -55,7 +59,8 @@ knowledge_data = [
         'category': 'services',
         'question': 'custom software|bespoke development|tailored solution',
         'answer': 'Our custom software development service includes:\n\n• Requirements analysis & planning\n• UI/UX design\n• Full-stack development\n• Database architecture\n• Testing & QA\n• Deployment & training\n• Ongoing support\n\nWe build solutions tailored to your exact business needs.',
-        'keywords': 'custom development, bespoke software'
+        'tags': ['custom development', 'bespoke software'],
+        'confidence_score': 0.95
     },
 
     # Services - Cloud
@@ -63,7 +68,8 @@ knowledge_data = [
         'category': 'services',
         'question': 'cloud services|cloud infrastructure|aws|azure',
         'answer': 'Our cloud infrastructure services:\n\n• Cloud migration & setup\n• AWS, Azure, Google Cloud\n• Scalable architecture design\n• Load balancing & auto-scaling\n• Security & compliance\n• Monitoring & maintenance\n• Cost optimization\n\n99.9% uptime guarantee.',
-        'keywords': 'cloud, infrastructure, aws, azure'
+        'tags': ['cloud', 'infrastructure', 'aws', 'azure'],
+        'confidence_score': 0.95
     },
 
     # Contact Information
@@ -71,7 +77,8 @@ knowledge_data = [
         'category': 'contact',
         'question': 'contact|phone|email|address|location',
         'answer': 'Contact E-Click:\n\n📞 Phone: +27 76 740 1777\n📧 Email: info@eclick.co.za\n📍 Address: 318 The Hillside Street, Lynnwood, Pretoria, 0081\n\n⏰ Hours: Monday-Friday, 7AM-4PM\n\nFeel free to reach out anytime!',
-        'keywords': 'contact, phone, email, address'
+        'tags': ['contact', 'phone', 'email', 'address'],
+        'confidence_score': 0.95
     },
 
     # Company Info
@@ -79,7 +86,8 @@ knowledge_data = [
         'category': 'company',
         'question': 'about|who are you|company info|experience',
         'answer': 'E-Click is a leading software development company with:\n\n• 10+ years of experience\n• 200+ successful projects\n• 50+ enterprise clients\n• Fortune 500 company partnerships\n\nWe specialize in delivering innovative, enterprise-grade software solutions that help businesses grow and succeed.',
-        'keywords': 'about, company, experience'
+        'tags': ['about', 'company', 'experience'],
+        'confidence_score': 0.95
     },
 
     # Technologies
@@ -87,7 +95,8 @@ knowledge_data = [
         'category': 'technology',
         'question': 'technologies|tech stack|programming languages|frameworks',
         'answer': 'We work with cutting-edge technologies:\n\n• Frontend: React, Vue.js, Angular\n• Backend: Node.js, Python, Django, .NET\n• Mobile: React Native, Flutter\n• Cloud: AWS, Azure, Google Cloud\n• Database: PostgreSQL, MySQL, MongoDB\n• DevOps: Docker, Kubernetes, CI/CD\n\nWe choose the best tech for your needs.',
-        'keywords': 'technology, tech stack, programming'
+        'tags': ['technology', 'tech stack', 'programming'],
+        'confidence_score': 0.95
     },
 
     # Timeline
@@ -95,7 +104,8 @@ knowledge_data = [
         'category': 'timeline',
         'question': 'how long|timeline|duration|project time',
         'answer': 'Project timelines vary by complexity:\n\n• Basic Website: 2-4 weeks\n• Business Website: 4-8 weeks\n• E-commerce: 8-12 weeks\n• Mobile App: 12-24 weeks\n• Enterprise Solution: 6-12 months\n\nWe provide detailed timelines during consultation.',
-        'keywords': 'timeline, duration, how long'
+        'tags': ['timeline', 'duration'],
+        'confidence_score': 0.95
     },
 
     # Support
@@ -103,7 +113,8 @@ knowledge_data = [
         'category': 'support',
         'question': 'support|maintenance|help after launch|post-launch',
         'answer': 'We offer comprehensive support:\n\n• 24/7 emergency support\n• Regular maintenance\n• Security updates\n• Performance monitoring\n• Bug fixes\n• Feature enhancements\n• Training & documentation\n\nAll projects include 3-6 months free support.',
-        'keywords': 'support, maintenance, post-launch'
+        'tags': ['support', 'maintenance', 'post-launch'],
+        'confidence_score': 0.95
     },
 
     # Industries
@@ -111,7 +122,8 @@ knowledge_data = [
         'category': 'industries',
         'question': 'industries|sectors|who do you work with',
         'answer': 'We serve diverse industries:\n\n• Financial Services\n• Healthcare\n• E-commerce & Retail\n• Manufacturing\n• Education\n• Real Estate\n• Transportation & Logistics\n• Government\n\nOur solutions are customized for each sector.',
-        'keywords': 'industries, sectors, clients'
+        'tags': ['industries', 'sectors', 'clients'],
+        'confidence_score': 0.95
     },
 
     # Process
@@ -119,7 +131,8 @@ knowledge_data = [
         'category': 'process',
         'question': 'process|workflow|how do you work|methodology',
         'answer': 'Our development process:\n\n1. Discovery & Planning\n2. Design & Prototyping\n3. Development & Testing\n4. Deployment & Training\n5. Support & Maintenance\n\nWe use Agile methodology with regular updates and client involvement.',
-        'keywords': 'process, workflow, methodology'
+        'tags': ['process', 'workflow', 'methodology'],
+        'confidence_score': 0.95
     },
 
     # Payment
@@ -127,7 +140,8 @@ knowledge_data = [
         'category': 'payment',
         'question': 'payment|payment terms|how to pay|invoice',
         'answer': 'Flexible payment options:\n\n• Milestone-based payments\n• 30% upfront deposit\n• 40% mid-project\n• 30% upon completion\n• Monthly retainers available\n• Bank transfer, credit card\n\nCustom payment plans for enterprise clients.',
-        'keywords': 'payment, terms, invoice'
+        'tags': ['payment', 'terms', 'invoice'],
+        'confidence_score': 0.95
     },
 ]
 
