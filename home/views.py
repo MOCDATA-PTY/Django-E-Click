@@ -386,8 +386,8 @@ def dashboard(request):
 
 @login_required
 def analytics(request):
-    if not request.user.is_staff:
-        messages.error(request, 'Access denied. Staff privileges required.')
+    if not request.user.is_superuser:
+        messages.error(request, 'Access denied. Admin privileges required.')
         return redirect('login')
     
     # Get real data from database
@@ -1104,8 +1104,8 @@ def settings(request):
 
 @login_required
 def reports(request):
-    if not request.user.is_staff:
-        messages.error(request, 'Access denied. Staff privileges required.')
+    if not request.user.is_superuser:
+        messages.error(request, 'Access denied. Admin privileges required.')
         return redirect('login')
     
     # Get date range for filtering (default to last 30 days)
@@ -4347,14 +4347,18 @@ def assign_users_to_project(request, project_id):
 
 @require_admin_access
 def admin_control(request):
-    
+    # Require superuser access
+    if not request.user.is_superuser:
+        messages.error(request, 'Access denied. Admin privileges required.')
+        return redirect('dashboard')
+
     from django.db.models import Count, Q
     from django.utils import timezone
     from datetime import datetime, timedelta
     import json
     import os
     import shutil
-    
+
     # Get system statistics
     total_users = User.objects.count()
     total_clients = Client.objects.count()
@@ -5630,8 +5634,8 @@ def dashboard_gantt_data(request):
 
 @login_required
 def send_report(request):
-    if not request.user.is_staff:
-        messages.error(request, 'Access denied. Staff privileges required.')
+    if not request.user.is_superuser:
+        messages.error(request, 'Access denied. Admin privileges required.')
         return redirect('login')
     
     # Log navigation to send report page
@@ -6889,7 +6893,11 @@ def user_reset_password(request):
 
 @login_required
 def team_dashboard(request):
-    """Team member dashboard showing assigned projects and tasks"""
+    """Team member dashboard showing assigned projects and tasks (Staff/Employees only)"""
+    # Redirect clients to client dashboard
+    if not request.user.is_staff:
+        return redirect('client_dashboard')
+
     # Get user's assigned projects
     assigned_projects = Project.objects.filter(assigned_users=request.user)
     
@@ -7823,7 +7831,7 @@ def admin_send_message(request):
 @login_required
 def system_logs(request):
     """System logs page for admins"""
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         messages.error(request, 'Access denied. Admin privileges required.')
         return redirect('dashboard')
     
@@ -8900,6 +8908,8 @@ def download_backup(request, backup_id):
         messages.error(request, f'Error downloading backup: {str(e)}')
     
     return redirect('backup_management')
+
+@csrf_exempt
 def ai_chat(request):
     """AI Chat endpoint for robot interactions"""
     if request.method == 'POST':
@@ -9247,7 +9257,7 @@ def chatbot_stats(request):
 def satisfaction_report(request):
     """Satisfaction report page (Admin only)"""
     # Check if user is admin
-    if not request.user.is_staff:
+    if not request.user.is_superuser:
         return redirect('home:index')
 
     from .models import ChatbotFeedback
@@ -9269,11 +9279,14 @@ def satisfaction_report(request):
     thirty_days_ago = timezone.now() - timedelta(days=30)
     recent_count = ChatbotFeedback.objects.filter(created_at__gte=thirty_days_ago).count()
 
-    # Get feedback by day for the last 7 days
-    seven_days_ago = timezone.now() - timedelta(days=7)
+    # Get feedback by day for the last 30 days for trend chart
     daily_feedback = []
-    for i in range(7):
-        day = timezone.now() - timedelta(days=6-i)
+    chart_labels = []
+    chart_ratings = []
+    chart_counts = []
+
+    for i in range(30):
+        day = timezone.now() - timedelta(days=29-i)
         day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
         day_end = day.replace(hour=23, minute=59, second=59, microsecond=999999)
 
@@ -9295,19 +9308,17 @@ def satisfaction_report(request):
             'avg_rating': round(avg_rating, 2) if avg_rating else 0
         })
 
+        # Data for chart
+        chart_labels.append(day.strftime('%b %d'))
+        chart_ratings.append(round(avg_rating, 2) if avg_rating else None)
+        chart_counts.append(count)
+
     # Get recent detailed feedback
     recent_feedback = ChatbotFeedback.objects.filter(
         Q(feedback_text__isnull=False) | Q(satisfaction_rating__isnull=False)
     ).select_related().order_by('-created_at')[:20]
 
-    # Emoji mapping
-    emoji_map = {
-        1: '😞',
-        2: '😐',
-        3: '😊',
-        4: '😄',
-        5: '😄'
-    }
+    import json
 
     context = {
         'avg_satisfaction': avg_satisfaction,
@@ -9317,7 +9328,9 @@ def satisfaction_report(request):
         'recent_count': recent_count,
         'daily_feedback': daily_feedback,
         'recent_feedback': recent_feedback,
-        'emoji_map': emoji_map,
+        'chart_labels': json.dumps(chart_labels),
+        'chart_ratings': json.dumps(chart_ratings),
+        'chart_counts': json.dumps(chart_counts),
     }
 
     return render(request, 'home/satisfaction_report.html', context)
@@ -9519,3 +9532,214 @@ def password_reset_confirm(request, uidb64, token):
 def password_reset_complete(request):
     """Show confirmation that password was reset"""
     return render(request, 'home/password_reset_complete.html')
+
+
+@login_required
+def eclick_chats(request):
+    """Eclick Chats page - where clients and employees can send messages to devs"""
+    from .models import DevMessage, Project
+    from django.db.models import Count, Q
+    from django.contrib import messages as django_messages
+
+    # Handle POST request (sending new message)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'send_message':
+            message_type = request.POST.get('message_type', 'feedback')
+            subject = request.POST.get('subject', '').strip()
+            message = request.POST.get('message', '').strip()
+            priority = request.POST.get('priority', 'medium')
+            project_id = request.POST.get('project')
+
+            # Truncate subject to fit database limit (1000 chars)
+            max_subject_length = 1000
+            if len(subject) > max_subject_length:
+                subject = subject[:max_subject_length - 3] + '...'
+
+            if subject and message:
+                dev_message = DevMessage.objects.create(
+                    user=request.user,
+                    message_type=message_type,
+                    subject=subject,
+                    message=message,
+                    priority=priority,
+                    project_id=project_id if project_id else None
+                )
+
+                # Send email notification to admin
+                try:
+                    from .email_service import email_service
+
+                    # Get project name if available
+                    project_name = 'None'
+                    if project_id:
+                        try:
+                            project = Project.objects.get(id=project_id)
+                            project_name = project.name
+                        except Project.DoesNotExist:
+                            pass
+
+                    # Prepare email content
+                    email_subject = f"New Message from {request.user.get_full_name() or request.user.username}"
+
+                    # Read and encode the logo
+                    import base64
+                    logo_path = os.path.join(django_settings.BASE_DIR, 'static', 'images', 'E Click Logo (1).png')
+                    with open(logo_path, 'rb') as logo_file:
+                        logo_data = base64.b64encode(logo_file.read()).decode()
+
+                    # Build HTML email body with logo
+                    email_body = f"""<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="data:image/png;base64,{logo_data}" alt="E-Click Logo" style="max-width: 200px;">
+    </div>
+
+    <p><strong>Subject:</strong> {subject}</p>
+
+    <p><strong>Message:</strong></p>
+    <p>{message}</p>
+
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+    <p style="text-align: center; color: #666; font-size: 14px;">E-Click Project Management System</p>
+</body>
+</html>"""
+
+                    # Send email to admin
+                    email_service.send_email(
+                        to_email='ethan.sevenster@moc-pty.com',
+                        subject=email_subject,
+                        body=email_body
+                    )
+                except Exception as e:
+                    # Log error but don't fail the message submission
+                    logger.error(f"Failed to send email notification: {e}")
+
+                django_messages.success(request, 'Your message has been sent successfully!')
+                return redirect('eclick_chats')
+            else:
+                django_messages.error(request, 'Please provide both subject and message.')
+
+        elif action == 'respond' and request.user.is_staff:
+            message_id = request.POST.get('message_id')
+            response = request.POST.get('response', '').strip()
+
+            if message_id and response:
+                try:
+                    dev_message = DevMessage.objects.get(id=message_id)
+                    dev_message.admin_response = response
+                    dev_message.responded_by = request.user
+                    dev_message.responded_at = timezone.now()
+                    dev_message.status = 'resolved'
+                    dev_message.save()
+                    django_messages.success(request, 'Response sent successfully!')
+                except DevMessage.DoesNotExist:
+                    django_messages.error(request, 'Message not found.')
+
+        elif action == 'update_status' and request.user.is_staff:
+            message_id = request.POST.get('message_id')
+            new_status = request.POST.get('status')
+
+            if message_id and new_status:
+                try:
+                    dev_message = DevMessage.objects.get(id=message_id)
+                    dev_message.status = new_status
+                    dev_message.save()
+                    django_messages.success(request, 'Status updated successfully!')
+                except DevMessage.DoesNotExist:
+                    django_messages.error(request, 'Message not found.')
+
+        elif action == 'delete_message' and request.user.is_staff:
+            message_id = request.POST.get('message_id')
+
+            if message_id:
+                try:
+                    dev_message = DevMessage.objects.get(id=message_id)
+                    dev_message.delete()
+                    django_messages.success(request, 'Message deleted successfully!')
+                    return redirect('eclick_chats')
+                except DevMessage.DoesNotExist:
+                    django_messages.error(request, 'Message not found.')
+
+    # Get messages based on user role
+    if request.user.is_staff:
+        # Admin sees all messages
+        all_messages = DevMessage.objects.select_related('user', 'project', 'responded_by').all()
+    else:
+        # Regular users see only their messages
+        all_messages = DevMessage.objects.filter(user=request.user).select_related('project', 'responded_by').all()
+
+    # Apply filters from GET parameters
+    from datetime import timedelta
+
+    # Date filter
+    date_filter = request.GET.get('date_filter', 'all')
+    if date_filter == 'week':
+        week_ago = timezone.now() - timedelta(days=7)
+        all_messages = all_messages.filter(created_at__gte=week_ago)
+    elif date_filter == 'month':
+        month_ago = timezone.now() - timedelta(days=30)
+        all_messages = all_messages.filter(created_at__gte=month_ago)
+    elif date_filter == 'today':
+        today_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        all_messages = all_messages.filter(created_at__gte=today_start)
+
+    # Search filter
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        all_messages = all_messages.filter(
+            Q(subject__icontains=search_query) |
+            Q(message__icontains=search_query) |
+            Q(user__username__icontains=search_query) |
+            Q(user__first_name__icontains=search_query) |
+            Q(user__last_name__icontains=search_query)
+        )
+
+    # Status filter
+    status_filter = request.GET.get('status', '')
+    if status_filter:
+        all_messages = all_messages.filter(status=status_filter)
+
+    # Message type filter
+    type_filter = request.GET.get('type', '')
+    if type_filter:
+        all_messages = all_messages.filter(message_type=type_filter)
+
+    # Get statistics
+    total_messages = all_messages.count()
+    new_messages = all_messages.filter(status='new').count()
+    resolved_messages = all_messages.filter(status='resolved').count()
+
+    # Get messages by type
+    messages_by_type = all_messages.values('message_type').annotate(count=Count('id'))
+
+    # Get user's projects for dropdown
+    if request.user.is_staff:
+        user_projects = Project.objects.all()
+    else:
+        user_projects = Project.objects.filter(
+            Q(assigned_users=request.user) | Q(client_username=request.user.username)
+        ).distinct()
+
+    # Admin sees full dashboard with stats, regular users see simple form
+    if request.user.is_staff:
+        context = {
+            'dev_messages': all_messages.order_by('-created_at')[:100],  # Latest 100 messages
+            'total_messages': total_messages,
+            'new_messages': new_messages,
+            'resolved_messages': resolved_messages,
+            'messages_by_type': messages_by_type,
+            'user_projects': user_projects,
+            'is_admin': request.user.is_staff,
+            'current_date_filter': date_filter,
+            'current_search': search_query,
+            'current_status': status_filter,
+            'current_type': type_filter,
+        }
+        return render(request, 'home/eclickchatsadmin.html', context)
+    else:
+        context = {
+            'user_projects': user_projects,
+        }
+        return render(request, 'home/eclick_chats.html', context)
