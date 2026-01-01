@@ -4,16 +4,16 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'eclick.settings')
 django.setup()
 
-from home.models import AIKnowledge
+from home.models import AIKnowledgeBase
 
 print("=" * 80)
 print("SYNCING CHATBOT KNOWLEDGE TO DATABASE")
 print("=" * 80)
 
 # Clear existing knowledge
-existing_count = AIKnowledge.objects.count()
+existing_count = AIKnowledgeBase.objects.count()
 print(f"\nFound {existing_count} existing knowledge entries")
-AIKnowledge.objects.all().delete()
+AIKnowledgeBase.objects.all().delete()
 print("Cleared all existing knowledge")
 
 # Add comprehensive knowledge base
@@ -134,19 +134,19 @@ knowledge_data = [
 # Add all knowledge to database
 created_count = 0
 for item in knowledge_data:
-    AIKnowledge.objects.create(**item)
+    AIKnowledgeBase.objects.create(**item)
     created_count += 1
 
 print(f"\n[SUCCESS] Added {created_count} knowledge entries to database")
 
 # Verify
-total = AIKnowledge.objects.count()
+total = AIKnowledgeBase.objects.count()
 print(f"\nVerification: {total} total knowledge entries in database")
 
 # Show breakdown by category
 print("\nBreakdown by category:")
 from django.db.models import Count
-categories = AIKnowledge.objects.values('category').annotate(count=Count('id')).order_by('category')
+categories = AIKnowledgeBase.objects.values('category').annotate(count=Count('id')).order_by('category')
 for cat in categories:
     print(f"  - {cat['category']}: {cat['count']} entries")
 
