@@ -171,6 +171,12 @@ GRAPH_CLIENT_ID = os.environ.get('GRAPH_CLIENT_ID', '2b89897f-049e-467e-9413-9d1
 GRAPH_CLIENT_SECRET = os.environ.get('GRAPH_CLIENT_SECRET', 'p4n8Q~X3z4JW~6kwY8dz~jRuFOXbOpMtBUkHTaCY')
 GRAPH_TENANT_ID = os.environ.get('GRAPH_TENANT_ID', 'e1aca71e-e160-4d3d-a40f-5738d03de05e')
 
+# Google reCAPTCHA v2 Configuration
+# Get your keys at: https://www.google.com/recaptcha/admin/create
+RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY', '6LcqSGEsAAAAANfaLORHNmAtugZqbOP2gKOehx8L')
+RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY', '6LcqSGEsAAAAAAFnRzr7WQvypC8GUj06w1Q6NUuY')
+RECAPTCHA_REQUIRED_SCORE = 0.85  # For v3, not used in v2
+
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
     'main.backends.EmailBackend',
