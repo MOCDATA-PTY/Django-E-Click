@@ -1,0 +1,107 @@
+<nav class="fixed w-full z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-lg h-16" id="navbar" style="width: 100% !important; left: 0 !important; right: 0 !important;">
+ <div class="container mx-auto px-4 sm:px-6 lg:px-8 h-full">
+   <div class="flex justify-between items-center h-full">
+     <!-- Logo -->
+     <a href="{% url 'home' %}" class="flex items-center gap-2 lg:gap-3 group">
+       <div class="relative">
+         <img src="/static/images/E%20Click%20Logo%20(1).png" alt="E-Click Logo" class="h-10 w-auto transition-transform duration-300 group-hover:scale-105 dark:hidden" loading="eager" fetchpriority="high">
+         <img src="/static/images/E%20Click%20Logo%20(2).png" alt="E-Click Logo" class="h-10 w-auto transition-transform duration-300 group-hover:scale-105 hidden dark:block" loading="eager" fetchpriority="high">
+       </div>
+     </a>
+     
+     <!-- Desktop Navigation -->
+     <div class="hidden md:flex items-center gap-8">
+       <a href="{% url 'home' %}" class="nav-link {% if current == 'home' %}text-red-600 dark:text-red-400{% else %}text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400{% endif %} font-medium transition-all duration-300 relative {% if current != 'home' %}group{% endif %}">
+         Home
+         {% if current == 'home' %}
+           <span class="absolute -bottom-2 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 rounded-full"></span>
+         {% else %}
+           <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+         {% endif %}
+       </a>
+       <a href="{% url 'services' %}" class="nav-link {% if current == 'services' %}text-red-600 dark:text-red-400{% else %}text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400{% endif %} font-medium transition-all duration-300 relative {% if current != 'services' %}group{% endif %}">
+         Services
+         {% if current == 'services' %}
+           <span class="absolute -bottom-2 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 rounded-full"></span>
+         {% else %}
+           <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+         {% endif %}
+       </a>
+       <a href="{% url 'solutions' %}" class="nav-link {% if current == 'solutions' %}text-red-600 dark:text-red-400{% else %}text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400{% endif %} font-medium transition-all duration-300 relative {% if current != 'solutions' %}group{% endif %}">
+         Solutions
+         {% if current == 'solutions' %}
+           <span class="absolute -bottom-2 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 rounded-full"></span>
+         {% else %}
+           <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+         {% endif %}
+       </a>
+       <a href="{% url 'about' %}" class="nav-link {% if current == 'about' %}text-red-600 dark:text-red-400{% else %}text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400{% endif %} font-medium transition-all duration-300 relative {% if current != 'about' %}group{% endif %}">
+         About
+         {% if current == 'about' %}
+           <span class="absolute -bottom-2 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 rounded-full"></span>
+         {% else %}
+           <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+         {% endif %}
+       </a>
+       <a href="{% url 'clients' %}" class="nav-link {% if current == 'clients' %}text-red-600 dark:text-red-400{% else %}text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400{% endif %} font-medium transition-all duration-300 relative {% if current != 'clients' %}group{% endif %}">
+         Clients
+         {% if current == 'clients' %}
+           <span class="absolute -bottom-2 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 rounded-full"></span>
+         {% else %}
+           <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+         {% endif %}
+       </a>
+       <a href="{% url 'contact' %}" class="nav-link {% if current == 'contact' %}text-red-600 dark:text-red-400{% else %}text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400{% endif %} font-medium transition-all duration-300 relative {% if current != 'contact' %}group{% endif %}">
+         Contact
+         {% if current == 'contact' %}
+           <span class="absolute -bottom-2 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 rounded-full"></span>
+         {% else %}
+           <span class="absolute -bottom-2 left-0 w-0 h-0.5 bg-red-600 dark:bg-red-400 rounded-full group-hover:w-full transition-all duration-300"></span>
+         {% endif %}
+       </a>
+     </div>
+     
+     <!-- Right Side: Auth -->
+     <div class="flex items-center gap-1">
+       <!-- Auth Button -->
+       <a href="/login/" class="px-6 py-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium transition-all duration-300 hover:scale-105 whitespace-nowrap">
+         login
+       </a>
+       
+       <!-- Mobile Menu Button -->
+       <button id="mobile-menu-button" class="md:hidden p-2 rounded-lg text-slate-600 dark:text-slate-400 border-0 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800" style="width: auto !important; padding: 0.5rem !important; font-size: inherit !important; outline: none !important;">
+         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+         </svg>
+       </button>
+     </div>
+   </div>
+ </div>
+ 
+ <!-- Mobile Menu -->
+ <div id="mobile-menu" class="md:hidden bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 hidden">
+   <div class="px-4 py-2 space-y-2">
+     <a href="{% url 'home' %}" class="block px-3 py-2 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 {% if current == 'home' %}text-red-600 dark:text-red-400 font-medium{% endif %}">Home</a>
+     <a href="{% url 'services' %}" class="block px-3 py-2 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition-colors {% if current == 'services' %}text-red-600 dark:text-red-400 font-medium{% endif %}">Services</a>
+     <a href="{% url 'solutions' %}" class="block px-3 py-2 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition-colors {% if current == 'solutions' %}text-red-600 dark:text-red-400 font-medium{% endif %}">Solutions</a>
+     <a href="{% url 'about' %}" class="block px-3 py-2 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition-colors {% if current == 'about' %}text-red-600 dark:text-red-400 font-medium{% endif %}">About</a>
+     <a href="{% url 'clients' %}" class="block px-3 py-2 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition-colors {% if current == 'clients' %}text-red-600 dark:text-red-400 font-medium{% endif %}">Clients</a>
+     <a href="{% url 'contact' %}" class="block px-3 py-2 text-slate-600 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 transition-colors {% if current == 'contact' %}text-red-600 dark:text-red-400 font-medium{% endif %}">Contact</a>
+   </div>
+ </div>
+</nav>
+
+<script>
+// Mobile menu functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+});
+</script>
+

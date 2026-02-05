@@ -1,0 +1,3314 @@
+{% extends 'home/dashboard_base.html' %}
+
+{% block content %}
+<div class="main-content">
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}message-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Hidden CSRF token for JavaScript -->
+    <input type="hidden" id="csrf-token" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <!-- Enhanced Edit Project Modal -->
+    <div class="edit-project-container">
+        <div class="edit-project-card">
+                            <div class="edit-project-header">
+                    <h2>Edit Project</h2>
+                </div>
+            <div class="edit-project-body">
+                <!-- Tabs -->
+                <div class="edit-project-tabs">
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="basic-info">
+                            <svg class="tab-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Basic Info
+                        </button>
+                        <button class="tab-btn" data-tab="tasks-breakdown">
+                            <svg class="tab-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            Tasks & Subtasks
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Basic Info Tab -->
+                <div class="tab-content active" id="basic-info">
+                    <form id="basicProjectForm" method="POST" action="{% url 'edit_project' project.id %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="project_name">Project Name *</label>
+                            <input type="text" id="project_name" name="name" value="{{ project.name }}" required>
+                        </div>
+                        
+                        <!-- Client Information Section -->
+                        <div class="client-info-section">
+                            <h3>Client Information</h3>
+                            <p class="section-description">Update the client details for this project</p>
+                            
+                            <div class="form-group">
+                                <label for="client_name">Client Name *</label>
+                                <input type="text" id="client_name" name="client" value="{{ project.client }}" required>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="client_username">Client Username</label>
+                                    <input type="text" id="client_username" name="client_username" value="{{ project.client_username }}" placeholder="Username for client login">
+                                    <small>Used for client portal access</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="client_email">Client Email *</label>
+                                    <input type="email" id="client_email" name="client_email" value="{{ project.client_email }}" required>
+                                    <small>Primary contact email for project communications</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="project_status">Status *</label>
+                                <select id="project_status" name="status" required>
+                                    <option value="planned" {% if project.status == 'planned' %}selected{% endif %}>Planned</option>
+                                    <option value="in_progress" {% if project.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                    <option value="completed" {% if project.status == 'completed' %}selected{% endif %}>Completed</option>
+                                </select>
+                            </div>
+                            
+
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Project Duration (Auto-calculated)</label>
+                            <div class="duration-display" id="project-duration-display">
+                                {% if project.start_date and project.end_date %}
+                                    {{ project.start_date|date:"M d, Y" }} - {{ project.end_date|date:"M d, Y" }}
+                                {% else %}
+                                    Not set (add tasks with dates)
+                                {% endif %}
+                            </div>
+                            <div class="duration-warning" id="duration-warning" style="display: none;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                                <span>Warning: Tasks added but no dates set. Project will not have start/end dates.</span>
+                            </div>
+                            <small class="help-text">Project dates are automatically calculated from task start and end dates</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="assigned_users">Assign Users (Optional)</label>
+                            <div class="users-dropdown-container">
+                                <button type="button" class="users-dropdown-toggle" onclick="toggleUsersDropdown()">
+                                    <span class="selected-users-text">
+                                        {% if project.assigned_users.all %}
+                                            {{ project.assigned_users.count }} user(s) selected
+                                        {% else %}
+                                            Select users...
+                                        {% endif %}
+                                    </span>
+                                    <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6,9 12,15 18,9"></polyline>
+                                    </svg>
+                                </button>
+                                <div class="users-dropdown-menu" id="usersDropdown">
+                                    <div class="users-dropdown-header">
+                                        <input type="text" class="user-search-input" placeholder="Search users..." onkeyup="filterUsers(this.value)">
+                                    </div>
+                                    <div class="users-dropdown-list">
+                                        {% for user in all_users %}
+                                            <label class="user-dropdown-option">
+                                                <div class="user-info">
+                                                    <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                                                    {% if user.is_staff %}<span class="user-admin-badge">Admin</span>{% endif %}
+                                                </div>
+                                                <div class="checkbox-container">
+                                                    <input type="checkbox" name="assigned_users" value="{{ user.id }}" class="user-checkbox"
+                                                           {% if user in project.assigned_users.all %}checked{% endif %}>
+                                                    <span class="checkmark"></span>
+                                                </div>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="selected-users-display" id="selectedUsersDisplay">
+                                {% if project.assigned_users.all %}
+                                    <div class="selected-users-list">
+                                        <strong>Assigned Team Members:</strong>
+                                        {% for user in project.assigned_users.all %}
+                                            <span class="selected-user-badge">
+                                                {{ user.get_full_name|default:user.username }}
+                                                {% if user.is_staff %}<span class="admin-indicator">(Admin)</span>{% endif %}
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <small>Click to select/deselect users</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="assigned_clients">Assign Clients (Optional)</label>
+                            <div class="users-dropdown-container">
+                                <button type="button" class="users-dropdown-toggle" onclick="toggleClientsDropdown()">
+                                    <span class="selected-clients-text">
+                                        {% if project.clients.all %}
+                                            {{ project.clients.count }} client(s) selected
+                                        {% else %}
+                                            Select clients...
+                                        {% endif %}
+                                    </span>
+                                    <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="6,9 12,15 18,9"></polyline>
+                                    </svg>
+                                </button>
+                                <div class="users-dropdown-menu" id="clientsDropdown">
+                                    <div class="users-dropdown-header">
+                                        <input type="text" class="user-search-input" placeholder="Search clients..." onkeyup="filterClients(this.value)">
+                                    </div>
+                                    <div class="users-dropdown-list" id="clientsDropdownList">
+                                        {% for client in all_clients %}
+                                            <label class="user-dropdown-option client-option">
+                                                <div class="user-info">
+                                                    <span class="user-name">{{ client.username }}</span>
+                                                    <span class="user-email">({{ client.email }})</span>
+                                                </div>
+                                                <input type="checkbox" name="assigned_clients" value="{{ client.id }}" class="client-checkbox" style="display: none;"
+                                                       {% if client in project.clients.all %}checked{% endif %}>
+                                                <span class="client-dot {% if client in project.clients.all %}selected{% endif %}"></span>
+                                            </label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="selected-users-display" id="selectedClientsDisplay">
+                                {% if project.clients.all %}
+                                    <div class="selected-users-list">
+                                        <strong>Assigned Clients:</strong>
+                                        {% for client in project.clients.all %}
+                                            <span class="selected-user-badge">
+                                                {{ client.username }}
+                                                <span class="admin-indicator">({{ client.email }})</span>
+                                            </span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <small>Click to select/deselect clients who can access this project</small>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="window.location.href='{% url 'projects_page' %}'">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Update Project</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Tasks Breakdown Tab -->
+                <div class="tab-content" id="tasks-breakdown">
+                    <div class="section-title">Project Tasks</div>
+                    
+                    <!-- Add New Task Button -->
+                    <div class="add-task-section">
+                        <button type="button" class="add-task-btn" onclick="openAddTaskModal()">+ Add New Task</button>
+                    </div>
+                    
+                    <!-- Existing Tasks -->
+                    <div class="existing-tasks">
+                        {% for task in project.tasks.all %}
+                        <div class="task-item" data-task-id="{{ task.id }}">
+                            <div class="task-header">
+                                <div class="task-info">
+                                    <h4>{{ task.title }}</h4>
+                                    <span class="task-status {{ task.status }}">{{ task.get_status_display }}</span>
+                                    <span class="task-priority {{ task.priority }}">{{ task.get_priority_display }}</span>
+                                </div>
+                                <div class="task-actions">
+                                    <div class="status-change-dropdown">
+                                        <button type="button" class="btn btn-sm btn-outline dropdown-toggle" onclick="toggleStatusDropdown({{ task.id }})">
+                                            <span class="status-text">{{ task.get_status_display }}</span>
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polyline points="6,9 12,15 18,9"></polyline>
+                                            </svg>
+                                        </button>
+                                        <div class="status-dropdown-menu" id="status-dropdown-{{ task.id }}">
+                                            <button type="button" class="status-option" onclick="changeTaskStatus({{ task.id }}, 'not_started')">Not Started</button>
+                                            <button type="button" class="status-option" onclick="changeTaskStatus({{ task.id }}, 'in_progress')">In Progress</button>
+                                            <button type="button" class="status-option" onclick="changeTaskStatus({{ task.id }}, 'completed')">Completed</button>
+                                            <button type="button" class="status-option" onclick="changeTaskStatus({{ task.id }}, 'on_hold')">On Hold</button>
+                                            <button type="button" class="status-option" onclick="changeTaskStatus({{ task.id }}, 'cancelled')">Cancelled</button>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-info" onclick="toggleEditTask({{ task.id }})">Edit</button>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteTask({{ task.id }})">Delete</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Task Edit Form (Hidden by default) -->
+                            <div class="task-edit-form" id="task-edit-{{ task.id }}" style="display: none;">
+                                <form id="task-edit-form-{{ task.id }}" method="POST" action="{% url 'edit_task' project.id task.id %}">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="task_title_{{ task.id }}">Task Title *</label>
+                                        <input type="text" id="task_title_{{ task.id }}" name="title" value="{{ task.title }}" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="task_description_{{ task.id }}">Description</label>
+                                        <textarea id="task_description_{{ task.id }}" name="description" rows="3">{{ task.description }}</textarea>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="task_priority_{{ task.id }}">Priority *</label>
+                                            <select id="task_priority_{{ task.id }}" name="priority" required>
+                                                <option value="low" {% if task.priority == 'low' %}selected{% endif %}>Low</option>
+                                                <option value="medium" {% if task.priority == 'medium' %}selected{% endif %}>Medium</option>
+                                                <option value="high" {% if task.priority == 'high' %}selected{% endif %}>High</option>
+                                                <option value="urgent" {% if task.priority == 'urgent' %}selected{% endif %}>Urgent</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="task_status_{{ task.id }}">Status *</label>
+                                            <select id="task_status_{{ task.id }}" name="status" required>
+                                                <option value="not_started">Not Started</option>
+                                                <option value="in_progress">In Progress</option>
+                                                <option value="in_progress_guidance_required">In Progress (Guidance Required)</option>
+                                                <option value="completed">Completed</option>
+                                                <option value="completed_review_pending">Completed (Review Pending)</option>
+                                                <option value="completed_data_discrepancy_addressing">Completed (Data Discrepancy addressing)</option>
+                                                <option value="on_hold">On Hold</option>
+                                                <option value="cancelled">Cancelled</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="task_development_status_{{ task.id }}">Development Status *</label>
+                                        <select id="task_development_status_{{ task.id }}" name="development_status" required>
+                                            <option value="original_quoted" {% if task.development_status == 'original_quoted' %}selected{% endif %}>Original/Quoted Development</option>
+                                            <option value="new_development" {% if task.development_status == 'new_development' %}selected{% endif %}>New Development</option>
+                                            <option value="new_development_qms" {% if task.development_status == 'new_development_qms' %}selected{% endif %}>New Development – QMS must be involved</option>
+                                            <option value="new_development_qms_change" {% if task.development_status == 'new_development_qms_change' %}selected{% endif %}>New Development – QMS Change</option>
+                                            <option value="new_quoted_development" {% if task.development_status == 'new_quoted_development' %}selected{% endif %}>New Development/Quoted Development</option>
+                                            <option value="ongoing_development" {% if task.development_status == 'ongoing_development' %}selected{% endif %}>Ongoing Development</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="task_start_date_{{ task.id }}">Start Date</label>
+                                            <input type="date" id="task_start_date_{{ task.id }}" name="start_date" 
+                                                   value="{% if task.start_date %}{{ task.start_date|date:'Y-m-d' }}{% endif %}">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="task_end_date_{{ task.id }}">End Date</label>
+                                            <input type="date" id="task_end_date_{{ task.id }}" name="end_date" 
+                                                   value="{% if task.end_date %}{{ task.end_date|date:'Y-m-d' }}{% endif %}">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="task_assigned_users_{{ task.id }}">Assigned Users</label>
+                                        <select id="task_assigned_users_{{ task.id }}" name="assigned_users" class="form-select" multiple>
+                                            {% for user in all_users %}
+                                                <option value="{{ user.id }}" {% if user in task.assigned_users.all %}selected{% endif %}>
+                                                    {{ user.get_full_name|default:user.username }} ({{ user.email }})
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <small>Hold Ctrl/Cmd to select multiple users</small>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="button" class="btn btn-secondary" onclick="toggleEditTask({{ task.id }})">Cancel</button>
+                                        <button type="button" class="btn btn-primary" onclick="submitTaskEdit({{ task.id }})">Update Task</button>
+                                    </div>
+                                </form>
+                            </div>
+                            
+                            {% if task.description %}
+                            <div class="task-description">
+                                <p>{{ task.description }}</p>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="task-details">
+                                <span class="task-dates">
+                                    {% if task.start_date and task.end_date %}
+                                        {{ task.start_date|date:"M d" }} - {{ task.end_date|date:"M d" }}
+                                    {% else %}
+                                        No dates set
+                                    {% endif %}
+                                </span>
+                                {% if task.assigned_users.all %}
+                                <span class="task-assigned">Assigned: 
+                                    {% for user in task.assigned_users.all %}
+                                        {{ user.get_full_name|default:user.username }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Subtasks -->
+                            {% if task.subtasks.all %}
+                            <div class="subtasks-section">
+                                <div class="subtasks-header">
+                                    <h5>Subtasks:</h5>
+                                    <button type="button" class="btn btn-xs btn-success" onclick="openAddSubtaskModal({{ task.id }})">+ Add Subtask</button>
+                                </div>
+                                <div class="subtasks-list">
+                                    {% for subtask in task.subtasks.all %}
+                                    <div class="subtask-item {% if subtask.is_completed %}completed{% endif %}" data-subtask-id="{{ subtask.id }}">
+                                        <div class="subtask-content">
+                                            <div class="subtask-header">
+                                                <div class="subtask-info">
+                                                    <h5 class="subtask-title">{{ subtask.title }}</h5>
+                                                    <div class="subtask-badges">
+                                                        <span class="subtask-status-badge {{ subtask.status }}">{{ subtask.get_status_display }}</span>
+                                                        <span class="subtask-priority priority-{{ subtask.priority }}">{{ subtask.get_priority_display }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% if subtask.description %}
+                                            <div class="subtask-description">
+                                                <strong>Description:</strong> {{ subtask.description }}
+                                            </div>
+                                            {% endif %}
+                                            <div class="subtask-details">
+                                                <span class="subtask-dates">
+                                                    <strong>Dates:</strong>
+                                                    {% if subtask.start_date and subtask.end_date %}
+                                                        {{ subtask.start_date|date:"M d, Y" }} - {{ subtask.end_date|date:"M d, Y" }}
+                                                    {% elif subtask.start_date %}
+                                                        Start: {{ subtask.start_date|date:"M d, Y" }}
+                                                    {% elif subtask.end_date %}
+                                                        End: {{ subtask.end_date|date:"M d, Y" }}
+                                                    {% else %}
+                                                        No dates set
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            <div class="subtask-timestamps">
+                                                <small class="text-muted">
+                                                    Created: {{ subtask.created_at|date:"M d, Y g:i A" }}
+                                                    {% if subtask.updated_at != subtask.created_at %}
+                                                    | Updated: {{ subtask.updated_at|date:"M d, Y g:i A" }}
+                                                    {% endif %}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <div class="subtask-actions">
+                                            <div class="status-change-dropdown">
+                                                <button type="button" class="btn btn-xs btn-outline dropdown-toggle" onclick="toggleSubtaskStatusDropdown({{ task.id }}, {{ subtask.id }})">
+                                                    <span class="status-text">{{ subtask.get_status_display }}</span>
+                                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <polyline points="6,9 12,15 18,9"></polyline>
+                                                    </svg>
+                                                </button>
+                                                <div class="status-dropdown-menu" id="subtask-status-dropdown-{{ task.id }}-{{ subtask.id }}">
+                                                    <button type="button" class="status-option" onclick="changeSubtaskStatus({{ task.id }}, {{ subtask.id }}, 'not_started')">Not Started</button>
+                                                    <button type="button" class="status-option" onclick="changeSubtaskStatus({{ task.id }}, {{ subtask.id }}, 'in_progress')">In Progress</button>
+                                                    <button type="button" class="status-option" onclick="changeSubtaskStatus({{ task.id }}, {{ subtask.id }}, 'completed')">Completed</button>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-xs btn-info" onclick="toggleEditSubtask({{ task.id }}, {{ subtask.id }})">Edit</button>
+                                            <button type="button" class="btn btn-xs btn-danger" onclick="deleteSubtask({{ subtask.id }})">Delete</button>
+                                        </div>
+                                        
+                                                                                <!-- Subtask Edit Form (Hidden by default) -->
+                                        <div class="subtask-edit-form" id="subtask-edit-{{ task.id }}-{{ subtask.id }}" style="display: none;">
+                                            <form method="POST" action="{% url 'edit_subtask' project.id task.id subtask.id %}">
+                                                {% csrf_token %}
+                                                <div class="form-group">
+                                                    <label for="subtask_title_{{ task.id }}_{{ subtask.id }}">Subtask Title *</label>
+                                                    <input type="text" id="subtask_title_{{ task.id }}_{{ subtask.id }}" name="title" value="{{ subtask.title }}" required>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label for="subtask_description_{{ task.id }}_{{ subtask.id }}">Description</label>
+                                                    <textarea id="subtask_description_{{ task.id }}_{{ subtask.id }}" name="description" rows="3">{{ subtask.description }}</textarea>
+                                                </div>
+                                                
+                                                <div class="form-row">
+                                                    <div class="form-group">
+                                                        <label for="subtask_status_{{ task.id }}_{{ subtask.id }}">Status</label>
+                                                        <select id="subtask_status_{{ task.id }}_{{ subtask.id }}" name="status" class="form-select">
+                                                            <option value="not_started" {% if subtask.status == 'not_started' %}selected{% endif %}>Not Started</option>
+                                                            <option value="in_progress" {% if subtask.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                                            <option value="completed" {% if subtask.status == 'completed' %}selected{% endif %}>Completed</option>
+                                                        </select>
+                                                    </div>
+                                                    
+                                                    <div class="form-group">
+                                                        <label for="subtask_priority_{{ task.id }}_{{ subtask.id }}">Priority</label>
+                                                        <select id="subtask_priority_{{ task.id }}_{{ subtask.id }}" name="priority" class="form-select">
+                                                            <option value="low" {% if subtask.priority == 'low' %}selected{% endif %}>Low</option>
+                                                            <option value="medium" {% if subtask.priority == 'medium' %}selected{% endif %}>Medium</option>
+                                                            <option value="high" {% if subtask.priority == 'high' %}selected{% endif %}>High</option>
+                                                            <option value="urgent" {% if subtask.priority == 'urgent' %}selected{% endif %}>Urgent</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="form-row">
+                                                    <div class="form-group">
+                                                        <label for="subtask_start_date_{{ task.id }}_{{ subtask.id }}">Start Date</label>
+                                                        <input type="date" id="subtask_start_date_{{ task.id }}_{{ subtask.id }}" name="start_date" 
+                                                               value="{% if subtask.start_date %}{{ subtask.start_date|date:'Y-m-d' }}{% endif %}">
+                                                    </div>
+                                                    
+                                                    <div class="form-group">
+                                                        <label for="subtask_end_date_{{ task.id }}_{{ subtask.id }}">End Date</label>
+                                                        <input type="date" id="subtask_end_date_{{ task.id }}_{{ subtask.id }}" name="end_date" 
+                                                               value="{% if subtask.end_date %}{{ subtask.end_date|date:'Y-m-d' }}{% endif %}">
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-actions">
+                                                    <button type="button" class="btn btn-secondary" onclick="toggleEditSubtask({{ task.id }}, {{ subtask.id }})">Cancel</button>
+                                                    <button type="button" class="btn btn-primary" onclick="submitSubtaskEdit({{ task.id }}, {{ subtask.id }})">Update Subtask</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="subtasks-section">
+                                <div class="subtasks-header">
+                                    <h5>Subtasks:</h5>
+                                    <button type="button" class="btn btn-xs btn-success" onclick="openAddSubtaskModal({{ task.id }})">+ Add Subtask</button>
+                                </div>
+                                <div class="subtasks-list" style="display: none;">
+                                    <!-- Subtasks will be added here -->
+                                </div>
+                                <p class="no-subtasks">No subtasks yet. Add one to get started.</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <div class="no-tasks">
+                            <div class="no-tasks-icon">📋</div>
+                            <h3>No tasks yet</h3>
+                            <p>Add tasks to get started with this project.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+<div id="addTaskModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Add New Task</h2>
+            <button class="close-btn" onclick="closeAddTaskModal()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="addTaskForm" method="POST" action="{% url 'add_task' %}">
+                {% csrf_token %}
+                <input type="hidden" name="project_id" value="{{ project.id }}">
+                
+                <div class="form-group">
+                    <label for="task_title">Task Title *</label>
+                    <input type="text" id="task_title" name="title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="task_description">Description</label>
+                    <textarea id="task_description" name="description" rows="3"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task_priority">Priority *</label>
+                        <select id="task_priority" name="priority" required>
+                            <option value="">Select Priority</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task_status">Status *</label>
+                        <select id="task_status" name="status" required>
+                            <option value="not_started">Not Started</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="in_progress_guidance_required">In Progress (Guidance Required)</option>
+                            <option value="completed">Completed</option>
+                            <option value="completed_review_pending">Completed (Review Pending)</option>
+                            <option value="completed_data_discrepancy_addressing">Completed (Data Discrepancy addressing)</option>
+                            <option value="on_hold">On Hold</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="task_development_status">Development Status *</label>
+                    <select id="task_development_status" name="development_status" required>
+                        <option value="original_quoted">Original/Quoted Development</option>
+                        <option value="new_development">New Development</option>
+                        <option value="new_development_qms">New Development – QMS must be involved</option>
+                        <option value="new_development_qms_change">New Development – QMS Change</option>
+                        <option value="new_quoted_development">New Development/Quoted Development</option>
+                        <option value="ongoing_development">Ongoing Development</option>
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task_start_date">Start Date</label>
+                        <input type="date" id="task_start_date" name="start_date">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="task_end_date">End Date</label>
+                        <input type="date" id="task_end_date" name="end_date">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="task_assigned_users">Assigned Users</label>
+                    <select id="task_assigned_users" name="assigned_users" class="form-select" multiple>
+                        {% for user in all_users %}
+                            <option value="{{ user.id }}">{{ user.get_full_name|default:user.username }} ({{ user.email }})</option>
+                        {% endfor %}
+                    </select>
+                    <small>Hold Ctrl/Cmd to select multiple users</small>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddTaskModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="submitTaskForm()">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Ensure page-level overflow handling */
+    body, html {
+        overflow-x: visible;
+        overflow-y: auto;
+    }
+
+    /* Projects page specific theme variables that extend the base theme */
+    :root {
+        --primary-color: #2563eb;
+        --primary-light: #60a5fa;
+        --primary-dark: #1e40af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #06b6d4;
+        --green-100: #dcfce7;
+        --green-700: #15803d;
+        --yellow-100: #fef3c7;
+        --yellow-700: #a16207;
+        --orange-100: #ffedd5;
+        --orange-700: #c2410c;
+        --red-100: #fee2e2;
+        --red-700: #b91c1c;
+        --blue-500: #3b82f6;
+        --gray-50: var(--background-secondary);
+        --gray-100: var(--background-tertiary);
+        --gray-200: var(--border-light);
+        --gray-300: var(--border-medium);
+        --gray-400: var(--border-dark);
+        --gray-500: var(--text-muted);
+        --gray-600: var(--text-secondary);
+        --gray-700: var(--text-secondary);
+        --gray-800: var(--text-primary);
+        --gray-900: var(--text-primary);
+        --white: var(--background-primary);
+        --text-color: var(--text-primary);
+        --shadow: var(--shadow-soft);
+        --shadow-lg: var(--shadow-medium);
+        --radius: var(--radius-small);
+        --radius-lg: var(--radius-medium);
+    }
+
+    /* Form Select Styling */
+    .form-select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius);
+        background-color: var(--white);
+        color: var(--text-color);
+        font-size: 0.875rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-select:hover {
+        border-color: var(--gray-400);
+    }
+
+    /* Status Change Dropdown Styles */
+    .status-change-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: transparent;
+        border: 1px solid var(--gray-300);
+        color: var(--gray-700);
+        padding: 0.375rem 0.75rem;
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .dropdown-toggle:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-400);
+    }
+
+    .dropdown-toggle svg {
+        transition: transform 0.2s ease;
+    }
+
+    .dropdown-toggle.active svg {
+        transform: rotate(180deg);
+    }
+
+    .status-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 10000 !important;
+        background: var(--white);
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        min-width: 200px;
+        margin-top: 0.25rem;
+        display: none;
+        padding: 0.5rem 0;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .status-option {
+        display: block;
+        width: 100%;
+        padding: 0.5rem 1rem;
+        text-align: left;
+        background: none;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        font-size: 0.875rem;
+        white-space: nowrap;
+        pointer-events: auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    .status-option:hover {
+        background: var(--gray-100);
+        color: var(--text-color);
+    }
+
+    .status-option:active {
+        background: var(--gray-200);
+    }
+
+    .status-option:first-child {
+        border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .status-option:last-child {
+        border-radius: 0 0 var(--radius) var(--radius);
+    }
+
+    /* Animation for status updates */
+    @keyframes fadeIn {
+        from { opacity: 0.7; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .fadeIn {
+        animation: fadeIn 0.3s ease;
+    }
+
+    /* Base Styles */
+    .main-content {
+        padding: 2rem;
+        min-height: 100vh;
+        overflow-x: visible;
+        overflow-y: auto;
+    }
+
+    /* Header */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        padding: 2rem;
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--gray-200);
+    }
+
+    .header-content .welcome-text {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin: 0 0 0.5rem 0;
+    }
+
+    .subtitle {
+        color: var(--gray-600);
+        font-size: 1.125rem;
+        margin: 0;
+    }
+
+    /* Messages */
+    .messages {
+        margin-bottom: 2rem;
+    }
+
+    .message {
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius);
+        margin-bottom: 1rem;
+        font-weight: 500;
+    }
+
+    .message-success {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .message-error {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .edit-project-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        overflow-x: visible;
+    }
+
+    .edit-project-card {
+        background: var(--white);
+        border-radius: 20px;
+        box-shadow: var(--shadow-lg);
+        overflow: visible;
+        border: 1px solid var(--gray-200);
+    }
+
+    .edit-project-header {
+        padding: 2.5rem 3rem 1rem;
+        border-bottom: none;
+        background: transparent;
+    }
+
+    .edit-project-header h2 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 300;
+        color: var(--gray-800);
+        letter-spacing: -0.02em;
+    }
+
+    .edit-project-body {
+        padding: 0 3rem 3rem;
+    }
+
+    /* Minimalist Tab Styles */
+    .edit-project-tabs {
+        margin-bottom: 3rem;
+    }
+
+    .tabs {
+        display: flex;
+        background: transparent;
+        border-radius: 0;
+        padding: 0;
+        margin-bottom: 3rem;
+        border-bottom: 1px solid var(--gray-200);
+        position: relative;
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 1.5rem 2rem;
+        border: none;
+        background: transparent;
+        color: var(--gray-500);
+        font-size: 0.9rem;
+        font-weight: 400;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        border-radius: 0;
+        position: relative;
+        letter-spacing: 0.025em;
+    }
+
+    .tab-icon {
+        width: 18px;
+        height: 18px;
+        transition: all 0.3s ease;
+    }
+
+    .tab-btn::after {
+        content: '';
+        position: absolute;
+        bottom: -1px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 2px;
+        background: var(--primary-color);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tab-btn.active {
+        background: transparent;
+        color: var(--primary-color);
+        box-shadow: none;
+        border: none;
+    }
+
+    .tab-btn.active::after {
+        width: 60%;
+    }
+
+    .tab-btn:hover:not(.active) {
+        background: transparent;
+        color: var(--gray-700);
+    }
+
+    .tab-btn:hover:not(.active)::after {
+        width: 30%;
+        background: var(--gray-300);
+    }
+
+    .tab-content {
+        display: none;
+        animation: fadeInUp 0.5s ease;
+        overflow: visible;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    @keyframes fadeInUp {
+        from { 
+            opacity: 0; 
+            transform: translateY(20px);
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0);
+        }
+    }
+
+    /* Minimalist Form Styles */
+    .form-group {
+        margin-bottom: 2rem;
+        overflow: visible;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 400;
+        color: var(--gray-700);
+        font-size: 0.875rem;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 1rem 0;
+        border: none;
+        border-bottom: 1px solid var(--gray-200);
+        border-radius: 0;
+        font-size: 1rem;
+        background: transparent;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        color: var(--gray-800);
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-bottom: 2px solid var(--primary-color);
+        background: transparent;
+        box-shadow: none;
+        transform: translateY(-1px);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: var(--gray-400);
+        font-weight: 300;
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        font-weight: 300;
+        font-style: italic;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    /* Minimalist Buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        border: 1px solid transparent;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 400;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        letter-spacing: 0.025em;
+        min-width: 120px;
+        justify-content: center;
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        min-width: 80px;
+    }
+
+    .btn-xs {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.625rem;
+        min-width: 60px;
+    }
+
+    .btn-primary {
+        background: var(--gray-900);
+        color: var(--white);
+        border-color: var(--gray-900);
+    }
+
+    .btn-primary:hover {
+        background: var(--gray-800);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--gray-600);
+        border-color: var(--gray-300);
+    }
+
+    .btn-secondary:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-400);
+        color: var(--gray-700);
+    }
+
+    .btn-info {
+        background: var(--info);
+        color: var(--white);
+        border-color: var(--info);
+    }
+
+    .btn-info:hover {
+        background: #0891b2;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow);
+    }
+
+    .btn-danger {
+        background: var(--danger);
+        color: var(--white);
+        border-color: var(--danger);
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow);
+    }
+
+    .btn-success {
+        background: var(--success);
+        color: var(--white);
+        border-color: var(--success);
+    }
+
+    .btn-success:hover {
+        background: #059669;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow);
+    }
+
+    /* Client Information Section */
+    .client-info-section {
+        margin-bottom: 3rem;
+        padding: 0;
+        background: transparent;
+        border-radius: 0;
+        border: none;
+    }
+
+    .client-info-section h3 {
+        margin: 0 0 0.5rem 0;
+        color: var(--gray-700);
+        font-size: 1rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-size: 0.8rem;
+    }
+
+    .section-description {
+        margin: 0 0 2rem 0;
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        line-height: 1.5;
+        font-weight: 300;
+    }
+
+    .duration-display {
+        background: transparent;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--gray-200);
+        color: var(--gray-700);
+        font-weight: 400;
+        margin-bottom: 0.75rem;
+        border-radius: 0;
+    }
+
+    .help-text {
+        color: var(--gray-500);
+        font-size: 0.75rem;
+        font-weight: 300;
+        font-style: italic;
+    }
+
+    .duration-warning {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        margin: 0.75rem 0;
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: var(--radius);
+        color: #92400e;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .duration-warning svg {
+        color: #f59e0b;
+        flex-shrink: 0;
+    }
+
+    /* Enhanced Dropdown Styles */
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        cursor: pointer;
+    }
+
+    select:focus {
+        border-bottom: 2px solid var(--primary-color);
+        background-color: var(--gray-50);
+    }
+
+    select option {
+        background: var(--white);
+        color: var(--text-color);
+        padding: 0.5rem;
+    }
+
+    select option:hover {
+        background: var(--gray-100);
+    }
+
+    /* Multi-select dropdown styling */
+    select[multiple] {
+        background-image: none;
+        padding-right: 0.75rem;
+        min-height: 120px;
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        padding: 0.75rem;
+    }
+
+    select[multiple] option {
+        padding: 0.5rem 0.75rem;
+        margin: 0.125rem 0;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    select[multiple] option:checked {
+        background: var(--primary-color);
+        color: var(--white);
+    }
+
+    select[multiple] option:hover:not(:checked) {
+        background: var(--gray-100);
+    }
+
+    /* Minimalist Tasks Section */
+    .section-title {
+        font-size: 1rem;
+        font-weight: 400;
+        color: var(--gray-700);
+        margin: 3rem 0 2rem 0;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-size: 0.8rem;
+    }
+
+    .add-task-section {
+        text-align: center;
+        margin: 2rem 0;
+    }
+
+    .add-task-btn {
+        background: transparent;
+        color: var(--gray-600);
+        border: 1px solid var(--gray-300);
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 400;
+        transition: all 0.3s ease;
+        letter-spacing: 0.025em;
+    }
+
+    .add-task-btn:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-400);
+        color: var(--gray-700);
+        transform: translateY(-1px);
+    }
+
+    .existing-tasks {
+        margin-bottom: 2rem;
+    }
+
+    .task-item {
+        background: transparent;
+        border-radius: 0;
+        padding: 2rem 0;
+        margin-bottom: 0;
+        border: none;
+        border-bottom: 1px solid var(--gray-200);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: visible;
+    }
+
+    .task-item:hover {
+        box-shadow: none;
+        border-bottom-color: var(--gray-300);
+        padding-left: 1rem;
+    }
+
+    .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .task-info h4 {
+        margin: 0 0 0.75rem 0;
+        color: var(--gray-800);
+        font-size: 1.125rem;
+        font-weight: 400;
+        letter-spacing: -0.01em;
+    }
+
+    .task-status,
+    .task-priority {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 400;
+        margin-right: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border: 1px solid;
+    }
+
+    .task-status.completed { 
+        background: transparent; 
+        color: var(--success); 
+        border-color: var(--success);
+    }
+    .task-status.in_progress { 
+        background: transparent; 
+        color: var(--warning); 
+        border-color: var(--warning);
+    }
+    .task-status.not_started { 
+        background: transparent; 
+        color: var(--gray-500); 
+        border-color: var(--gray-300);
+    }
+
+    .task-priority.high { 
+        background: transparent; 
+        color: var(--danger); 
+        border-color: var(--danger);
+    }
+    .task-priority.medium { 
+        background: transparent; 
+        color: var(--warning); 
+        border-color: var(--warning);
+    }
+    .task-priority.low { 
+        background: transparent; 
+        color: var(--gray-500); 
+        border-color: var(--gray-300);
+    }
+    .task-priority.urgent { 
+        background: var(--danger); 
+        color: var(--white); 
+        border-color: var(--danger);
+    }
+
+    .task-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .task-edit-form {
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        border-radius: 20px;
+        padding: 2rem 3rem;
+        margin: 2% auto;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        max-height: 92vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    .task-description {
+        margin-bottom: 1rem;
+    }
+
+    .task-description p {
+        margin: 0;
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    .task-details {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+        color: var(--gray-600);
+    }
+
+    .task-dates {
+        background: transparent;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        border: 1px solid var(--gray-200);
+    }
+
+    .task-assigned {
+        font-style: italic;
+    }
+
+    /* Minimalist Subtasks */
+    .subtasks-section {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .subtasks-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .subtasks-header h5 {
+        margin: 0;
+        color: var(--gray-600);
+        font-size: 0.8rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .subtasks-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .subtask-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        background: transparent;
+        border-radius: 0;
+        font-size: 0.875rem;
+        border: none;
+        border-bottom: 1px solid var(--gray-100);
+        position: relative;
+        overflow: visible;
+    }
+
+    .subtask-item.completed {
+        background: transparent;
+        border-bottom-color: var(--success);
+    }
+
+    .subtask-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .subtask-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .subtask-title {
+        color: var(--text-color);
+        font-weight: 500;
+        flex: 1;
+    }
+
+    .subtask-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+    }
+
+    .subtask-priority {
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .priority-low {
+        background: var(--green-100);
+        color: var(--green-700);
+    }
+
+    .priority-medium {
+        background: var(--yellow-100);
+        color: var(--yellow-700);
+    }
+
+    .priority-high {
+        background: var(--orange-100);
+        color: var(--orange-700);
+    }
+
+    .priority-urgent {
+        background: var(--red-100);
+        color: var(--red-700);
+    }
+
+    .subtask-dates {
+        color: var(--gray-600);
+        font-size: 0.75rem;
+    }
+
+    .subtask-description {
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        line-height: 1.4;
+        margin-top: 0.25rem;
+    }
+
+    .subtask-status {
+        color: var(--success);
+        font-weight: 400;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .subtask-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .subtask-edit-form {
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 0.75rem 0;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .subtask-edit-form .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .subtask-edit-form .form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .subtask-edit-form label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-color);
+        font-size: 0.875rem;
+    }
+
+    .subtask-edit-form input[type="text"],
+    .subtask-edit-form input[type="date"],
+    .subtask-edit-form textarea,
+    .subtask-edit-form select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 8px;
+        background: var(--white);
+        color: var(--text-color);
+        font-size: 0.875rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .subtask-edit-form input[type="text"]:focus,
+    .subtask-edit-form input[type="date"]:focus,
+    .subtask-edit-form textarea:focus,
+    .subtask-edit-form select:focus {
+        outline: none;
+        border-color: var(--blue-500);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .subtask-edit-form .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .subtask-edit-form .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .no-subtasks {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+        font-style: italic;
+        margin: 0;
+    }
+
+    .no-tasks {
+        text-align: center;
+        padding: 3rem;
+        color: var(--gray-600);
+    }
+
+    .no-tasks-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .no-tasks h3 {
+        margin: 0 0 0.5rem 0;
+        color: var(--text-color);
+    }
+
+    .no-tasks p {
+        margin: 0;
+        font-size: 0.875rem;
+    }
+
+    /* Minimalist Checkbox Styles */
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        cursor: pointer;
+        font-weight: 400;
+        color: var(--gray-700);
+        font-size: 0.875rem;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        display: none;
+    }
+
+    .checkmark {
+        width: 16px;
+        height: 16px;
+        border: 1px solid var(--gray-300);
+        border-radius: 3px;
+        position: relative;
+        transition: all 0.3s ease;
+        background: transparent;
+        flex-shrink: 0;
+    }
+
+    .checkbox-label input[type="checkbox"]:checked + .checkmark {
+        background: var(--gray-800);
+        border-color: var(--gray-800);
+    }
+
+    .checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: var(--white);
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    /* Minimalist Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+        animation: fadeIn 0.3s ease;
+        overflow: hidden;
+    }
+
+    .modal-content {
+        background: var(--background-primary);
+        margin: 2% auto;
+        border-radius: 20px;
+        width: 90%;
+        max-width: 600px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        border: 1px solid var(--border-light);
+        max-height: 92vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        animation: slideInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideInScale {
+        from { 
+            opacity: 0; 
+            transform: translateY(30px) scale(0.95);
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 2.5rem 3rem 1rem;
+        border-bottom: none;
+        background: transparent;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 300;
+        color: var(--gray-800);
+        letter-spacing: -0.02em;
+    }
+
+    .close-btn {
+        background: transparent;
+        border: none;
+        color: var(--gray-400);
+        cursor: pointer;
+        padding: 0.75rem;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .close-btn:hover {
+        background: var(--gray-100);
+        color: var(--gray-600);
+        transform: scale(1.1);
+    }
+
+    .modal-body {
+        padding: 0 3rem 3rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 1rem;
+        }
+
+        .header {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .client-type-options {
+            grid-template-columns: 1fr;
+        }
+
+        .client-type-option:first-child {
+            border-radius: 8px 8px 0 0;
+            border-right: 1px solid var(--gray-200);
+            border-bottom: none;
+        }
+
+        .client-type-option:last-child {
+            border-radius: 0 0 8px 8px;
+            border-top: none;
+        }
+
+        .modal-content {
+            margin: 1rem auto;
+            width: 95%;
+            border-radius: 16px;
+        }
+
+        .modal-header {
+            padding: 2rem 1.5rem 1rem;
+        }
+
+        .modal-body {
+            padding: 0 1.5rem 2rem;
+        }
+
+        .task-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .task-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+        .tabs {
+            flex-direction: column;
+        }
+
+        .tab-btn {
+            border-bottom: 1px solid var(--gray-200);
+            justify-content: flex-start;
+            padding: 1rem 0;
+        }
+
+        .tab-btn::after {
+            display: none;
+        }
+
+        .tab-btn.active {
+            background: var(--gray-50);
+            color: var(--primary-color);
+        }
+
+        .users-dropdown-menu {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            min-width: 300px;
+        }
+
+        .users-dropdown-list {
+            max-height: 60vh;
+        }
+    }
+
+    /* Subtask status styles */
+    .subtask-status.completed {
+        color: #059669;
+    }
+
+    .subtask-status.in-progress {
+        color: #d97706;
+    }
+
+    .subtask-status.not-started {
+        color: #6b7280;
+    }
+
+    /* Users Dropdown Styles */
+    .users-dropdown-container {
+        position: relative;
+        width: 100%;
+        overflow: visible;
+    }
+
+    .users-dropdown-toggle {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 8px;
+        background: var(--white);
+        color: var(--text-color);
+        font-size: 0.875rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .users-dropdown-toggle:hover {
+        border-color: var(--blue-500);
+    }
+
+    .users-dropdown-toggle:focus {
+        outline: none;
+        border-color: var(--blue-500);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .dropdown-arrow {
+        transition: transform 0.2s ease;
+    }
+
+    .users-dropdown-toggle.active .dropdown-arrow {
+        transform: rotate(180deg);
+    }
+
+    .users-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: var(--white);
+        border: 1px solid var(--gray-300);
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        z-index: 9999;
+        display: none;
+        margin-top: 4px;
+        min-width: 100%;
+        width: max-content;
+        max-width: 400px;
+        max-height: 300px;
+        overflow: hidden;
+    }
+
+    .users-dropdown-menu.show {
+        display: block;
+    }
+
+    .users-dropdown-header {
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--gray-200);
+        background: var(--gray-50);
+    }
+
+    .user-search-input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--gray-300);
+        border-radius: 6px;
+        font-size: 0.875rem;
+        background: var(--white);
+    }
+
+    .user-search-input:focus {
+        outline: none;
+        border-color: var(--blue-500);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+
+    .users-dropdown-list {
+        padding: 0.5rem 0;
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    .user-dropdown-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0.75rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        gap: 1rem;
+    }
+
+    .user-dropdown-option:hover {
+        background: var(--gray-100);
+    }
+
+    .user-checkbox {
+        display: none;
+    }
+
+    .checkbox-container {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        margin-left: auto;
+    }
+
+    .checkmark {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #d1d5db;
+        border-radius: 50%;
+        position: relative;
+        transition: all 0.2s ease;
+        background: #ffffff;
+        flex-shrink: 0;
+        cursor: pointer;
+        display: block;
+    }
+
+    .user-dropdown-option:hover .checkmark {
+        border-color: #60a5fa;
+        background: #ffffff;
+    }
+
+    .user-checkbox:checked + .checkmark {
+        background: #60a5fa;
+        border-color: #60a5fa;
+    }
+
+    .user-checkbox:checked + .checkmark::after {
+        content: '✓';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: var(--white);
+        font-size: 12px;
+        font-weight: bold;
+        line-height: 1;
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .user-name {
+        font-weight: 500;
+        color: var(--text-color);
+        font-size: 0.875rem;
+    }
+
+    .user-admin-badge {
+        background: var(--blue-100);
+        color: var(--blue-700);
+        padding: 0.125rem 0.375rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        align-self: flex-start;
+    }
+
+    .user-email {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        margin-left: 0.375rem;
+        font-weight: 400;
+    }
+
+    .client-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--border-medium);
+        border: 2px solid var(--border-light);
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .client-dot.selected {
+        background: var(--primary);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .client-option:hover .client-dot {
+        transform: scale(1.15);
+    }
+
+    .selected-users-text {
+        color: var(--text-color);
+    }
+
+    /* Selected Users Display */
+    .selected-users-display {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        display: none;
+    }
+
+    .selected-users-display.show {
+        display: block;
+    }
+
+    .selected-users-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .selected-users-list strong {
+        color: var(--gray-700);
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .selected-user-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: var(--white);
+        border: 1px solid var(--gray-200);
+        border-radius: 6px;
+        font-size: 0.875rem;
+        color: var(--text-color);
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .admin-indicator {
+        color: var(--blue-600);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab functionality
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetTab = this.dataset.tab;
+            
+            // Update active tab button
+            tabBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update active tab content
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === targetTab) {
+                    content.classList.add('active');
+                }
+            });
+        });
+    });
+});
+
+// Modal functions
+function openAddTaskModal() {
+    document.getElementById('addTaskModal').style.display = 'block';
+}
+
+function closeAddTaskModal() {
+    document.getElementById('addTaskModal').style.display = 'none';
+    document.getElementById('addTaskForm').reset();
+}
+
+function toggleEditTask(taskId) {
+    const taskEditForm = document.getElementById(`task-edit-${taskId}`);
+    const taskItem = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
+    
+    if (taskEditForm.style.display === 'none') {
+        taskEditForm.style.display = 'block';
+        taskItem.querySelector('.task-actions').style.display = 'none'; // Hide original actions
+    } else {
+        taskEditForm.style.display = 'none';
+        taskItem.querySelector('.task-actions').style.display = 'flex'; // Show original actions
+    }
+}
+
+function deleteTask(taskId) {
+    if (confirm('Are you sure you want to delete this task?')) {
+        fetch('/projects/delete-task/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                task_id: taskId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the task element from DOM instead of reloading
+                const taskElement = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
+                if (taskElement) {
+                    taskElement.remove();
+                    showMessage('Task deleted successfully!', 'success');
+                }
+            } else {
+                showMessage('Error deleting task: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Error deleting task. Please try again.', 'error');
+        });
+    }
+}
+
+function deleteSubtask(subtaskId) {
+    if (confirm('Are you sure you want to delete this subtask?')) {
+        fetch('/projects/delete-subtask/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                subtask_id: subtaskId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the subtask element from DOM instead of reloading
+                const subtaskElement = document.querySelector(`.subtask-item[data-subtask-id="${subtaskId}"]`);
+                if (subtaskElement) {
+                    subtaskElement.remove();
+                    showMessage('Subtask deleted successfully!', 'success');
+                }
+            } else {
+                showMessage('Error deleting subtask: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Error deleting subtask. Please try again.', 'error');
+            });
+    }
+}
+
+function toggleEditSubtask(taskId, subtaskId) {
+    const subtaskEditForm = document.getElementById(`subtask-edit-${taskId}-${subtaskId}`);
+    const subtaskItem = subtaskEditForm.closest('.subtask-item');
+    
+    if (subtaskEditForm.style.display === 'none') {
+        subtaskEditForm.style.display = 'block';
+        subtaskItem.querySelector('.subtask-actions').style.display = 'none';
+    } else {
+        subtaskEditForm.style.display = 'none';
+        subtaskItem.querySelector('.subtask-actions').style.display = 'flex';
+    }
+}
+
+function submitTaskForm() {
+    const form = document.getElementById('addTaskForm');
+    const formData = new FormData(form);
+    
+    console.log('Submitting task form with data:', {
+        title: formData.get('title'),
+        status: formData.get('status'),
+        priority: formData.get('priority'),
+        development_status: formData.get('development_status'),
+        assigned_users: formData.getAll('assigned_users')
+    });
+    
+    fetch('{% url "add_task" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Task creation response:', data);
+        if (data.success) {
+            // Close the modal
+            closeAddTaskModal();
+            
+            // Clear the form
+            form.reset();
+            
+            // Show success message
+            showMessage('Task created successfully!', 'success');
+            
+            // Add the new task to the page without reloading
+            addTaskToPage(data.task_id, formData);
+        } else {
+            showMessage('Error creating task: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error creating task. Please try again.', 'error');
+    });
+}
+
+function showMessage(message, type) {
+    // Create message element
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message message-${type}`;
+    messageDiv.textContent = message;
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        background-color: ${type === 'success' ? '#4CAF50' : '#f44336'};
+        color: white;
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 10000;
+        font-size: 14px;
+    `;
+
+    // Insert at the top of the body
+    document.body.insertBefore(messageDiv, document.body.firstChild);
+
+    // Remove after 5 seconds
+    setTimeout(() => {
+        messageDiv.remove();
+    }, 5000);
+}
+
+function submitSubtaskForm(button) {
+    const modal = button.closest('.modal');
+    const form = modal.querySelector('form');
+    const formData = new FormData(form);
+    const taskId = formData.get('task_id');
+    
+    fetch('/projects/add-subtask/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close the modal
+            modal.remove();
+            
+            // Show success message
+            showMessage('Subtask created successfully!', 'success');
+            
+            // Add the new subtask to the page without reloading
+            addSubtaskToPage(data.subtask_id, formData, taskId);
+        } else {
+            showMessage('Error creating subtask: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error creating subtask. Please try again.', 'error');
+    });
+}
+
+function addTaskToPage(taskId, formData) {
+    // Get the existing tasks container
+    const existingTasks = document.querySelector('.existing-tasks');
+    
+    if (!existingTasks) {
+        console.error('Could not find .existing-tasks container');
+        return;
+    }
+    
+    // Create new task HTML
+    const taskHtml = `
+        <div class="task-item" data-task-id="${taskId}">
+            <div class="task-header">
+                <div class="task-info">
+                    <h4>${formData.get('title')}</h4>
+                    <span class="task-status ${formData.get('status')}">${getStatusDisplay(formData.get('status'))}</span>
+                    <span class="task-priority ${formData.get('priority')}">${getPriorityDisplay(formData.get('priority'))}</span>
+                    <span class="task-development-status">${getDevelopmentStatusDisplay(formData.get('development_status'))}</span>
+                </div>
+                <div class="task-actions">
+                    <button type="button" class="btn btn-sm btn-info" onclick="toggleEditTask(${taskId})">Edit</button>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteTask(${taskId})">Delete</button>
+                </div>
+            </div>
+            
+            <div class="task-description">
+                <p>${formData.get('description') || ''}</p>
+            </div>
+            
+            <div class="task-details">
+                <span class="task-dates">
+                    ${formData.get('start_date') && formData.get('end_date') ? 
+                        `${formatDate(formData.get('start_date'))} - ${formatDate(formData.get('end_date'))}` : 
+                        'No dates set'}
+                </span>
+                ${formData.getAll('assigned_users') && formData.getAll('assigned_users').length > 0 ?
+                    `<span class="task-assigned">Assigned: ${getUserDisplay(formData.getAll('assigned_users'))}</span>` :
+                    ''}
+            </div>
+            
+            <div class="subtasks-section">
+                <div class="subtasks-header">
+                    <h5>Subtasks:</h5>
+                    <button type="button" class="btn btn-xs btn-success" onclick="openAddSubtaskModal(${taskId})">+ Add Subtask</button>
+                </div>
+                <div class="subtasks-list" style="display: none;">
+                    <!-- Subtasks will be added here -->
+                </div>
+                <p class="no-subtasks">No subtasks yet. Add one to get started.</p>
+            </div>
+        </div>
+    `;
+    
+    // Insert the new task at the beginning
+    existingTasks.insertAdjacentHTML('afterbegin', taskHtml);
+    
+    // Remove the "no tasks" message if it exists
+    const noTasks = existingTasks.querySelector('.no-tasks');
+    if (noTasks) {
+        noTasks.remove();
+    }
+    
+    console.log('Task added to page successfully:', taskId);
+}
+
+function addSubtaskToPage(subtaskId, formData, taskId) {
+    // Find the task that this subtask belongs to
+    const taskItem = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
+    if (!taskItem) return;
+
+    // Find the subtasks list
+    const subtasksList = taskItem.querySelector('.subtasks-list');
+    if (!subtasksList) return;
+
+    // Get project ID
+    const projectId = {{ project.id }};
+
+    // Get status value
+    const status = formData.get('status') || 'not_started';
+
+    // Get current date/time for timestamps
+    const now = new Date();
+    const createdDate = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' +
+                        now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    // Format dates
+    const startDate = formData.get('start_date');
+    const endDate = formData.get('end_date');
+    let dateDisplay = 'No dates set';
+    if (startDate && endDate) {
+        dateDisplay = formatDateWithYear(startDate) + ' - ' + formatDateWithYear(endDate);
+    } else if (startDate) {
+        dateDisplay = 'Start: ' + formatDateWithYear(startDate);
+    } else if (endDate) {
+        dateDisplay = 'End: ' + formatDateWithYear(endDate);
+    }
+
+    // Create new subtask HTML
+    const subtaskHtml = `
+        <div class="subtask-item" data-subtask-id="${subtaskId}">
+            <div class="subtask-content">
+                <div class="subtask-header">
+                    <div class="subtask-info">
+                        <h5 class="subtask-title">${formData.get('title')}</h5>
+                        <div class="subtask-badges">
+                            <span class="subtask-status-badge ${status}">${getStatusDisplay(status)}</span>
+                            <span class="subtask-priority priority-${formData.get('priority') || 'medium'}">${getPriorityDisplay(formData.get('priority') || 'medium')}</span>
+                        </div>
+                    </div>
+                </div>
+                ${formData.get('description') ? `<div class="subtask-description"><strong>Description:</strong> ${formData.get('description')}</div>` : ''}
+                <div class="subtask-details">
+                    <span class="subtask-dates">
+                        <strong>Dates:</strong> ${dateDisplay}
+                    </span>
+                </div>
+                <div class="subtask-timestamps">
+                    <small class="text-muted">
+                        Created: ${createdDate}
+                    </small>
+                </div>
+            </div>
+            <div class="subtask-actions">
+                <div class="status-change-dropdown">
+                    <button type="button" class="btn btn-xs btn-outline dropdown-toggle" onclick="toggleSubtaskStatusDropdown(${taskId}, ${subtaskId})">
+                        <span class="status-text">${getStatusDisplay(status)}</span>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="status-dropdown-menu" id="subtask-status-dropdown-${taskId}-${subtaskId}">
+                        <button type="button" class="status-option" onclick="changeSubtaskStatus(${taskId}, ${subtaskId}, 'not_started')">Not Started</button>
+                        <button type="button" class="status-option" onclick="changeSubtaskStatus(${taskId}, ${subtaskId}, 'in_progress')">In Progress</button>
+                        <button type="button" class="status-option" onclick="changeSubtaskStatus(${taskId}, ${subtaskId}, 'completed')">Completed</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-xs btn-info" onclick="window.location.href='/projects/${projectId}/edit-task/${taskId}/edit-subtask/${subtaskId}/'">Edit</button>
+                <button type="button" class="btn btn-xs btn-danger" onclick="deleteSubtask(${subtaskId})">Delete</button>
+            </div>
+        </div>
+    `;
+    
+    // Insert the new subtask
+    subtasksList.insertAdjacentHTML('beforeend', subtaskHtml);
+    
+    // Remove the "no subtasks" message if it exists
+    const noSubtasks = taskItem.querySelector('.no-subtasks');
+    if (noSubtasks) {
+        noSubtasks.remove();
+    }
+    
+    // Update the subtasks section to show the list instead of the message
+    const subtasksSection = taskItem.querySelector('.subtasks-section');
+    if (subtasksSection.querySelector('.subtasks-list')) {
+        subtasksSection.querySelector('.subtasks-list').style.display = 'block';
+    }
+}
+
+function getStatusDisplay(status) {
+    const statusMap = {
+        'not_started': 'Not Started',
+        'in_progress': 'In Progress',
+        'completed': 'Completed',
+        'on_hold': 'On Hold',
+        'cancelled': 'Cancelled'
+    };
+    return statusMap[status] || status;
+}
+
+function getPriorityDisplay(priority) {
+    const priorityMap = {
+        'low': 'Low',
+        'medium': 'Medium',
+        'high': 'High',
+        'urgent': 'Urgent'
+    };
+    return priorityMap[priority] || priority;
+}
+
+function getDevelopmentStatusDisplay(developmentStatus) {
+    const developmentStatusMap = {
+        'original_quoted': 'Original/Quoted Development',
+        'new_development': 'New Development',
+        'new_development_qms': 'New Development – QMS must be involved',
+        'new_development_qms_change': 'New Development – QMS Change',
+        'new_quoted_development': 'New Development/Quoted Development',
+        'ongoing_development': 'Ongoing Development'
+    };
+    return developmentStatusMap[developmentStatus] || developmentStatus;
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function formatDateWithYear(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function getUserDisplay(userIds) {
+    if (!userIds || userIds.length === 0) return 'Unassigned';
+    
+    // If it's a single user ID
+    if (typeof userIds === 'string') {
+        return `User ${userIds}`;
+    }
+    
+    // If it's an array of user IDs
+    if (Array.isArray(userIds)) {
+        return userIds.map(id => `User ${id}`).join(', ');
+    }
+    
+    return 'Unassigned';
+}
+
+function submitTaskEdit(taskId) {
+    const form = document.getElementById(`task-edit-form-${taskId}`);
+    const formData = new FormData(form);
+    
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close the edit form
+            toggleEditTask(taskId);
+            
+            // Show success message
+            showMessage(data.message, 'success');
+            
+            // Update the task display on the page
+            updateTaskDisplay(taskId, formData);
+        } else {
+            showMessage('Error updating task: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error updating task. Please try again.', 'error');
+    });
+}
+
+function submitSubtaskEdit(taskId, subtaskId) {
+    const form = document.querySelector(`#subtask-edit-${taskId}-${subtaskId} form`);
+    const formData = new FormData(form);
+    
+    // Get the project ID from the current page URL or form data
+    const projectId = {{ project.id }};
+    
+    fetch(`/projects/${projectId}/edit-task/${taskId}/edit-subtask/${subtaskId}/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Close the edit form
+            toggleEditSubtask(taskId, subtaskId);
+            
+            // Show success message
+            showMessage(data.message, 'success');
+            
+            // Update the subtask display on the page
+            updateSubtaskDisplay(taskId, subtaskId, formData);
+        } else {
+            showMessage('Error updating subtask: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error updating subtask. Please try again.', 'error');
+    });
+}
+
+function updateTaskDisplay(taskId, formData) {
+    const taskItem = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
+    if (!taskItem) return;
+    
+    // Update task title
+    const taskTitle = taskItem.querySelector('.task-info h4');
+    if (taskTitle) {
+        taskTitle.textContent = formData.get('title');
+    }
+    
+    // Update task status
+    const taskStatus = taskItem.querySelector('.task-status');
+    if (taskStatus) {
+        taskStatus.textContent = getStatusDisplay(formData.get('status'));
+        taskStatus.className = `task-status ${formData.get('status')}`;
+    }
+    
+    // Update task priority
+    const taskPriority = taskItem.querySelector('.task-priority');
+    if (taskPriority) {
+        taskPriority.textContent = getPriorityDisplay(formData.get('priority'));
+        taskPriority.className = `task-priority ${formData.get('priority')}`;
+    }
+    
+    // Update task description
+    const taskDescription = taskItem.querySelector('.task-description p');
+    if (taskDescription) {
+        taskDescription.textContent = formData.get('description') || '';
+    }
+    
+    // Update task dates
+    const taskDates = taskItem.querySelector('.task-dates');
+    if (taskDates) {
+        if (formData.get('start_date') && formData.get('end_date')) {
+            taskDates.textContent = `${formatDate(formData.get('start_date'))} - ${formatDate(formData.get('end_date'))}`;
+        } else {
+            taskDates.textContent = 'No dates set';
+        }
+    }
+}
+
+function updateSubtaskDisplay(taskId, subtaskId, formData) {
+    const subtaskItem = document.querySelector(`.subtask-item[data-subtask-id="${subtaskId}"]`);
+    if (!subtaskItem) return;
+    
+    // Update subtask title
+    const subtaskTitle = subtaskItem.querySelector('.subtask-title');
+    if (subtaskTitle) {
+        subtaskTitle.textContent = formData.get('title');
+    }
+    
+    // Update subtask description if it exists
+    const subtaskDescription = subtaskItem.querySelector('.subtask-description');
+    if (subtaskDescription) {
+        subtaskDescription.textContent = formData.get('description') || '';
+    }
+    
+    // Update subtask priority
+    const subtaskPriority = subtaskItem.querySelector('.subtask-priority');
+    if (subtaskPriority) {
+        subtaskPriority.textContent = getPriorityDisplay(formData.get('priority'));
+        subtaskPriority.className = `subtask-priority priority-${formData.get('priority')}`;
+    }
+    
+    // Update subtask dates
+    const subtaskDates = subtaskItem.querySelector('.subtask-dates');
+    if (subtaskDates) {
+        if (formData.get('start_date') && formData.get('end_date')) {
+            subtaskDates.textContent = `${formatDate(formData.get('start_date'))} - ${formatDate(formData.get('end_date'))}`;
+        } else if (formData.get('start_date')) {
+            subtaskDates.textContent = formatDate(formData.get('start_date'));
+        } else if (formData.get('end_date')) {
+            subtaskDates.textContent = formatDate(formData.get('end_date'));
+        } else {
+            subtaskDates.textContent = '';
+        }
+    }
+}
+
+// Status change functions
+function toggleStatusDropdown(taskId) {
+    const dropdown = document.getElementById(`status-dropdown-${taskId}`);
+    
+    if (!dropdown) {
+        return;
+    }
+    
+    const allDropdowns = document.querySelectorAll('.status-dropdown-menu');
+    
+    // Close all other dropdowns
+    allDropdowns.forEach(d => {
+        if (d.id !== `status-dropdown-${taskId}`) {
+            d.style.display = 'none';
+        }
+    });
+    
+    // Toggle current dropdown
+    const currentDisplay = dropdown.style.display;
+    const newDisplay = currentDisplay === 'none' || currentDisplay === '' ? 'block' : 'none';
+    dropdown.style.display = newDisplay;
+}
+
+function toggleSubtaskStatusDropdown(taskId, subtaskId) {
+    const dropdown = document.getElementById(`subtask-status-dropdown-${taskId}-${subtaskId}`);
+    
+    if (!dropdown) {
+        return;
+    }
+    
+    const allDropdowns = document.querySelectorAll('.status-dropdown-menu');
+    
+    // Close all other dropdowns
+    allDropdowns.forEach(d => {
+        if (d.id !== `subtask-status-dropdown-${taskId}-${subtaskId}`) {
+            d.style.display = 'none';
+        }
+    });
+    
+    // Toggle current dropdown
+    const currentDisplay = dropdown.style.display;
+    const newDisplay = currentDisplay === 'none' || currentDisplay === '' ? 'block' : 'none';
+    dropdown.style.display = newDisplay;
+}
+
+function changeTaskStatus(taskId, newStatus) {
+    console.log('changeTaskStatus called:', taskId, newStatus);
+
+    // Close dropdown immediately - directly set display to none
+    const dropdown = document.getElementById(`status-dropdown-${taskId}`);
+    console.log('Closing dropdown:', dropdown);
+    if (dropdown) {
+        dropdown.style.display = 'none';
+        console.log('Dropdown closed!');
+    } else {
+        console.warn('Dropdown not found:', `status-dropdown-${taskId}`);
+    }
+
+    const projectId = {{ project.id }};
+
+    // Get CSRF token from any available source
+    let csrfToken = document.getElementById('csrf-token')?.value;
+    if (!csrfToken) {
+        csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    }
+    if (!csrfToken) {
+        csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]')?.value;
+    }
+
+    console.log('CSRF token found:', csrfToken);
+
+    if (!csrfToken) {
+        showMessage('CSRF token not found. Please refresh the page.', 'error');
+        return;
+    }
+    
+    const requestBody = JSON.stringify({
+        status: newStatus
+    });
+    console.log('Request body:', requestBody);
+    console.log('Status value being sent:', newStatus);
+    console.log('Status value type:', typeof newStatus);
+    console.log('Status value length:', newStatus ? newStatus.length : 'undefined');
+    console.log('Full request details:', {
+        url: `/projects/${projectId}/edit-task/${taskId}/`,
+        method: 'POST',
+        status: newStatus,
+        csrfToken: csrfToken ? 'Found' : 'Missing'
+    });
+    
+    fetch(`/projects/${projectId}/edit-task/${taskId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrfToken
+        },
+        body: requestBody
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            // Update the status display
+            const taskItem = document.querySelector(`.task-item[data-task-id="${taskId}"]`);
+            console.log('Task item found:', taskItem);
+            
+            if (taskItem) {
+                // Update status text in dropdown button
+                const statusText = taskItem.querySelector('.status-text');
+                console.log('Status text element found:', statusText);
+                if (statusText) {
+                    statusText.textContent = getStatusDisplay(newStatus);
+                    console.log('Status text updated to:', getStatusDisplay(newStatus));
+                }
+                
+                // Update main task status display
+                const taskStatus = taskItem.querySelector('.task-status');
+                console.log('Task status element found:', taskStatus);
+                if (taskStatus) {
+                    taskStatus.className = `task-status ${newStatus}`;
+                    taskStatus.textContent = getStatusDisplay(newStatus);
+                    console.log('Task status updated to:', newStatus);
+                }
+                
+                // Also update the status in the edit form if it's open
+                const statusSelect = taskItem.querySelector(`#task_status_${taskId}`);
+                if (statusSelect) {
+                    statusSelect.value = newStatus;
+                    console.log('Task status select updated to:', newStatus);
+                }
+                
+                // Force a visual refresh
+                taskItem.style.animation = 'none';
+                taskItem.offsetHeight; // Trigger reflow
+                taskItem.style.animation = 'fadeIn 0.3s ease';
+            } else {
+                console.error('Task item not found for ID:', taskId);
+            }
+
+            showMessage(`Task status updated to ${getStatusDisplay(newStatus)}`, 'success');
+        } else {
+            console.error('Error response:', data);
+            showMessage('Error updating task status: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error updating task status. Please try again.', 'error');
+    });
+}
+
+function changeSubtaskStatus(taskId, subtaskId, newStatus) {
+    // Close dropdown immediately - directly set display to none
+    const dropdown = document.getElementById(`subtask-status-dropdown-${taskId}-${subtaskId}`);
+    console.log('Closing dropdown:', dropdown);
+    if (dropdown) {
+        dropdown.style.display = 'none';
+        console.log('Dropdown closed!');
+    } else {
+        console.warn('Dropdown not found:', `subtask-status-dropdown-${taskId}-${subtaskId}`);
+    }
+
+    const projectId = {{ project.id }};
+
+    // Get CSRF token from any available source
+    let csrfToken = document.getElementById('csrf-token')?.value;
+    if (!csrfToken) {
+        csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    }
+    if (!csrfToken) {
+        csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]')?.value;
+    }
+
+    if (!csrfToken) {
+        showMessage('CSRF token not found. Please refresh the page.', 'error');
+        return;
+    }
+    
+    const requestBody = JSON.stringify({
+        status: newStatus
+    });
+    
+    fetch(`/projects/${projectId}/edit-task/${taskId}/edit-subtask/${subtaskId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': csrfToken
+        },
+        body: requestBody
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update the status display
+            const subtaskItem = document.querySelector(`.subtask-item[data-subtask-id="${subtaskId}"]`);
+            
+            if (subtaskItem) {
+                // Update status text in dropdown button - ALWAYS update this
+                const statusText = subtaskItem.querySelector('.status-text');
+                
+                if (statusText) {
+                    const displayText = getStatusDisplay(newStatus);
+                    statusText.textContent = displayText;
+                }
+                
+                // Update status display for ALL statuses (copy the same pattern)
+                const statusDisplay = subtaskItem.querySelector('.subtask-status');
+                if (statusDisplay) {
+                    // Update the CSS classes for proper styling
+                    statusDisplay.className = `subtask-status ${newStatus === 'completed' ? 'completed' : newStatus === 'in_progress' ? 'in-progress' : 'not-started'}`;
+                    
+                    if (newStatus === 'completed') {
+                        statusDisplay.textContent = '✓ Completed';
+                        statusDisplay.style.display = 'inline';
+                    } else if (newStatus === 'in_progress') {
+                        statusDisplay.textContent = '🔄 In Progress';
+                        statusDisplay.style.display = 'inline';
+                    } else if (newStatus === 'not_started') {
+                        statusDisplay.textContent = '⏳ Not Started';
+                        statusDisplay.style.display = 'inline';
+                    } else {
+                        statusDisplay.style.display = 'none';
+                    }
+                } else {
+                    // Create status display if it doesn't exist
+                    const subtaskContent = subtaskItem.querySelector('.subtask-content');
+                    if (subtaskContent) {
+                        const newStatusDisplay = document.createElement('span');
+                        newStatusDisplay.className = `subtask-status ${newStatus === 'completed' ? 'completed' : newStatus === 'in_progress' ? 'in-progress' : 'not-started'}`;
+                        if (newStatus === 'completed') {
+                            newStatusDisplay.textContent = '✓ Completed';
+                        } else if (newStatus === 'in_progress') {
+                            newStatusDisplay.textContent = '🔄 In Progress';
+                        } else if (newStatus === 'not_started') {
+                            newStatusDisplay.textContent = '⏳ Not Started';
+                        }
+                        newStatusDisplay.style.display = 'inline';
+                        subtaskContent.appendChild(newStatusDisplay);
+                    }
+                }
+                
+                // Force a visual refresh
+                subtaskItem.style.animation = 'none';
+                subtaskItem.offsetHeight; // Trigger reflow
+                subtaskItem.style.animation = 'fadeIn 0.3s ease';
+            }
+
+            showMessage('Subtask status updated successfully!', 'success');
+        } else {
+            showMessage('Error updating subtask status: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Error updating subtask status. Please try again.', 'error');
+    });
+}
+
+// Close dropdowns when clicking outside
+// Handle status option clicks with event delegation
+document.addEventListener('click', function(event) {
+    // Handle status option clicks
+    if (event.target.classList.contains('status-option')) {
+        console.log('Status option clicked!', event.target);
+        const onclick = event.target.getAttribute('onclick');
+        console.log('Onclick attribute:', onclick);
+        if (onclick) {
+            try {
+                // Execute the onclick handler
+                console.log('Executing onclick handler...');
+                eval(onclick);
+                console.log('Onclick handler executed successfully');
+            } catch (error) {
+                console.error('Error executing onclick:', error);
+                showMessage('Error: ' + error.message, 'error');
+            }
+        } else {
+            console.warn('No onclick attribute found');
+        }
+        event.stopPropagation();
+        return;
+    }
+
+    // Close dropdowns when clicking outside
+    if (!event.target.closest('.status-change-dropdown')) {
+        const allDropdowns = document.querySelectorAll('.status-dropdown-menu');
+        allDropdowns.forEach(dropdown => {
+            dropdown.style.display = 'none';
+        });
+    }
+
+    // Close users dropdown when clicking outside
+    if (!event.target.closest('.users-dropdown-container')) {
+        const usersDropdown = document.getElementById('usersDropdown');
+        if (usersDropdown) {
+            usersDropdown.classList.remove('show');
+            const toggles = document.querySelectorAll('.users-dropdown-toggle');
+            if (toggles[0]) {
+                toggles[0].classList.remove('active');
+            }
+        }
+
+        // Also close clients dropdown
+        const clientsDropdown = document.getElementById('clientsDropdown');
+        if (clientsDropdown) {
+            clientsDropdown.classList.remove('show');
+            if (toggles[1]) {
+                toggles[1].classList.remove('active');
+            }
+        }
+    }
+});
+
+// Users Dropdown Functions
+function toggleUsersDropdown() {
+    const dropdown = document.getElementById('usersDropdown');
+    const toggle = document.querySelector('.users-dropdown-toggle');
+    
+    if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+        toggle.classList.remove('active');
+    } else {
+        dropdown.classList.add('show');
+        toggle.classList.add('active');
+    }
+}
+
+function filterUsers(searchTerm) {
+    const userOptions = document.querySelectorAll('.user-dropdown-option');
+    const searchLower = searchTerm.toLowerCase();
+    
+    userOptions.forEach(option => {
+        const userName = option.querySelector('.user-name').textContent.toLowerCase();
+        if (userName.includes(searchLower)) {
+            option.style.display = 'flex';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+}
+
+// Update selected users count when checkboxes change
+document.addEventListener('change', function(event) {
+    if (event.target.classList.contains('user-checkbox')) {
+        updateSelectedUsersCount();
+        updateSelectedUsersDisplay();
+    }
+});
+
+function updateSelectedUsersCount() {
+    const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
+    const selectedText = document.querySelector('.selected-users-text');
+    
+    if (selectedCheckboxes.length > 0) {
+        selectedText.textContent = `${selectedCheckboxes.length} user(s) selected`;
+    } else {
+        selectedText.textContent = 'Select users...';
+    }
+}
+
+function updateSelectedUsersDisplay() {
+    const selectedCheckboxes = document.querySelectorAll('.user-checkbox:checked');
+    const displayDiv = document.getElementById('selectedUsersDisplay');
+    
+    if (selectedCheckboxes.length > 0) {
+        let displayHTML = '<div class="selected-users-list"><strong>Assigned Team Members:</strong>';
+        
+        selectedCheckboxes.forEach(checkbox => {
+            const userOption = checkbox.closest('.user-dropdown-option');
+            const userName = userOption.querySelector('.user-name').textContent;
+            const isAdmin = userOption.querySelector('.user-admin-badge') !== null;
+            
+            displayHTML += `<span class="selected-user-badge">${userName}`;
+            if (isAdmin) {
+                displayHTML += '<span class="admin-indicator">(Admin)</span>';
+            }
+            displayHTML += '</span>';
+        });
+        
+        displayHTML += '</div>';
+        displayDiv.innerHTML = displayHTML;
+        displayDiv.classList.add('show');
+    } else {
+        displayDiv.classList.remove('show');
+        displayDiv.innerHTML = '';
+    }
+}
+
+// Client dropdown functions (similar to users dropdown)
+function toggleClientsDropdown() {
+    const dropdown = document.getElementById('clientsDropdown');
+    const toggle = document.querySelectorAll('.users-dropdown-toggle')[1]; // Second toggle button
+
+    if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+        toggle.classList.remove('active');
+    } else {
+        dropdown.classList.add('show');
+        toggle.classList.add('active');
+    }
+}
+
+function filterClients(searchTerm) {
+    const clientOptions = document.querySelectorAll('.client-option');
+    const searchLower = searchTerm.toLowerCase();
+
+    clientOptions.forEach(option => {
+        const clientName = option.querySelector('.user-name').textContent.toLowerCase();
+        const clientEmail = option.querySelector('.user-email').textContent.toLowerCase();
+        if (clientName.includes(searchLower) || clientEmail.includes(searchLower)) {
+            option.style.display = 'flex';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+}
+
+// Update selected clients count when checkboxes change
+document.addEventListener('change', function(event) {
+    if (event.target.classList.contains('client-checkbox')) {
+        // Toggle the dot's selected class
+        const dot = event.target.nextElementSibling;
+        if (dot && dot.classList.contains('client-dot')) {
+            if (event.target.checked) {
+                dot.classList.add('selected');
+            } else {
+                dot.classList.remove('selected');
+            }
+        }
+        updateSelectedClientsCount();
+        updateSelectedClientsDisplay();
+    }
+});
+
+function updateSelectedClientsCount() {
+    const selectedCheckboxes = document.querySelectorAll('.client-checkbox:checked');
+    const selectedText = document.querySelector('.selected-clients-text');
+
+    if (selectedCheckboxes.length > 0) {
+        selectedText.textContent = `${selectedCheckboxes.length} client(s) selected`;
+    } else {
+        selectedText.textContent = 'Select clients...';
+    }
+}
+
+function updateSelectedClientsDisplay() {
+    const selectedCheckboxes = document.querySelectorAll('.client-checkbox:checked');
+    const displayDiv = document.getElementById('selectedClientsDisplay');
+
+    if (selectedCheckboxes.length > 0) {
+        let displayHTML = '<div class="selected-users-list"><strong>Assigned Clients:</strong>';
+
+        selectedCheckboxes.forEach(checkbox => {
+            const clientOption = checkbox.closest('.client-option');
+            const clientName = clientOption.querySelector('.user-name').textContent;
+            const clientEmail = clientOption.querySelector('.user-email').textContent;
+
+            displayHTML += `<span class="selected-user-badge">${clientName}`;
+            displayHTML += `<span class="admin-indicator">${clientEmail}</span>`;
+            displayHTML += '</span>';
+        });
+
+        displayHTML += '</div>';
+        displayDiv.innerHTML = displayHTML;
+        displayDiv.classList.add('show');
+    } else {
+        displayDiv.classList.remove('show');
+        displayDiv.innerHTML = '';
+    }
+}
+
+// Ensure form submission includes selected users
+document.addEventListener('DOMContentLoaded', function() {
+    const basicProjectForm = document.getElementById('basicProjectForm');
+    if (basicProjectForm) {
+        basicProjectForm.addEventListener('submit', function(e) {
+            // The form will automatically include the checkbox values
+            // Django handles multiple values with the same name correctly
+            console.log('Form submitted with users:', Array.from(document.querySelectorAll('.user-checkbox:checked')).map(cb => cb.value));
+        });
+    }
+    
+    // Initialize selected users display
+    updateSelectedUsersDisplay();
+});
+
+
+
+function openAddSubtaskModal(taskId) {
+    // Create a simple modal for adding subtasks
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Subtask</h2>
+                <button class="close-btn" onclick="this.closest('.modal').remove()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="/projects/add-subtask/">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="${document.querySelector('[name=csrfmiddlewaretoken]').value}">
+                    <input type="hidden" name="task_id" value="${taskId}">
+                    
+                    <div class="form-group">
+                        <label for="subtask_title">Subtask Title *</label>
+                        <input type="text" id="subtask_title" name="title" required>
+                    </div>
+                    
+                                        <div class="form-group">
+                        <label for="subtask_description">Description</label>
+                        <textarea id="subtask_description" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="subtask_status">Status</label>
+                            <select id="subtask_status" name="status" class="form-select">
+                                <option value="not_started">Not Started</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="in_progress_guidance_required">In Progress (Guidance Required)</option>
+                                <option value="completed">Completed</option>
+                                <option value="completed_review_pending">Completed (Review Pending)</option>
+                                <option value="completed_data_discrepancy_addressing">Completed (Data Discrepancy addressing)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subtask_priority">Priority</label>
+                            <select id="subtask_priority" name="priority" class="form-select">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="subtask_start_date">Start Date</label>
+                            <input type="date" id="subtask_start_date" name="start_date">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subtask_end_date">End Date</label>
+                            <input type="date" id="subtask_end_date" name="end_date">
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="submitSubtaskForm(this)">Add Subtask</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// Close modals when clicking outside
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
+
+// Listen for theme changes from settings page
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if there's a saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    // Listen for theme change events
+    window.addEventListener('storage', function(event) {
+        if (event.key === 'theme') {
+            const newTheme = event.newValue || 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+        }
+    });
+    
+    // Listen for custom theme change events
+    window.addEventListener('themeChanged', function(event) {
+        const newTheme = event.detail.theme;
+        document.documentElement.setAttribute('data-theme', newTheme);
+    });
+});
+</script>
+{% endblock %}

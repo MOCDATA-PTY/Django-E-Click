@@ -1,0 +1,1036 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="E-Click Admin Dashboard">
+    <title>{% block title %}E-Click Admin Dashboard{% endblock %}</title>
+    
+    <!-- Favicon - E-Click Logo -->
+    <link rel="icon" type="image/png" href="{% static 'images/E-CLICK_LOGO-removebg-preview.png' %}">
+    
+    {% csrf_token %}
+    
+    <!-- Critical CSS for immediate rendering -->
+    <style>
+        * { box-sizing: border-box; }
+        
+        /* Critical theme detection - prevents flash */
+        :root {
+            --primary: #1a1a1a;
+            --primary-light: #333333;
+            --primary-dark: #000000;
+            --secondary: #f8f9fa;
+            --accent: #6c757d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6c757d;
+            --text-muted: #adb5bd;
+            --text-white: #ffffff;
+            --background-primary: #ffffff;
+            --background-secondary: #f8f9fa;
+            --background-tertiary: #e9ecef;
+            --border-light: #e9ecef;
+            --border-medium: #dee2e6;
+            --border-dark: #adb5bd;
+            --shadow-minimal: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.1);
+            --radius-minimal: 2px;
+            --radius-small: 8px;
+            --radius-medium: 12px;
+            --radius-large: 20px;
+            --sidebar-width: 280px;
+        }
+
+        [data-theme="dark"] {
+            --primary: #ffffff;
+            --primary-light: #f8f9fa;
+            --primary-dark: #e9ecef;
+            --secondary: #2d3748;
+            --accent: #718096;
+            --success: #68d391;
+            --warning: #faf089;
+            --danger: #fc8181;
+            --info: #63b3ed;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --text-muted: #718096;
+            --text-white: #1a202c;
+            --background-primary: #1a202c;
+            --background-secondary: #2d3748;
+            --background-tertiary: #4a5568;
+            --border-light: #4a5568;
+            --border-medium: #718096;
+            --border-dark: #a0aec0;
+            --shadow-minimal: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.2);
+            --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background-secondary);
+            transition: none; /* Disable transitions during initial load */
+        }
+        
+
+        
+        /* Critical dashboard styles */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--background-primary);
+            padding: 0;
+        }
+    </style>
+    
+    <!-- Critical theme detection script -->
+    <script>
+        // Immediately detect and apply theme to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme === 'system' ? (prefersDark ? 'dark' : 'light') : savedTheme;
+            
+            // Apply theme immediately
+            document.documentElement.setAttribute('data-theme', theme);
+            document.body.setAttribute('data-theme', theme);
+            
+            // Add class to html element
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"></noscript>
+    
+    <style>
+        :root {
+            /* Minimalist Theme Variables */
+            --primary: #1a1a1a;
+            --primary-light: #333333;
+            --primary-dark: #000000;
+            --secondary: #f8f9fa;
+            --accent: #6c757d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6c757d;
+            --text-muted: #adb5bd;
+            --text-white: #ffffff;
+            --background-primary: #ffffff;
+            --background-secondary: #f8f9fa;
+            --background-tertiary: #e9ecef;
+            --border-light: #e9ecef;
+            --border-medium: #dee2e6;
+            --border-dark: #adb5bd;
+            --shadow-minimal: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.1);
+            --radius-minimal: 2px;
+            --radius-small: 8px;
+            --radius-medium: 12px;
+            --radius-large: 20px;
+            --sidebar-width: 280px;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode Minimalist Theme */
+            --primary: #ffffff;
+            --primary-light: #f8f9fa;
+            --primary-dark: #e9ecef;
+            --secondary: #2d3748;
+            --accent: #718096;
+            --success: #68d391;
+            --warning: #faf089;
+            --danger: #fc8181;
+            --info: #63b3ed;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+            --text-muted: #718096;
+            --text-white: #1a202c;
+            --background-primary: #1a202c;
+            --background-secondary: #2d3748;
+            --background-tertiary: #4a5568;
+            --border-light: #4a5568;
+            --border-medium: #718096;
+            --border-dark: #a0aec0;
+            --shadow-minimal: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.2);
+            --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            min-height: 100vh;
+            font-weight: 300;
+            letter-spacing: -0.01em;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Minimalist Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--background-primary);
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-right: 1px solid var(--border-light);
+        }
+
+        /* Minimalist Scrollbar */
+        .sidebar::-webkit-scrollbar {
+            width: 1px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-medium);
+            border-radius: 0;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: var(--border-dark);
+        }
+
+        /* Minimalist Logo */
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin: 0;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.625rem 1.5rem 1rem;
+            background: transparent;
+            border: none;
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .logo:hover {
+            color: var(--text-secondary);
+            transform: none;
+        }
+
+        .logo .nav-icon {
+            width: 19px;
+            height: 19px;
+            opacity: 0.7;
+        }
+
+        /* Minimalist Navigation */
+        .nav-links {
+            list-style: none;
+            padding: 0.75rem 0 1.5rem;
+            margin: 0;
+        }
+
+        .nav-links li {
+            margin-bottom: 0;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            gap: 0.75rem;
+            font-weight: 300;
+            font-size: 0.8125rem;
+            border: none;
+            background: transparent;
+            margin: 0;
+            box-shadow: none;
+            position: relative;
+            letter-spacing: 0.025em;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: var(--background-secondary);
+            color: var(--text-primary);
+            transform: none;
+            box-shadow: none;
+            border: none;
+            padding-left: 2rem;
+        }
+
+        .nav-links a:hover::before {
+            background: var(--text-primary);
+        }
+
+        .nav-links a.active {
+            background: var(--background-secondary);
+            color: var(--text-primary);
+            font-weight: 400;
+            box-shadow: none;
+            border: none;
+            transform: none;
+            padding-left: 2rem;
+        }
+
+        .nav-links a.active::before {
+            background: var(--text-primary);
+        }
+
+        .nav-icon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+
+        .nav-links a:hover .nav-icon,
+        .nav-links a.active .nav-icon {
+            opacity: 1;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: calc(var(--sidebar-width) + 1rem);
+            padding: 2rem;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            width: calc(100% - var(--sidebar-width) - 1rem);
+            overflow-x: hidden;
+            background: var(--background-secondary);
+        }
+
+        /* Minimalist Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+        }
+
+        .welcome-text {
+            font-size: 1.75rem;
+            font-weight: 300;
+            color: var(--text-primary);
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            padding: 1rem;
+            background: var(--background-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-small);
+            cursor: pointer;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1001;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .menu-toggle:hover {
+            background: var(--background-secondary);
+            border-color: var(--border-medium);
+        }
+
+        .menu-toggle svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Mobile Backdrop */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: var(--shadow-medium);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-backdrop.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1rem;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .welcome-text {
+                font-size: 1.5rem;
+            }
+
+            .logo {
+                padding: 1.5rem 2rem 1rem;
+                font-size: 1.1rem;
+            }
+
+            .nav-links {
+                padding: 0.5rem 0 2rem;
+            }
+
+            .nav-links a {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.875rem;
+            }
+
+            .nav-links a:hover,
+            .nav-links a.active {
+                padding-left: 2.25rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 0.75rem;
+            }
+
+            .header {
+                margin-bottom: 1.5rem;
+            }
+
+            .welcome-text {
+                font-size: 1.25rem;
+            }
+
+            .logo {
+                padding: 1.25rem 1.5rem 0.75rem;
+                font-size: 1rem;
+            }
+
+            .nav-links a {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.85rem;
+                gap: 0.75rem;
+            }
+
+            .nav-links a:hover,
+            .nav-links a.active {
+                padding-left: 2rem;
+            }
+
+            .nav-icon {
+                width: 16px;
+                height: 16px;
+            }
+
+            .menu-toggle {
+                top: 0.75rem;
+                right: 0.75rem;
+                padding: 0.875rem;
+            }
+
+            .menu-toggle svg {
+                width: 18px;
+                height: 18px;
+            }
+        }
+
+        /* Large Desktop */
+        @media (min-width: 1600px) {
+            .sidebar {
+                width: 320px;
+            }
+
+            .main-content {
+                margin-left: calc(320px + 1rem);
+                width: calc(100% - 320px - 1rem);
+                padding: 2.5rem;
+            }
+
+            .nav-links a {
+                padding: 1rem 2rem;
+                font-size: 0.95rem;
+            }
+
+            .nav-links a:hover,
+            .nav-links a.active {
+                padding-left: 2.75rem;
+            }
+
+            .nav-icon {
+                width: 19px;
+                height: 19px;
+            }
+
+            .logo {
+                padding: 2rem 2rem 1.25rem;
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Animation Enhancements */
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(10px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0);
+            }
+        }
+
+        .nav-links li {
+            animation: fadeIn 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .nav-links li:nth-child(1) { animation-delay: 0.05s; }
+        .nav-links li:nth-child(2) { animation-delay: 0.1s; }
+        .nav-links li:nth-child(3) { animation-delay: 0.15s; }
+        .nav-links li:nth-child(4) { animation-delay: 0.2s; }
+        .nav-links li:nth-child(5) { animation-delay: 0.25s; }
+        .nav-links li:nth-child(6) { animation-delay: 0.3s; }
+        .nav-links li:nth-child(7) { animation-delay: 0.35s; }
+        .nav-links li:nth-child(8) { animation-delay: 0.4s; }
+        .nav-links li:nth-child(9) { animation-delay: 0.45s; }
+        .nav-links li:nth-child(10) { animation-delay: 0.5s; }
+
+        /* Focus States for Accessibility */
+        .nav-links a:focus {
+            outline: 1px solid var(--text-primary);
+            outline-offset: -1px;
+            background: var(--background-secondary);
+        }
+
+        .menu-toggle:focus {
+            outline: 1px solid var(--text-primary);
+            outline-offset: 2px;
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .nav-links a {
+                padding: 1rem 1.5rem;
+                min-height: 48px;
+            }
+
+            .menu-toggle {
+                min-height: 48px;
+                min-width: 48px;
+            }
+
+            .nav-links a:hover {
+                transform: none;
+            }
+
+            .nav-links a:active {
+                background: var(--background-tertiary);
+            }
+        }
+
+        /* High Contrast Mode */
+        @media (prefers-contrast: high) {
+            .nav-links a {
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .nav-links a:hover,
+            .nav-links a.active {
+                border-left: 3px solid var(--text-primary);
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            .nav-links a,
+            .menu-toggle,
+            .sidebar,
+            .main-content {
+                transition: none;
+            }
+
+            .nav-links li {
+                animation: none;
+                opacity: 1;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar,
+            .menu-toggle {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        /* Ensure content doesn't overflow horizontally */
+        .main-content > * {
+            max-width: 100%;
+        }
+
+        /* Additional Responsive Breakpoints */
+        @media (max-width: 1400px) {
+            .main-content {
+                padding: 1.75rem;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 260px;
+            }
+            .main-content {
+                margin-left: 260px;
+                width: calc(100% - 260px);
+                padding: 1.5rem;
+            }
+            :root {
+                --sidebar-width: 260px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+            .main-content {
+                margin-left: 240px;
+                width: calc(100% - 240px);
+                padding: 1.25rem;
+            }
+            :root {
+                --sidebar-width: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 0px;
+            }
+        }
+
+        /* Disabled navigation items */
+        .nav-links a.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <button class="menu-toggle" onclick="toggleSidebar()">
+        <svg fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+        </svg>
+    </button>
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+    <div class="dashboard-container">
+        <aside class="sidebar" id="sidebar">
+            <a href="{% url 'dashboard' %}" class="logo">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z"/>
+                </svg>
+                {% if user.is_staff %}E-Click Admin{% else %}E-Click Dashboard{% endif %}
+            </a>
+            <ul class="nav-links">
+                <li>
+                    <a href="{% url 'dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'projects_page' %}" {% if request.resolver_match.url_name == 'projects_page' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/>
+                        </svg>
+                        {% if user.is_staff %}All Projects{% else %}My Projects{% endif %}
+                    </a>
+                </li>
+
+                {% if user.is_staff %}
+                <li>
+                    <a href="{% url 'team_dashboard' %}" {% if request.resolver_match.url_name == 'team_dashboard' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                        </svg>
+                        Team Dashboard
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if user.is_superuser %}
+                <!-- Admin Notifications - temporarily disabled
+                <li>
+                    <a href="#" class="disabled">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                        </svg>
+                        Admin Notifications
+                    </a>
+                </li>
+                -->
+                {% endif %}
+
+                {% if user.is_superuser %}
+                <li>
+                    <a href="{% url 'admin_control' %}" {% if request.resolver_match.url_name == 'admin_control' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                        </svg>
+                        Admin Control
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'reports' %}" {% if request.resolver_match.url_name == 'reports' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                        </svg>
+                        Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'analytics' %}" {% if request.resolver_match.url_name == 'analytics' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/>
+                            <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/>
+                        </svg>
+                        Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'send_report' %}" {% if request.resolver_match.url_name == 'send_report' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                        </svg>
+                        Send Report
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'satisfaction_report' %}" {% if request.resolver_match.url_name == 'satisfaction_report' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        Satisfaction Report
+                    </a>
+                </li>
+                {% endif %}
+
+                <li>
+                    <a href="{% url 'eclick_chats' %}" {% if request.resolver_match.url_name == 'eclick_chats' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"/>
+                            <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"/>
+                        </svg>
+                        Send Message
+                    </a>
+                </li>
+
+                {% if user.is_superuser %}
+                <li>
+                    <a href="{% url 'system_logs' %}" {% if request.resolver_match.url_name == 'system_logs' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        System Logs
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'backup_management' %}" {% if request.resolver_match.url_name == 'backup_management' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                        </svg>
+                        Backup Management
+                    </a>
+                </li>
+                {% endif %}
+                <li>
+                    <a href="{% url 'settings' %}" {% if request.resolver_match.url_name == 'settings' %}class="active"{% endif %}>
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Settings
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'logout' %}">
+                        <svg class="nav-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+                        </svg>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            sidebar.classList.toggle('active');
+            backdrop.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.querySelector('.menu-toggle');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                    backdrop.classList.remove('active');
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                backdrop.classList.remove('active');
+            }
+        });
+
+        // Handle escape key to close sidebar
+        document.addEventListener('keydown', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            
+            if (event.key === 'Escape' && window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+                backdrop.classList.remove('active');
+            }
+        });
+
+
+
+        // Prevent horizontal scroll issues
+        window.addEventListener('load', function() {
+            // Ensure no horizontal overflow
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.style.overflowX = 'auto';
+            }
+        });
+
+        // Theme Management
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const html = document.documentElement;
+            const body = document.body;
+            
+            // Set the theme
+            html.setAttribute('data-theme', savedTheme);
+            body.setAttribute('data-theme', savedTheme);
+        }
+
+        // Initialize theme when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTheme();
+        });
+
+        // Enhanced navigation interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-links a');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(4px)';
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('active')) {
+                        this.style.transform = 'translateX(0)';
+                    }
+                });
+            });
+        });
+
+        // Smooth scrolling for navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('a[href^="#"]');
+            
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    
+                    if (targetSection) {
+                        targetSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+
+        // Performance optimization: Lazy load content
+        function lazyLoadContent() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('loaded');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            });
+
+            const lazyElements = document.querySelectorAll('.lazy-load');
+            lazyElements.forEach(el => observer.observe(el));
+        }
+
+        // Initialize lazy loading
+        document.addEventListener('DOMContentLoaded', lazyLoadContent);
+
+        // Enhanced keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            // Alt + M to toggle mobile menu
+            if (event.altKey && event.key === 'm') {
+                event.preventDefault();
+                toggleSidebar();
+            }
+            
+            // Tab navigation enhancement
+            if (event.key === 'Tab') {
+                document.body.classList.add('keyboard-navigation');
+            }
+        });
+
+        // Remove keyboard navigation class on mouse use
+        document.addEventListener('mousedown', function() {
+            document.body.classList.remove('keyboard-navigation');
+        });
+
+        // Add CSS for keyboard navigation
+        const keyboardStyle = document.createElement('style');
+        keyboardStyle.textContent = `
+            .keyboard-navigation .nav-links a:focus {
+                background: var(--background-secondary);
+                outline: 2px solid var(--text-primary);
+                outline-offset: -2px;
+            }
+        `;
+        document.head.appendChild(keyboardStyle);
+
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

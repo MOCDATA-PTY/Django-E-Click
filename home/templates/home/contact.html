@@ -1,0 +1,1706 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - E-Click</title>
+    
+    <!-- Favicon - Hard Coded -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/E-CLICK LOGO FINGER.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/images/E-CLICK LOGO FINGER.png">
+    <link rel="apple-touch-icon" href="/static/images/E-CLICK LOGO FINGER.png">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config for Hero Section -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'accent': '#ef4444',
+                        'accent-dark': '#dc2626',
+                        'eclick-600': '#dc2626',
+                        'eclick-700': '#b91c1c',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Dark Mode Detection Script -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (theme === 'dark' || (theme === null && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    
+    <!-- Dark Mode Toggle Script -->
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.classList.contains('dark') ? 'light' : 'dark';
+            
+            if (currentTheme === 'dark') {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+    </script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'accent': '#ef4444',
+                        'accent-dark': '#dc2626',
+                        'eclick-600': '#dc2626',
+                        'eclick-700': '#b91c1c',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --primary: #dc2626;
+            --primary-light: #ef4444;
+            --primary-dark: #b91c1c;
+            --secondary: #f8f9fa;
+            --accent: #dc2626;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --text-primary: #000000;
+            --text-secondary: #333333;
+            --text-muted: #666666;
+            --text-white: #ffffff;
+            --background-primary: #ffffff;
+            --background-secondary: #f8f9fa;
+            --background-tertiary: #e9ecef;
+            --border-light: #e0e0e0;
+            --border-medium: #cccccc;
+            --border-dark: #999999;
+            --shadow-minimal: 0 1px 3px rgba(220, 38, 38, 0.1);
+            --shadow-soft: 0 4px 12px rgba(220, 38, 38, 0.08);
+            --shadow-medium: 0 8px 25px rgba(220, 38, 38, 0.12);
+            --shadow-heavy: 0 20px 40px rgba(220, 38, 38, 0.15);
+            --radius-minimal: 2px;
+            --radius-small: 8px;
+            --radius-medium: 12px;
+            --radius-large: 20px;
+            --radius-xl: 30px;
+        }
+
+        [data-theme="dark"] {
+            --primary: #f87171;
+            --primary-light: #ef4444;
+            --primary-dark: #dc2626;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --background-primary: #0f172a;
+            --background-secondary: #1e293b;
+            --background-tertiary: #334155;
+            --border-light: rgba(51, 65, 85, 0.5);
+            --border-medium: rgba(71, 85, 105, 0.4);
+            --border-dark: #64748b;
+        }
+
+        /* Dark mode specific overrides */
+        .dark {
+            --primary: #f87171;
+            --primary-light: #ef4444;
+            --primary-dark: #dc2626;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --background-primary: #0f172a;
+            --background-secondary: #1e293b;
+            --background-tertiary: #334155;
+            --border-light: rgba(51, 65, 85, 0.5);
+            --border-medium: rgba(71, 85, 105, 0.4);
+            --border-dark: #64748b;
+        }
+        
+        /* Text Reveal Animation */
+        @keyframes text-reveal {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .animate-text-reveal {
+            animation: text-reveal 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+            transform: translateY(100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Adjust scroll offset for fixed navigation */
+        html {
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--background-primary);
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .dark body {
+            background: var(--background-primary);
+            color: var(--text-primary);
+        }
+
+        /* Navigation styles removed - now using navbar partial */
+
+        /* Main Content - adjusted for navbar partial */
+        .main-content {
+            margin-top: 0;
+        }
+
+        /* Hero Section styles removed - now using Tailwind classes */
+
+        /* Contact Section */
+        .contact-section {
+            padding: 4rem 0;
+            background: var(--background-secondary);
+            transition: background-color 0.3s ease;
+        }
+
+        .dark .contact-section {
+            background: var(--background-primary);
+        }
+
+        /* Container styles removed - now using Tailwind classes */
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .section-header p {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+        }
+
+        .dark .section-header h2 {
+            color: var(--text-primary);
+        }
+
+        .dark .section-header p {
+            color: var(--text-secondary);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* Contact Form */
+        .contact-form-card {
+            background: var(--background-primary);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-heavy);
+            border: 1px solid var(--border-light);
+            min-height: auto;
+            transition: all 0.3s ease;
+        }
+
+        .dark .contact-form-card {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: var(--border-light);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .contact-form-card h3 {
+            font-size: clamp(1.25rem, 3vw, 1.75rem);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .dark .contact-form-card h3 {
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .dark .form-label {
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-medium);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            background: var(--background-primary);
+            color: var(--text-primary);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .dark .form-input {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: var(--border-light);
+            color: var(--text-primary);
+        }
+
+        .dark .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+        }
+
+        .dark .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--text-white);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius-medium);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Contact Info */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-info-card {
+            background: var(--background-primary);
+            border-radius: var(--radius-large);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .contact-info-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .dark .contact-info-card {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: var(--border-light);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark .contact-info-card:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .contact-info-card h3 {
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: color 0.3s ease;
+        }
+
+        .dark .contact-info-card h3 {
+            color: var(--text-primary);
+        }
+
+        .contact-info-card h3::before {
+            content: '';
+            width: 3px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: var(--radius-minimal);
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: border-color 0.3s ease;
+        }
+
+        .contact-method:last-child {
+            border-bottom: none;
+        }
+
+        .dark .contact-method {
+            border-bottom-color: var(--border-medium);
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: var(--radius-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-white);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .contact-details h4 {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .contact-details p {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            transition: color 0.3s ease;
+        }
+
+        .dark .contact-details h4 {
+            color: var(--text-primary);
+        }
+
+        .dark .contact-details p {
+            color: var(--text-secondary);
+        }
+
+        /* Google Maps */
+        .map-container {
+            background: var(--background-primary);
+            border-radius: var(--radius-large);
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .dark .map-container {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: var(--border-light);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 250px;
+            border: 0;
+            border-radius: 12px;
+        }
+
+        /* Company Info Section */
+        .company-info-section {
+            padding: 4rem 0;
+            background: var(--background-primary);
+            transition: background-color 0.3s ease;
+        }
+
+        .dark .company-info-section {
+            background: var(--background-secondary);
+        }
+
+        .company-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .company-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .company-card h3 {
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .company-card p {
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* Service Lists */
+        .service-list {
+            list-style: none;
+            padding: 0;
+            color: var(--text-secondary);
+        }
+
+        .service-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
+        }
+
+        .service-list li:last-child {
+            border-bottom: none;
+        }
+
+        .dark .service-list li {
+            border-bottom-color: var(--border-medium);
+            color: var(--text-secondary);
+        }
+
+        /* Values Section */
+        .values-container {
+            color: var(--text-secondary);
+        }
+
+        .value-item {
+            margin-bottom: 1rem;
+        }
+
+        .value-item h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .value-item p {
+            font-size: 0.85rem;
+            margin: 0;
+            transition: color 0.3s ease;
+        }
+
+        .dark .value-item p {
+            color: var(--text-secondary);
+        }
+
+        /* Chatbot specific styles */
+        #chatbot-window {
+            z-index: 9999 !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            transform-origin: bottom right !important;
+            min-height: 32rem !important;
+            max-height: 32rem !important;
+            overflow: hidden !important;
+            width: 20rem !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transform: scale(0.8) translateY(20px) !important;
+            pointer-events: none !important;
+            display: none !important;
+        }
+        
+        #chatbot-messages {
+            max-height: 20rem !important;
+            overflow-y: auto !important;
+            scrollbar-width: thin !important;
+            scrollbar-color: rgba(156, 163, 175, 0.5) transparent !important;
+        }
+        
+        #chatbot-messages::-webkit-scrollbar {
+            width: 4px !important;
+        }
+        
+        #chatbot-messages::-webkit-scrollbar-track {
+            background: transparent !important;
+        }
+        
+        #chatbot-messages::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.5) !important;
+            border-radius: 2px !important;
+        }
+        
+        #chatbot-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7) !important;
+        }
+        
+                 /* Chatbot open state */
+         #chatbot-window.chatbot-open {
+             opacity: 1 !important;
+             visibility: visible !important;
+             transform: scale(1) translateY(0) !important;
+             pointer-events: auto !important;
+             display: block !important;
+         }
+        
+        #chatbot-button {
+            z-index: 9999 !important;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+        
+        #chatbot-messages {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        #chatbot-messages p {
+            word-break: break-word;
+        }
+        
+        #chatbot-messages ul {
+            word-break: break-word;
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 1024px) {
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+                                                  
+
+            .contact-section {
+                padding: 3rem 0;
+            }
+
+            .company-info-section {
+                padding: 3rem 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+
+                                                  
+
+            .contact-section {
+                padding: 2.5rem 0;
+            }
+
+            .company-info-section {
+                padding: 2.5rem 0;
+            }
+
+            .section-header {
+                margin-bottom: 2rem;
+            }
+
+            .contact-form-card {
+                padding: 1.5rem;
+                border-radius: var(--radius-large);
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .contact-info-card {
+                padding: 1.25rem;
+            }
+
+            .contact-method {
+                gap: 0.75rem;
+                padding: 0.625rem 0;
+            }
+
+            .contact-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .company-grid {
+                gap: 1.5rem;
+            }
+
+            .company-card {
+                padding: 1rem;
+            }
+
+            .map-container iframe {
+                height: 200px;
+            }
+
+            .chatbot-window {
+                width: calc(100vw - 2rem);
+                right: 1rem;
+                bottom: 70px;
+            }
+
+            .chatbot-container {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .chatbot-button {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+                         
+
+            .contact-section,
+            .company-info-section {
+                padding: 2rem 0;
+            }
+
+            .section-header {
+                margin-bottom: 1.5rem;
+            }
+
+            .contact-form-card {
+                padding: 1.25rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .form-input {
+                padding: 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .submit-button {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.85rem;
+            }
+
+            .contact-info-card {
+                padding: 1rem;
+            }
+
+            .contact-method {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                text-align: left;
+            }
+
+            .contact-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+
+            .company-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .company-card {
+                padding: 0.75rem;
+            }
+
+            .service-list li {
+                font-size: 0.8rem;
+                padding: 0.375rem 0;
+            }
+
+            .value-item h4 {
+                font-size: 0.85rem;
+            }
+
+            .value-item p {
+                font-size: 0.8rem;
+            }
+
+            .map-container iframe {
+                height: 180px;
+            }
+
+            .chatbot-messages {
+                max-height: 250px;
+                padding: 0.75rem;
+            }
+
+            .chatbot-input-container {
+                padding: 0.75rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .contact-form-card {
+                padding: 1rem;
+            }
+
+            .contact-info-card {
+                padding: 0.875rem;
+            }
+
+            .form-input {
+                padding: 0.625rem;
+            }
+
+            .submit-button {
+                padding: 0.75rem 1.25rem;
+            }
+
+            .chatbot-window {
+                width: calc(100vw - 1rem);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .success-message {
+            background: var(--success);
+            color: var(--text-white);
+            padding: 1rem;
+            border-radius: var(--radius-medium);
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .error-message {
+            background: var(--danger);
+            color: var(--text-white);
+            padding: 1rem;
+            border-radius: var(--radius-medium);
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .warning-message {
+            background: var(--warning);
+            color: var(--text-primary);
+            padding: 1rem;
+            border-radius: var(--radius-medium);
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .dark .success-message {
+            background: #059669;
+            color: var(--text-white);
+        }
+
+        .dark .error-message {
+            background: #dc2626;
+            color: var(--text-white);
+        }
+
+        .dark .warning-message {
+            background: #d97706;
+            color: var(--text-white);
+        }
+
+        /* Utility Classes */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body class="transition-colors duration-300">
+    <!-- Navigation -->
+    {% include 'home/partials/navbar.html' with current='contact' %}
+
+    <!-- Main Content -->
+    <div class="main-content">
+                 <!-- Hero Section -->
+         <section class="relative pt-20 lg:pt-32 px-4 sm:px-6 lg:px-8 bg-white dark:bg-slate-900 overflow-hidden transition-colors min-h-[60vh] lg:min-h-screen">
+          <!-- Animated Background -->
+          <div class="absolute inset-0 opacity-5 dark:opacity-10 pointer-events-none">
+            <div class="absolute inset-0 bg-gradient-to-br from-red-500/20 via-blue-500/10 to-purple-500/20 animate-pulse"></div>
+          </div>
+
+          <div class="container mx-auto relative z-10">
+            <div class="max-w-7xl mx-auto">
+                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[calc(60vh-5rem)] lg:min-h-[85vh]">
+                
+                <!-- Left Content -->
+                <div class="space-y-6 lg:space-y-8 max-w-2xl order-2 lg:order-1">
+                  <!-- Company Logo -->
+                  <div class="flex items-center justify-center lg:justify-start reveal-element opacity-0 translate-y-10 transition-all duration-700">
+                    <div class="relative">
+                      <img src="/static/images/E%20Click%20Logo%20(1).png" alt="E-Click Logo" class="h-24 w-auto lg:h-32 transition-transform duration-300 hover:scale-105 dark:hidden" loading="eager" fetchpriority="high">
+                      <img src="/static/images/E%20Click%20Logo%20(2).png" alt="E-Click Logo" class="h-24 w-auto lg:h-32 transition-transform duration-300 hover:scale-105 hidden dark:block" loading="eager" fetchpriority="high">
+                      <div class="absolute -inset-2 bg-gradient-to-r from-red-500/20 to-blue-500/20 rounded-xl blur-lg"></div>
+                    </div>
+                  </div>
+                  
+                  <!-- Innovation Badge -->
+                  <div class="flex justify-center lg:justify-start reveal-element opacity-0 translate-y-10 transition-all duration-700" style="transition-delay: 200ms">
+                    <span class="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2 sm:py-3 rounded-full text-xs sm:text-sm font-semibold bg-gradient-to-r from-red-50 to-blue-50 dark:from-red-900/20 dark:to-blue-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20">
+                      <div class="relative">
+                        <div class="w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full"></div>
+                        <div class="absolute inset-0 w-2 h-2 bg-red-500 dark:bg-red-400 rounded-full animate-ping"></div>
+                      </div>
+                      <span class="hidden sm:inline">Get In Touch</span>
+                      <span class="sm:hidden">Contact Us</span>
+                      <svg class="w-3 h-3 sm:w-4 sm:h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                      </svg>
+                    </span>
+                  </div>
+                  
+                  <!-- Main Headline -->
+                  <h1 class="reveal-element opacity-0 translate-y-10 transition-all duration-700 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight text-slate-900 dark:text-white text-center lg:text-left" style="transition-delay: 300ms">
+                    Let's Build Something 
+                    <span class="relative">
+                      <span class="bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 bg-clip-text text-transparent">
+                        Amazing
+                      </span>
+                    </span>
+                    <br>Together
+                  </h1>
+                  
+                  <!-- Value Proposition -->
+                  <p class="reveal-element opacity-0 translate-y-10 transition-all duration-700 text-base sm:text-lg lg:text-xl leading-relaxed text-slate-600 dark:text-slate-300 text-center lg:text-left" style="transition-delay: 400ms">
+                    Ready to transform your business? Whether you need a custom software solution, web application, or want to transform your business with innovative technology, we're here to turn your vision into reality.
+                  </p>
+                  
+                  <!-- CTA Buttons -->
+                  <div class="reveal-element opacity-0 translate-y-10 transition-all duration-700 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start" style="transition-delay: 600ms">
+                    <a href="#contact-form" class="group bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:transform hover:scale-105 flex items-center justify-center gap-3">
+                      <svg class="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                      </svg>
+                      Start Your Project
+                    </a>
+                    
+                    <a href="{% url 'services' %}" class="group bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-300 hover:transform hover:scale-105 flex items-center justify-center gap-3 hover:border-red-300 dark:hover:border-red-500">
+                      <svg class="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      Explore Services
+                    </a>
+                  </div>
+                </div>
+                
+                                 <!-- Right Side - Contact Visual -->
+                 <div class="relative order-1 lg:order-2 reveal-element opacity-0 translate-y-10 transition-all duration-700 hidden lg:block" style="transition-delay: 600ms">
+                   <div class="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden max-w-lg mx-auto lg:max-w-none">
+                     <!-- Contact Form Preview -->
+                     <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+                       <div class="flex items-center gap-2 sm:gap-3">
+                         <div class="flex items-center gap-1 sm:gap-2">
+                           <div class="w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full"></div>
+                           <div class="w-2 h-2 sm:w-3 sm:h-3 bg-yellow-500 rounded-full"></div>
+                           <div class="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full"></div>
+                         </div>
+                         <span class="text-white/80 text-xs sm:text-sm font-mono">Contact Form</span>
+                       </div>
+                       <div class="px-2 sm:px-3 py-1 bg-green-500 text-white text-xs rounded-full flex items-center gap-1">
+                         <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-pulse"></div>
+                         Ready
+                       </div>
+                     </div>
+                     
+                     <!-- Form Fields Preview -->
+                     <div class="bg-slate-900 p-3 sm:p-6 font-mono text-xs sm:text-sm">
+                       <div class="space-y-1 sm:space-y-2">
+                         <div class="flex">
+                           <span class="text-slate-500 w-6 sm:w-8">1</span>
+                           <span class="text-blue-400">Name:</span>
+                           <span class="text-white ml-1 sm:ml-2">John Smith</span>
+                         </div>
+                         <div class="flex">
+                           <span class="text-slate-500 w-6 sm:w-8">2</span>
+                           <span class="text-green-400">Email:</span>
+                           <span class="text-white ml-1 sm:ml-2">john@company.com</span>
+                         </div>
+                         <div class="flex">
+                           <span class="text-slate-500 w-6 sm:w-8">3</span>
+                           <span class="text-yellow-400">Project:</span>
+                           <span class="text-white ml-1 sm:ml-2">Custom Software</span>
+                         </div>
+                         <div class="flex">
+                           <span class="text-slate-500 w-6 sm:w-8">4</span>
+                           <span class="text-purple-400">Message:</span>
+                           <span class="text-white ml-1 sm:ml-2">Ready to start...</span>
+                         </div>
+                       </div>
+                     </div>
+                     
+                     <!-- Contact Info Preview -->
+                     <div class="bg-white dark:bg-slate-800 p-3 sm:p-6 border-t border-slate-200 dark:border-slate-700">
+                       <div class="grid grid-cols-1 gap-2 sm:gap-4">
+                         <div class="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-red-50 dark:bg-red-900/20 rounded-xl">
+                           <div class="w-4 h-4 sm:w-5 sm:h-5 bg-red-500 rounded-lg flex items-center justify-center">
+                             <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                             </svg>
+                           </div>
+                           <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">+27 76 740 1777</span>
+                         </div>
+                         
+                         <div class="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                           <div class="w-4 h-4 sm:w-5 sm:h-5 bg-blue-500 rounded-lg flex items-center justify-center">
+                             <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                             </svg>
+                           </div>
+                           <div class="contact-details">
+                               <h4>Email</h4>
+                               <p>info@eclick.co.za</p>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+                
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <div class="container">
+                <div class="section-header fade-in-up">
+                    <h2>Let's Build Something Great Together</h2>
+                    <p>Have a software project in mind? Want to transform your business with innovative technology? We specialize in custom software development, web applications, and digital solutions that drive results. Get in touch and let's discuss how we can bring your ideas to life!</p>
+                </div>
+
+                <div class="contact-grid">
+                    <!-- Contact Form -->
+                    <div class="contact-form-card fade-in-up" id="contact-form">
+                        <h3>Start Your Project</h3>
+                        <form method="post" class="contact-form" id="contactForm">
+                            {% csrf_token %}
+                            
+                            <!-- Django Messages Display -->
+                            {% if messages %}
+                                <div class="messages-container" style="margin-bottom: 1.5rem;">
+                                    {% for message in messages %}
+                                        <div class="{% if message.tags == 'error' %}error-message{% elif message.tags == 'warning' %}warning-message{% else %}success-message{% endif %}">
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" name="first_name" class="form-input" required value="{{ request.POST.first_name|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" name="last_name" class="form-input" required value="{{ request.POST.last_name|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" name="email" class="form-input" required value="{{ request.POST.email|default:'' }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" name="phone" class="form-input" value="{{ request.POST.phone|default:'' }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Subject</label>
+                                <input type="text" name="subject" class="form-input" required value="{{ request.POST.subject|default:'' }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Project Details</label>
+                                <textarea name="message" class="form-input form-textarea" rows="6" required placeholder="Tell us about your software project, business goals, or how we can help transform your ideas into reality...">{{ request.POST.message|default:'' }}</textarea>
+                            </div>
+                            <!-- Honeypot — invisible; must stay empty -->
+                            <input type="text" name="website" style="position:absolute;opacity:0;height:0;width:0;pointer-events:none;" tabindex="-1" autocomplete="off">
+
+                            <!-- Google reCAPTCHA v2 -->
+                            <div class="form-group">
+                                <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                                <p id="recaptcha-error" style="color:#d93025; font-size:0.8rem; margin-top:8px; display:none; font-weight:500;">Please complete the reCAPTCHA verification.</p>
+                            </div>
+                            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                            <script>
+                                window._captchaReset = function() {
+                                    if (typeof grecaptcha !== 'undefined') {
+                                        grecaptcha.reset();
+                                    }
+                                    document.getElementById('recaptcha-error').style.display = 'block';
+                                    document.getElementById('recaptcha-error').textContent = 'Please complete the reCAPTCHA verification.';
+                                };
+
+                                // --- Contact form submit ---
+                                document.getElementById('contactForm').addEventListener('submit', function (e) {
+                                    e.preventDefault();
+
+                                    var recaptchaResponse = grecaptcha.getResponse();
+                                    var recaptchaError = document.getElementById('recaptcha-error');
+
+                                    if (!recaptchaResponse) {
+                                        recaptchaError.style.display = 'block';
+                                        recaptchaError.textContent = 'Please complete the reCAPTCHA verification.';
+                                        return;
+                                    }
+
+                                    recaptchaError.style.display = 'none';
+
+                                    var formData = new FormData(this);
+                                    var submitBtn = document.getElementById('submitBtn');
+                                    var submitText = document.getElementById('submitText');
+                                    var submitLoading = document.getElementById('submitLoading');
+
+                                    submitText.style.display = 'none';
+                                    submitLoading.style.display = 'inline';
+                                    submitBtn.disabled = true;
+
+                                    fetch('/contact/', {
+                                        method: 'POST',
+                                        body: formData,
+                                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                                    })
+                                    .then(function (response) { return response.json(); })
+                                    .then(function (data) {
+                                        if (data.success) {
+                                            submitBtn.innerHTML = '<span style="color:#22c55e; font-size:1.1rem;">Message sent successfully!</span>';
+                                        } else if (data.captcha_error) {
+                                            window._captchaReset();
+                                        } else {
+                                            alert(data.message || 'An error occurred. Please try again.');
+                                        }
+                                    })
+                                    .catch(function () { alert('An error occurred. Please try again.'); })
+                                    .finally(function () {
+                                        submitText.style.display = 'inline';
+                                        submitLoading.style.display = 'none';
+                                        submitBtn.disabled = false;
+                                    });
+                                });
+                            </script>
+
+                            <button type="submit" class="submit-button" id="submitBtn">
+                                <span id="submitText">Start My Project</span>
+                                <span id="submitLoading" style="display: none;">Sending...</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="contact-info">
+                        <!-- Direct Contact -->
+                        <div class="contact-info-card fade-in-up">
+                            <h3>Contact Details</h3>
+                                                         <div class="contact-method">
+                                 <div class="contact-icon">
+                                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                     </svg>
+                                 </div>
+                                 <div class="contact-details">
+                                     <h4>Email</h4>
+                                     <p>info@eclick.co.za</p>
+                                 </div>
+                             </div>
+                             <div class="contact-method">
+                                 <div class="contact-icon">
+                                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                     </svg>
+                                 </div>
+                                 <div class="contact-details">
+                                     <h4>Phone</h4>
+                                     <p>+27 76 740 1777</p>
+                                 </div>
+                             </div>
+                             <div class="contact-method">
+                                 <div class="contact-icon">
+                                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                     </svg>
+                                 </div>
+                                 <div class="contact-details">
+                                     <h4>Office Hours</h4>
+                                     <p>Monday - Friday: 8:00 AM - 6:00 PM SAST</p>
+                                 </div>
+                             </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="contact-info-card fade-in-up">
+                            <h3>Our Location</h3>
+                                                         <div class="contact-method">
+                                 <div class="contact-icon">
+                                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                     </svg>
+                                 </div>
+                                 <div class="contact-details">
+                                     <h4>Address</h4>
+                                     <p>318 The Hillside Street<br>Lynnwood, Pretoria, 0081<br>South Africa</p>
+                                 </div>
+                             </div>
+                            <div class="map-container">
+                                <iframe 
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3593.0587160606965!2d28.265421675400585!3d-25.768624077347518!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1e9560f11a7399d5%3A0x6006d7e1dd3a6416!2s318%20The%20Hillside%20St%2C%20Lynnwood%2C%20Pretoria%2C%200081!5e0!3m2!1sen!2sza!4v1756139546428!5m2!1sen!2sza" 
+                                    allowfullscreen="" 
+                                    loading="lazy" 
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                    title="E-Click Office Location">
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Company Information Section -->
+        <section class="company-info-section">
+            <div class="container">
+                <div class="section-header fade-in-up">
+                    <h2>Our Expertise & Services</h2>
+                    <p>We deliver cutting-edge software solutions that transform businesses and drive innovation. Let us help you build the future of your business.</p>
+                </div>
+
+                <div class="company-grid">
+                    <div class="contact-info-card fade-in-up">
+                        <h3>Our Services</h3>
+                                                 <ul class="service-list">
+                             <li>
+                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; margin-right: 8px; color: var(--primary);">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                 </svg>
+                                 Custom Software Development
+                             </li>
+                             <li>
+                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; margin-right: 8px; color: var(--primary);">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                 </svg>
+                                 Project Management Solutions
+                             </li>
+                             <li>
+                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; margin-right: 8px; color: var(--primary);">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                 </svg>
+                                 Web & Mobile Applications
+                             </li>
+                             <li>
+                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; margin-right: 8px; color: var(--primary);">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                 </svg>
+                                 AI & Machine Learning Integration
+                             </li>
+                             <li>
+                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; margin-right: 8px; color: var(--primary);">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                 </svg>
+                                 Cloud Infrastructure & DevOps
+                             </li>
+                             <li>
+                                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; margin-right: 8px; color: var(--primary);">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                 </svg>
+                                 Digital Transformation Consulting
+                             </li>
+                         </ul>
+                    </div>
+
+                    <div class="contact-info-card fade-in-up">
+                        <h3>Our Values</h3>
+                                                 <div class="values-container">
+                             <div class="value-item">
+                                 <h4>
+                                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; margin-right: 8px;">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                     </svg>
+                                     Innovation
+                                 </h4>
+                                 <p>Pushing boundaries with cutting-edge technology</p>
+                             </div>
+                             <div class="value-item">
+                                 <h4>
+                                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; margin-right: 8px;">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                                     </svg>
+                                     Quality
+                                 </h4>
+                                 <p>Delivering excellence in every project</p>
+                             </div>
+                             <div class="value-item">
+                                 <h4>
+                                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; margin-right: 8px;">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                     </svg>
+                                     Collaboration
+                                 </h4>
+                                 <p>Working together to achieve success</p>
+                             </div>
+                             <div class="value-item">
+                                 <h4>
+                                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; margin-right: 8px;">
+                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                                     </svg>
+                                     Integrity
+                                 </h4>
+                                 <p>Building trust through transparency</p>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Chatbot Component -->
+    <div class="fixed bottom-4 right-4 z-50">
+        <button id="chatbot-button" class="bg-red-600 hover:bg-red-700 text-white rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110 cursor-pointer">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+        </button>
+        
+        <div id="chatbot-window" class="absolute bottom-16 right-0 w-80 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 transition-all duration-300 z-50 transform origin-bottom-right">
+            <div class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 rounded-t-lg">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <div>
+                            <h3 class="font-semibold text-lg">E-Click Assistant</h3>
+                            <p class="text-sm opacity-90">Online • Ready to help!</p>
+                        </div>
+                    </div>
+                    <button id="chatbot-close" class="text-white hover:text-gray-200 transition-colors p-1 rounded-full hover:bg-white hover:bg-opacity-10">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="chatbot-messages" class="p-4 space-y-3 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+                <div class="flex justify-start">
+                    <div class="max-w-[85%] rounded-lg p-3 bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 shadow-sm">
+                        <p class="text-sm leading-relaxed">👋 Hi there! I'm your E-Click Assistant. I can help you with:</p>
+                        <ul class="text-sm mt-2 space-y-1">
+                            <li>• Switching between light/dark mode</li>
+                            <li>• Information about our services</li>
+                            <li>• Contact details</li>
+                            <li>• General questions</li>
+                        </ul>
+                        <p class="text-xs mt-3 opacity-70">💡 <strong>Try saying "light mode" or "dark mode" to change the theme!</strong></p>
+                        <p class="text-xs mt-1 opacity-50" id="initial-timestamp"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="chatbot-form" class="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+                <div class="flex gap-2">
+                    <input 
+                        id="chatbot-input" 
+                        type="text" 
+                        placeholder="Type your message..." 
+                        class="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:focus:ring-red-400 dark:focus:border-red-400 transition-colors"
+                    >
+                    <button type="submit" class="px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Chatbot Functionality
+        let chatbotOpen = false;
+        let isTyping = false;
+
+        const responses = {
+            greetings: [
+                "Hello! 👋 How can I help you today?",
+                "Hi there! 😊 What can I do for you?",
+                "Hey! 🤖 Ready to assist you!",
+                "Greetings! ✨ How may I help?"
+            ],
+            
+            help: [
+                "I can help you with:\n• 🌞 Switch to light mode\n• 🌙 Switch to dark mode\n• 📁 Navigate to projects\n• 📊 Go to dashboard\n• 📞 Contact information\n• 💡 General assistance\n\nJust ask me naturally!",
+                "Here's what I can do:\n• Theme switching (light/dark mode)\n• Navigation help\n• Project management tips\n• Contact assistance\n• General E-Click assistance\n\nTry saying 'light mode' or 'dark mode'!"
+            ],
+            
+            lightMode: [
+                "☀️ Switching to light mode for you! Much brighter now!",
+                "🌞 Light mode activated! Hope you enjoy the bright interface!",
+                "✨ There we go! Light mode is now on. Looking good!"
+            ],
+            
+            darkMode: [
+                "🌙 Dark mode activated! Easy on the eyes!",
+                "🌃 Switched to dark mode! Perfect for night work!",
+                "✨ Dark mode is on! Sleek and professional!"
+            ],
+            
+            projects: [
+                "📁 You can access your projects from the navigation menu or visit your dashboard for an overview!",
+                "🚀 To manage projects, check out the Projects section in the main navigation!",
+                "📊 Your project dashboard has all the details you need about your active projects!"
+            ],
+            
+            dashboard: [
+                "📊 Your dashboard shows all your project statistics and recent activities!",
+                "📈 Check out your dashboard for project overviews and performance metrics!",
+                "🎯 Your dashboard is your command center for all project management!"
+            ],
+            
+            contact: [
+                            "📞 Phone: +27 76 740 1777\n📧 Email: info@eclick.co.za\n📍 Address: 318 The Hillside Street, Lynnwood, Pretoria",
+            "📬 You can reach us at:\n• Phone: +27 76 740 1777\n• Email: info@eclick.co.za\n• Address: 318 The Hillside Street, Lynnwood, Pretoria",
+            "📞 Contact us:\n• Call: +27 76 740 1777\n• Email: info@eclick.co.za\n• Visit: 318 The Hillside Street, Lynnwood, Pretoria"
+            ],
+            
+            location: [
+                "📍 We are located at: 318 The Hillside Street, Lynnwood, Pretoria, South Africa",
+                "🗺️ Our office is at: 318 The Hillside Street, Lynnwood, Pretoria",
+                "🏢 Find us at: 318 The Hillside Street, Lynnwood, Pretoria, South Africa"
+            ],
+            
+            services: [
+                "🛠️ E-Click offers:\n• Custom Software Development\n• Web & Mobile Applications\n• Project Management Solutions\n• AI & Machine Learning\n• Cloud Infrastructure\n• Digital Transformation",
+                "💼 Our services include:\n• Custom software solutions\n• Web and mobile app development\n• Project management tools\n• AI integration\n• Cloud services\n• Business automation",
+                "🚀 We specialize in:\n• Custom software development\n• Digital transformation\n• Project management\n• AI and automation\n• Cloud solutions\n• Business optimization"
+            ]
+        };
+
+                 function toggleChatbot() {
+             const chatbotWindow = document.getElementById('chatbot-window');
+             chatbotOpen = !chatbotOpen;
+             
+             if (chatbotOpen) {
+                 chatbotWindow.classList.add('chatbot-open');
+                 document.getElementById('chatbot-input').focus();
+                 updateCurrentTime();
+             } else {
+                 chatbotWindow.classList.remove('chatbot-open');
+             }
+         }
+
+        function sendMessage() {
+            const input = document.getElementById('chatbot-input');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate typing
+            setTimeout(() => {
+                const response = getResponse(message);
+                addMessage(response, 'bot');
+            }, 1000);
+        }
+
+        function addMessage(message, sender) {
+            const messagesContainer = document.getElementById('chatbot-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = `<p>${message.replace(/\n/g, '<br>')}</p>`;
+            
+            messageDiv.appendChild(messageContent);
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+                 function getResponse(message) {
+             const lowerMessage = message.toLowerCase();
+             
+             // Theme switching
+             if (lowerMessage.includes('light mode') || lowerMessage.includes('light')) {
+                 document.documentElement.classList.remove('dark');
+                 localStorage.setItem('theme', 'light');
+                 return getRandomResponse('lightMode');
+             }
+             
+             if (lowerMessage.includes('dark mode') || lowerMessage.includes('dark')) {
+                 document.documentElement.classList.add('dark');
+                 localStorage.setItem('theme', 'dark');
+                 return getRandomResponse('darkMode');
+             }
+            
+            // Help
+            if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
+                return getRandomResponse('help');
+            }
+            
+            // Contact
+            if (lowerMessage.includes('contact') || lowerMessage.includes('phone') || lowerMessage.includes('email')) {
+                return getRandomResponse('contact');
+            }
+            
+            // Location
+            if (lowerMessage.includes('location') || lowerMessage.includes('address') || lowerMessage.includes('where')) {
+                return getRandomResponse('location');
+            }
+            
+            // Services
+            if (lowerMessage.includes('service') || lowerMessage.includes('what do you do') || lowerMessage.includes('offer')) {
+                return getRandomResponse('services');
+            }
+            
+            // Projects
+            if (lowerMessage.includes('project')) {
+                return getRandomResponse('projects');
+            }
+            
+            // Dashboard
+            if (lowerMessage.includes('dashboard')) {
+                return getRandomResponse('dashboard');
+            }
+            
+            // Greetings
+            if (lowerMessage.includes('hi') || lowerMessage.includes('hello') || lowerMessage.includes('hey')) {
+                return getRandomResponse('greetings');
+            }
+            
+            // Default response
+            return "Thanks for your message! I'm here to help. You can ask me about light/dark mode, contact information, services, or any questions about E-Click.";
+        }
+
+        function getRandomResponse(category) {
+            const categoryResponses = responses[category];
+            return categoryResponses[Math.floor(Math.random() * categoryResponses.length)];
+        }
+
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            const timestampElement = document.getElementById('initial-timestamp');
+            if (timestampElement) {
+                timestampElement.textContent = timeString;
+            }
+        }
+
+        // Form handling - Allow Django to handle form submission
+        // The form will submit normally to the Django view
+
+        // Add fade-in animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatbotButton = document.getElementById('chatbot-button');
+            const chatbotClose = document.getElementById('chatbot-close');
+            const chatbotForm = document.getElementById('chatbot-form');
+            const chatbotInput = document.getElementById('chatbot-input');
+            
+            if (chatbotButton) {
+                chatbotButton.addEventListener('click', toggleChatbot);
+            }
+            
+            if (chatbotClose) {
+                chatbotClose.addEventListener('click', toggleChatbot);
+            }
+            
+            if (chatbotForm) {
+                chatbotForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    sendMessage();
+                });
+            }
+            
+            if (chatbotInput) {
+                chatbotInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            }
+            
+            // Set initial timestamp
+            updateCurrentTime();
+            
+                         // Load saved theme
+             const savedTheme = localStorage.getItem('theme') || 'light';
+             if (savedTheme === 'dark') {
+                 document.documentElement.classList.add('dark');
+             } else {
+                 document.documentElement.classList.remove('dark');
+             }
+        });
+        
+        // Reveal animations on scroll for new hero section
+        const revealObserverOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, revealObserverOptions);
+
+        document.querySelectorAll('.reveal-element').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            revealObserver.observe(el);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,3295 @@
+{% extends 'home/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Client Reports - E-Click{% endblock %}
+
+{% block content %}
+<div class="admin-controls">
+
+
+
+
+    <div class="settings-container">
+        {% csrf_token %}
+                <form class="controls-form">
+
+
+
+
+
+
+
+
+
+    
+
+    
+        <!-- Statistics Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Overview</h2>
+                <div class="section-actions">
+                    <button type="button" class="btn btn-secondary" onclick="refreshStats()" title="Refresh statistics">
+                        <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                        </svg>
+                        Refresh
+                    </button>
+                </div>
+            </div>
+            <div class="section-content">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon clients-icon">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <label>Total Clients</label>
+                            <span class="stat-value">{{ clients_with_projects|length }}</span>
+                            <small>Active clients with projects</small>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon projects-icon">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <label>Total Projects</label>
+                            <span class="stat-value">{{ total_projects|default:"0" }}</span>
+                            <small>Across all clients</small>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon reports-icon">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <label>Reports Sent</label>
+                            <span class="stat-value">{{ reports_sent|default:"0" }}</span>
+                            <small>This month</small>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon active-icon">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <label>Active Projects</label>
+                            <span class="stat-value">{{ active_projects|default:"0" }}</span>
+                            <small>Currently in progress</small>
+                        </div>
+                    </div>
+                </div>
+                
+                        <!-- Enhanced Reports Info -->
+        <div class="enhanced-reports-info">
+            <div class="info-header">
+                <div class="info-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <h3>Professional Project Reports</h3>
+            </div>
+            <div class="info-content">
+                <p>Our enhanced project reports now include comprehensive analytics and insights:</p>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <span>Priority Analysis</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">👥</span>
+                        <span>Team Insights</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">⏱️</span>
+                        <span>Performance Metrics</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔍</span>
+                        <span>Development Status</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📅</span>
+                        <span>Timeline Analysis</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Controls -->
+        <div class="controls-section">
+            <form class="controls-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dateFilter">Report Period</label>
+                                <select class="form-input" id="dateFilter">
+                                    <option value="30">Last 30 Days</option>
+                                    <option value="60">Last 60 Days</option>
+                                    <option value="90">Last 90 Days</option>
+                                    <option value="365">Last Year</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Bulk Actions</label>
+                                <div class="bulk-actions">
+                                    <button type="button" class="professional-btn btn-secondary" onclick="selectAllClients()" id="selectAllBtn">
+                                        <svg class="btn-icon" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Select All
+                                    </button>
+                                    <button type="button" class="professional-btn btn-primary" onclick="sendBulkReports()" id="bulkSendBtn" disabled>
+                                        <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                        Send Selected (<span id="selectedCount">0</span>)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <small class="help-text">Select the time period for generating reports and use bulk actions to send multiple reports at once</small>
+                        </div>
+                    </form>
+                </div>
+
+        <!-- Client Reports Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Client Reports</h2>
+                <div class="section-actions">
+                    <span class="client-count">{{ clients_with_projects|length }} clients</span>
+                </div>
+            </div>
+            <div class="section-content">
+        
+        <div class="clients-container" id="clientsContainer">
+            {% for client in clients_with_projects %}
+            <div class="client-card" data-client-id="{{ client.id }}">
+                <div class="client-row">
+                    <div class="client-select">
+                        <input type="checkbox" class="client-checkbox" id="client-{{ client.id }}" onchange="updateBulkActions()">
+                        <label for="client-{{ client.id }}" class="checkbox-label"></label>
+                    </div>
+                    
+                    <div class="client-info">
+                        <div class="client-avatar">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                            </svg>
+                        </div>
+                        <div class="client-details">
+                            <h3>{{ client.username }}</h3>
+                            <span class="client-email">{{ client.email }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="client-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">Projects</span>
+                            <span class="summary-value">{{ client.projects_count }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Active</span>
+                            <span class="summary-value">{{ client.active_projects_count|default:"0" }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Completed</span>
+                            <span class="summary-value">{{ client.completed_projects_count|default:"0" }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="client-actions">
+                        <button type="button" class="expand-projects-btn" onclick="toggleProjects('{{ client.id }}', this)" title="View projects">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <button type="button" class="client-report-btn" onclick="sendClientReport('{{ client.id }}', '{{ client.username }}', '{{ client.email }}')">
+                            <span>Send Report</span>
+                            <div class="btn-loading">
+                                <svg class="loading-spinner" fill="none" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                        <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                        <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                                    </animate>
+                                </svg>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="projects-table" id="projects-{{ client.id }}" style="display: none;">
+                    <div class="table-header">
+                                            <div class="table-title">
+                        <h4>Projects for {{ client.username }}</h4>
+                        <span class="project-count-badge">{{ client.projects_count }} project{{ client.projects_count|pluralize }}</span>
+                        <div class="enhanced-report-info" title="Enhanced Project Reports include comprehensive analytics, priority analysis, team insights, performance metrics, and strategic recommendations">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Enhanced Reports</span>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="table-content">
+                        {% for project in client.project_list %}
+                        <div class="project-row">
+                            <div class="project-name">
+                                <div class="project-icon">
+                                    <svg fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <span>{{ project.name }}</span>
+                            </div>
+                            <div class="project-status">
+                                <span class="status-badge status-{{ project.status }}">{{ project.get_status_display }}</span>
+                            </div>
+                            <div class="project-dates">
+                                {% if project.start_date and project.end_date %}
+                                    <span>{{ project.start_date|date:"M d" }} - {{ project.end_date|date:"M d, Y" }}</span>
+                                {% else %}
+                                    <span>{{ project.created_at|date:"M d, Y" }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="project-action">
+                                <button type="button" class="project-report-btn enhanced" onclick="sendProjectReport('{{ project.id }}', '{{ project.name }}', '{{ client.username }}', '{{ client.email }}')" title="Send Enhanced Project Report">
+                                    <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    <span>Send Report</span>
+                                    <div class="btn-loading">
+                                        <svg class="loading-spinner" fill="none" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                                <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                                <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                                            </animate>
+                                        </svg>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="no-projects">
+                            <span>No projects available</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-clients">
+                <div class="empty-state">
+                    <span class="empty-icon">👥</span>
+                    <h3>No Clients Found</h3>
+                    <p>No clients with projects found in the selected date range.</p>
+                </div>
+            </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* CSS Variables for consistent theming - EXACTLY matching admin controls */
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --text-muted: #9ca3af;
+        --text-white: #ffffff;
+        --background-primary: #ffffff;
+        --background-secondary: #f9fafb;
+        --background-tertiary: #f1f5f9;
+        --info: #3b82f6;
+        --border-light: #e5e7eb;
+        --border-medium: #d1d5db;
+        --border-dark: #94a3b8;
+        --radius-small: 0.375rem;
+        --radius-medium: 0.5rem;
+        --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Dark mode variables */
+    [data-theme="dark"] {
+        --text-primary: #f9fafb;
+        --text-secondary: #d1d5db;
+        --text-muted: #9ca3af;
+        --text-white: #ffffff;
+        --background-primary: #111827;
+        --background-secondary: #1f2937;
+        --background-tertiary: #374151;
+        --border-light: #374151;
+        --border-medium: #4b5563;
+        --border-dark: #6b7280;
+        --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        --primary: #60a5fa;
+        --primary-dark: #3b82f6;
+    }
+
+    /* EXACTLY matching admin control panel styles */
+    .admin-controls {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        background: var(--background-primary);
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
+
+    /* Settings Container - Main box styling */
+    .settings-container {
+        max-width: none;
+        width: 100%;
+        margin: 0;
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        box-shadow: var(--shadow-medium);
+        overflow: hidden;
+    }
+
+    /* Dashboard Header - Clean and consistent styling */
+    .dashboard-header {
+        background: var(--background-primary);
+        border: none;
+        border-radius: 0;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        text-align: left;
+        position: relative;
+        width: 100%;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .dashboard-header h1 {
+        color: var(--text-primary);
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 1.2;
+    }
+
+    .dashboard-header p {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        font-weight: 400;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    /* Section Styling - EXACTLY matching admin control style */
+    .section {
+        background: var(--background-primary);
+        border: none;
+        border-radius: 0;
+        margin-bottom: 0;
+        overflow: visible;
+        padding: 0;
+        border-bottom: 1px solid var(--border-light);
+        width: 100%;
+    }
+
+    .section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .section-header {
+        background: var(--background-secondary);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--border-light);
+        margin-bottom: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .section-header h2 {
+        color: var(--text-primary);
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        text-transform: none;
+        letter-spacing: -0.025em;
+    }
+
+    .section-content {
+        padding: 2rem;
+        background: var(--background-primary);
+        width: 100%;
+    }
+
+    /* Form Actions - EXACTLY matching admin control style */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin: 0;
+        padding: 2rem;
+        border-top: 1px solid var(--border-light);
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    /* Controls Section Styling */
+    .controls-section {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-light);
+    }
+
+    .controls-form {
+        width: 100%;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        width: 100%;
+    }
+
+    .form-group {
+        margin-bottom: 2rem;
+        position: relative;
+        display: block;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 400;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 1rem 0;
+        border: none;
+        border-bottom: 1px solid var(--border-light);
+        border-radius: 0;
+        font-size: 1rem;
+        background: transparent;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        color: var(--text-primary);
+        box-sizing: border-box;
+        display: block;
+        line-height: 1.4;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding-right: 2rem;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0 center;
+        background-size: 1.5em 1.5em;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-bottom: 2px solid var(--primary);
+        background: transparent;
+        box-shadow: none;
+        transform: translateY(-1px);
+    }
+
+    .form-input::placeholder {
+        color: var(--text-muted);
+        font-weight: 300;
+    }
+
+    .help-text {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 400;
+        font-style: normal;
+        line-height: 1.4;
+        text-align: left;
+        margin: 0;
+    }
+
+    /* Dark mode dropdown styling */
+    [data-theme="dark"] .form-input {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        color: var(--text-white);
+    }
+
+    [data-theme="dark"] .form-input:focus {
+        border-bottom-color: var(--primary);
+    }
+
+    [data-theme="dark"] .form-group label {
+        color: var(--text-secondary);
+    }
+
+    [data-theme="dark"] .help-text {
+        color: var(--text-muted);
+    }
+
+
+
+    /* Button Styles - EXACTLY matching admin control style */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        border: 1px solid transparent;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 400;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        letter-spacing: 0.025em;
+        min-width: 120px;
+        justify-content: center;
+        background: transparent;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: var(--text-white);
+        border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--text-secondary);
+        border-color: var(--border-medium);
+    }
+
+    .btn-secondary:hover {
+        background: var(--background-secondary);
+        color: var(--text-primary);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .btn-icon {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    /* Form Styles - EXACTLY matching admin control style */
+    .form-group {
+        margin-bottom: 2rem;
+        position: relative;
+        display: block;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 400;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 1rem 0;
+        border: none;
+        border-bottom: 1px solid var(--border-light);
+        border-radius: 0;
+        font-size: 1rem;
+        background: transparent;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        color: var(--text-primary);
+        box-sizing: border-box;
+        display: block;
+        line-height: 1.4;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-bottom: 2px solid var(--primary);
+        background: transparent;
+        box-shadow: none;
+        transform: translateY(-1px);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: var(--text-muted);
+        font-weight: 300;
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        font-style: italic;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        width: 100%;
+    }
+
+    .form-row .form-group {
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    /* Select dropdown styling */
+    select.form-input {
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        appearance: none;
+    }
+
+    /* Help text styling */
+    .help-text {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 400;
+        font-style: normal;
+        line-height: 1.4;
+        text-align: left;
+        margin: 0;
+    }
+
+    /* Messages - EXACTLY matching admin control style */
+    .messages {
+        margin-bottom: 3rem;
+    }
+
+    .message {
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+        border-radius: 0;
+        border: none;
+        border-bottom: 1px solid;
+        background: transparent;
+    }
+
+    .message-success {
+        border-bottom-color: var(--success);
+        color: var(--success);
+    }
+
+    .message-error {
+        border-bottom-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .message-warning {
+        border-bottom-color: var(--warning);
+        color: var(--warning);
+    }
+
+    .message-info {
+        border-bottom-color: var(--info);
+        color: var(--info);
+    }
+
+    /* Section Actions */
+    .section-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .client-count {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 300;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 1rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 2rem;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        border-color: var(--border-medium);
+        transform: translateY(-2px);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 300;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 300;
+    }
+
+    /* Bulk Actions */
+    .bulk-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    /* Clients Container */
+    .clients-container {
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+        overflow: visible;
+    }
+
+    .client-card {
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 2rem 0;
+        margin-bottom: 0;
+        border: none;
+        border-bottom: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+
+    .client-card:hover {
+        padding-left: 1rem;
+        border-bottom-color: var(--border-medium);
+    }
+
+    .client-row {
+        display: grid;
+        grid-template-columns: auto 1fr auto auto;
+        gap: 2rem;
+        align-items: center;
+        padding: 0;
+    }
+
+    .client-select {
+        position: relative;
+    }
+
+    .client-checkbox {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border-medium);
+        border-radius: 4px;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        transition: all 0.3s ease;
+        background: transparent;
+    }
+
+    .client-checkbox:checked {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .client-checkbox:checked::before {
+        content: '✓';
+        position: absolute;
+        top: -2px;
+        left: 1px;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .client-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 0;
+    }
+
+    .client-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--background-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        border: 2px solid var(--border-light);
+    }
+
+    .client-avatar svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .client-details {
+        min-width: 0;
+    }
+
+    .client-details h3 {
+        margin: 0 0 0.25rem 0;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+        font-weight: 400;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .client-email {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        font-weight: 300;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .client-summary {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .summary-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .summary-label {
+        font-size: 0.75rem;
+        font-weight: 300;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .summary-value {
+        font-size: 1.5rem;
+        font-weight: 300;
+        color: var(--text-primary);
+        line-height: 1;
+    }
+
+    .client-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .expand-projects-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--border-light);
+        border-radius: 6px;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        padding: 0;
+    }
+
+    .expand-projects-btn:hover {
+        border-color: var(--text-primary);
+        color: var(--text-primary);
+        background: var(--background-secondary);
+    }
+
+    .expand-projects-btn svg {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.3s ease;
+    }
+
+    .expand-projects-btn.expanded svg {
+        transform: rotate(180deg);
+    }
+
+    .client-report-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        border: 1px solid var(--primary);
+        border-radius: 50px;
+        background: transparent;
+        color: var(--primary);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+        font-weight: 300;
+        letter-spacing: 0.025em;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .client-report-btn:hover {
+        background: var(--primary);
+        color: white;
+    }
+
+    .client-report-btn svg {
+        width: 16px;
+        height: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: none;
+    }
+
+    .loading-spinner {
+        width: 16px;
+        height: 16px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .client-report-btn.loading span,
+    .client-report-btn.loading svg:not(.loading-spinner) {
+        opacity: 0;
+    }
+
+    .client-report-btn.loading .btn-loading {
+        display: block;
+    }
+
+    /* Projects Table */
+    .projects-table {
+        background: transparent;
+        border-top: 1px solid var(--border-light);
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+
+    .table-header {
+        padding: 0 0 1rem 0;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .table-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .table-title h4 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    .project-count-badge {
+        padding: 0.25rem 0.75rem;
+        background: var(--background-secondary);
+        border: 1px solid var(--border-light);
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 300;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .table-content {
+        padding: 0;
+    }
+
+    .project-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
+        gap: 2rem;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+
+    .project-row:hover {
+        padding-left: 1rem;
+        border-bottom-color: var(--border-medium);
+    }
+
+    .project-row:last-child {
+        border-bottom: none;
+    }
+
+    .project-name {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 0;
+    }
+
+    .project-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--background-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        flex-shrink: 0;
+    }
+
+    .project-icon svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    .project-name span {
+        font-weight: 400;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .project-status .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 300;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        background: transparent;
+        border: 1px solid;
+        white-space: nowrap;
+    }
+
+    .status-planned {
+        border-color: var(--info);
+        color: var(--info);
+    }
+
+    .status-in_progress {
+        border-color: var(--warning);
+        color: var(--warning);
+    }
+
+    .status-completed {
+        border-color: var(--success);
+        color: var(--success);
+    }
+
+    .project-dates {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        white-space: nowrap;
+    }
+
+    .project-report-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--border-light);
+        border-radius: 6px;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        padding: 0;
+    }
+
+    .project-report-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: rgba(var(--primary-rgb), 0.1);
+    }
+
+    .project-report-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Empty States */
+    .no-projects {
+        padding: 2rem;
+        text-align: center;
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 0.875rem;
+        font-weight: 300;
+    }
+
+    .no-clients {
+        padding: 4rem 0;
+        text-align: center;
+    }
+
+    .empty-state {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .empty-state h3 {
+        margin: 0 0 0.5rem 0;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        font-weight: 300;
+    }
+
+    .empty-state p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        font-weight: 300;
+    }
+
+    /* Debug Section */
+    .debug-section {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.02);
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+    }
+
+    .debug-card h3 {
+        margin: 0 0 1rem 0;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+        font-weight: 400;
+    }
+
+    .debug-message {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .debug-info {
+        background: rgba(59, 130, 246, 0.1);
+        border-left: 3px solid #3b82f6;
+    }
+
+    .debug-success {
+        background: rgba(34, 197, 94, 0.1);
+        border-left: 3px solid #22c55e;
+    }
+
+    .debug-error {
+        background: rgba(239, 68, 68, 0.1);
+        border-left: 3px solid #ef4444;
+    }
+
+    .debug-warning {
+        background: rgba(245, 158, 11, 0.1);
+        border-left: 3px solid #f59e0b;
+    }
+
+    .debug-timestamp {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+
+    .debug-text {
+        color: var(--text-primary);
+        white-space: pre-line;
+        word-break: break-word;
+    }
+
+
+
+
+
+
+
+
+
+    .bulk-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+
+
+    .control-group label {
+        display: block;
+        font-weight: 300;
+        color: var(--text-secondary);
+        margin-bottom: 0.75rem;
+        font-size: 0.875rem;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+
+
+
+
+
+    .info-text {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 300;
+        font-style: italic;
+    }
+
+
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .section-header h2 {
+        color: var(--text-primary);
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 300;
+        letter-spacing: -0.025em;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .section-actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .client-count {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 300;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+
+
+
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 3rem;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        background: var(--background-white);
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--primary);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-2px);
+        border-color: var(--border-medium);
+        box-shadow: var(--shadow-md);
+    }
+
+    .stat-item:hover::before {
+        opacity: 1;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+    }
+
+    .clients-icon {
+        background: rgba(99, 102, 241, 0.1);
+        color: #6366f1;
+    }
+
+    .projects-icon {
+        background: rgba(34, 197, 94, 0.1);
+        color: #22c55e;
+    }
+
+    .reports-icon {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .active-icon {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .stat-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .stat-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .stat-item label {
+        font-weight: 300;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 200;
+        color: var(--text-primary);
+        letter-spacing: -0.025em;
+        line-height: 1;
+    }
+
+    .stat-item small {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 300;
+        font-style: italic;
+    }
+
+
+
+    .clients-container {
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+        overflow: visible;
+    }
+
+    .client-card {
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 2rem 0;
+        margin-bottom: 0;
+        border: none;
+        border-bottom: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+
+    .client-card:hover {
+        padding-left: 1rem;
+        border-bottom-color: var(--border-medium);
+    }
+
+    .client-row {
+        display: grid;
+        grid-template-columns: auto 1fr auto auto;
+        gap: 2rem;
+        align-items: center;
+        padding: 0;
+    }
+
+    .client-select {
+        position: relative;
+    }
+
+    .client-checkbox {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--border-medium);
+        border-radius: 4px;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        transition: all 0.3s ease;
+        background: transparent;
+    }
+
+    .client-checkbox:checked {
+        background: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .client-checkbox:checked::before {
+        content: '✓';
+        position: absolute;
+        top: -2px;
+        left: 1px;
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .client-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 0;
+    }
+
+    .client-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--background-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        border: 2px solid var(--border-light);
+    }
+
+    .client-avatar svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .client-details {
+        min-width: 0;
+    }
+
+    .client-details h3 {
+        margin: 0 0 0.25rem 0;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+        font-weight: 400;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .client-email {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        font-weight: 300;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .client-summary {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .summary-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .summary-label {
+        font-size: 0.75rem;
+        font-weight: 300;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .summary-value {
+        font-size: 1.5rem;
+        font-weight: 300;
+        color: var(--text-primary);
+        line-height: 1;
+    }
+
+    .client-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .expand-projects-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--border-light);
+        border-radius: 6px;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        padding: 0;
+    }
+
+    .expand-projects-btn:hover {
+        border-color: var(--text-primary);
+        color: var(--text-primary);
+        background: var(--background-secondary);
+    }
+
+    .expand-projects-btn svg {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.3s ease;
+    }
+
+    .expand-projects-btn.expanded svg {
+        transform: rotate(180deg);
+    }
+
+    .client-report-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        border: 1px solid var(--primary);
+        border-radius: 50px;
+        background: transparent;
+        color: var(--primary);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.875rem;
+        font-weight: 300;
+        letter-spacing: 0.025em;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .client-report-btn:hover {
+        background: var(--primary);
+        color: white;
+    }
+
+    .client-report-btn svg {
+        width: 16px;
+        height: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: none;
+    }
+
+    .loading-spinner {
+        width: 16px;
+        height: 16px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .client-report-btn.loading span,
+    .client-report-btn.loading svg:not(.loading-spinner) {
+        opacity: 0;
+    }
+
+    .client-report-btn.loading .btn-loading {
+        display: block;
+    }
+
+    /* Settings-Style Projects Table */
+    .projects-table {
+        background: transparent;
+        border-top: 1px solid var(--border-light);
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+
+    .table-header {
+        padding: 0 0 1rem 0;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .table-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .table-title h4 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    .project-count-badge {
+        padding: 0.25rem 0.75rem;
+        background: var(--background-secondary);
+        border: 1px solid var(--border-light);
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 300;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .table-content {
+        padding: 0;
+    }
+
+    .project-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
+        gap: 2rem;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+    }
+
+    .project-row:hover {
+        padding-left: 1rem;
+        border-bottom-color: var(--border-medium);
+    }
+
+    .project-row:last-child {
+        border-bottom: none;
+    }
+
+    .project-name {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 0;
+    }
+
+    .project-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--background-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        flex-shrink: 0;
+    }
+
+    .project-icon svg {
+        width: 12px;
+        height: 12px;
+    }
+
+    .project-name span {
+        font-weight: 400;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .project-status .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 300;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        background: transparent;
+        border: 1px solid;
+        white-space: nowrap;
+    }
+
+    .status-planned {
+        border-color: var(--info);
+        color: var(--info);
+    }
+
+    .status-in_progress {
+        border-color: var(--warning);
+        color: var(--warning);
+    }
+
+    .status-completed {
+        border-color: var(--success);
+        color: var(--success);
+    }
+
+    .project-dates {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        white-space: nowrap;
+    }
+
+    .project-report-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid var(--border-light);
+        border-radius: 6px;
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        padding: 0;
+    }
+
+    .project-report-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: rgba(var(--primary-rgb), 0.1);
+    }
+
+    .project-report-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Empty States */
+    .no-projects {
+        padding: 2rem;
+        text-align: center;
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 0.875rem;
+        font-weight: 300;
+    }
+
+    .no-clients {
+        padding: 4rem 0;
+        text-align: center;
+    }
+
+    .empty-state {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .empty-state h3 {
+        margin: 0 0 0.5rem 0;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        font-weight: 300;
+    }
+
+    .empty-state p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        font-weight: 300;
+    }
+
+    /* Debug Section */
+    .debug-section {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.02);
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+    }
+
+    .debug-card h3 {
+        margin: 0 0 1rem 0;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+        font-weight: 400;
+    }
+
+    .debug-message {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .debug-info {
+        background: rgba(59, 130, 246, 0.1);
+        border-left: 3px solid #3b82f6;
+    }
+
+    .debug-success {
+        background: rgba(34, 197, 94, 0.1);
+        border-left: 3px solid #22c55e;
+    }
+
+    .debug-error {
+        background: rgba(239, 68, 68, 0.1);
+        border-left: 3px solid #ef4444;
+    }
+
+    .debug-warning {
+        background: rgba(245, 158, 11, 0.1);
+        border-left: 3px solid #f59e0b;
+    }
+
+    .debug-timestamp {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        white-space: nowrap;
+    }
+
+    .debug-text {
+        color: var(--text-primary);
+        white-space: pre-line;
+        word-break: break-word;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+
+        .dashboard-header {
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.1rem;
+        }
+
+        .stats-container {
+            padding: 1.5rem 0;
+        }
+
+
+
+        .bulk-actions {
+            justify-content: flex-start;
+        }
+
+        .client-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .client-summary {
+            gap: 1rem;
+        }
+
+        .client-actions {
+            justify-content: flex-start;
+        }
+
+        .project-row {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .project-action {
+            justify-self: start;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .client-card {
+            padding: 1.5rem 0;
+        }
+
+        .client-card:hover {
+            padding-left: 0.5rem;
+        }
+
+        .project-row {
+            padding: 0.75rem 0;
+        }
+
+        .project-row:hover {
+            padding-left: 0.5rem;
+        }
+
+        .controls-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-header {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .client-card {
+            padding: 1rem 0;
+        }
+
+        .project-row {
+            padding: 0.5rem 0;
+        }
+
+                .bulk-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+    }
+
+
+
+    /* Animations */
+    .client-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .client-card:nth-child(1) { animation-delay: 0.1s; }
+    .client-card:nth-child(2) { animation-delay: 0.2s; }
+    .client-card:nth-child(3) { animation-delay: 0.3s; }
+    .client-card:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    .client-report-btn:focus-visible {
+        outline: 2px solid var(--text-primary);
+        outline-offset: 2px;
+    }
+
+    /* Enhanced Project Report Button Styles */
+    .project-report-btn {
+        width: auto;
+        min-width: 140px;
+        height: auto;
+        border: 1px solid #e2e8f0;
+        border-radius: 50px;
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        color: #2d3748;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        padding: 0.875rem 1.5rem;
+        position: relative;
+        font-size: 0.875rem;
+        font-weight: 400;
+        letter-spacing: 0.025em;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    .project-report-btn.enhanced {
+        background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 8px 25px rgba(26, 54, 93, 0.15);
+        font-weight: 400;
+    }
+    
+    .project-report-btn.enhanced:hover {
+        background: linear-gradient(135deg, #2d3748 0%, #1a365d 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(26, 54, 93, 0.25);
+    }
+    
+    .project-report-btn .btn-icon {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.3s ease;
+    }
+    
+    .project-report-btn:hover .btn-icon {
+        transform: scale(1.1);
+    }
+    
+    /* Loading state for enhanced project report buttons */
+    .project-report-btn.loading span,
+    .project-report-btn.loading svg:not(.loading-spinner) {
+        opacity: 0;
+    }
+    
+    .project-report-btn.loading .btn-loading {
+        display: block;
+    }
+    
+    .project-report-btn .btn-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: none;
+    }
+    
+    .project-report-btn .loading-spinner {
+        width: 16px;
+        height: 16px;
+        animation: spin 1s linear infinite;
+    }
+
+    .project-report-btn:hover {
+        border-color: #cbd5e0;
+        color: #1a365d;
+        background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Professional Email-Style Button Design */
+    .client-report-btn {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+        color: white;
+        border: 1px solid transparent;
+        border-radius: 50px;
+        box-shadow: 0 8px 25px rgba(26, 54, 93, 0.15);
+        font-weight: 400;
+        font-size: 0.875rem;
+        letter-spacing: 0.025em;
+        transition: all 0.3s ease;
+        padding: 1rem 2rem;
+        min-width: 140px;
+        justify-content: center;
+    }
+
+    .client-report-btn:hover {
+        background: linear-gradient(135deg, #2d3748 0%, #1a365d 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(26, 54, 93, 0.25);
+    }
+
+    .client-report-btn span {
+        font-weight: 400;
+        text-transform: none;
+    }
+
+    /* Professional Project Report Button */
+    .project-report-btn {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        border-color: var(--border-medium);
+        color: var(--text-primary);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .project-report-btn:hover {
+        background: var(--primary);
+        color: var(--text-white);
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Dark mode specific button styling */
+    [data-theme="dark"] .client-report-btn {
+        background: var(--primary);
+        color: var(--text-white);
+        border-color: var(--primary);
+        box-shadow: 0 2px 8px rgba(96, 165, 250, 0.4);
+    }
+
+    [data-theme="dark"] .client-report-btn:hover {
+        background: var(--primary-dark);
+        box-shadow: 0 4px 12px rgba(96, 165, 250, 0.6);
+    }
+
+    [data-theme="dark"] .project-report-btn {
+        background: var(--background-tertiary);
+        border-color: var(--border-medium);
+        color: var(--text-secondary);
+    }
+
+    [data-theme="dark"] .project-report-btn:hover {
+        background: var(--primary);
+        color: var(--text-white);
+        border-color: var(--primary);
+    }
+
+    /* Ensure proper contrast in dark mode */
+    [data-theme="dark"] .btn {
+        color: var(--text-white);
+    }
+
+    [data-theme="dark"] .btn-secondary {
+        background: transparent;
+        color: var(--text-secondary);
+        border-color: var(--border-medium);
+    }
+
+    [data-theme="dark"] .btn-secondary:hover {
+        background: var(--background-secondary);
+        color: var(--text-primary);
+        border-color: var(--border-dark);
+    }
+
+    /* Add pulsing animation to make buttons more noticeable */
+    .client-report-btn,
+    .project-report-btn {
+        animation: subtle-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes subtle-pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.02);
+        }
+    }
+
+    .client-report-btn:hover,
+    .project-report-btn:hover {
+        animation: none;
+    }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    
+    /* Large Desktop (1200px and up) */
+    @media (min-width: 1200px) {
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        
+        .client-row {
+            grid-template-columns: auto 1fr auto auto;
+            gap: 2.5rem;
+            padding: 2rem 2.5rem;
+        }
+    }
+
+    /* Desktop (1024px to 1199px) */
+    @media (max-width: 1199px) {
+        .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 2rem;
+        }
+        
+        .client-row {
+            grid-template-columns: auto 1fr auto auto;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem;
+        }
+    }
+
+    /* Tablet Landscape (768px to 1023px) */
+    @media (max-width: 1023px) {
+        .bulk-actions {
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .client-row {
+            grid-template-columns: auto 1fr auto;
+            gap: 1rem;
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .client-summary {
+            display: none; /* Hide summary on tablet */
+        }
+        
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .section-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
+
+    /* Tablet Portrait (600px to 767px) */
+    @media (max-width: 767px) {
+
+        
+
+        
+
+        
+        .controls-card {
+            padding: 1.5rem 0;
+        }
+        
+
+        
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            padding: 1.25rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+        }
+        
+
+        
+        .client-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            padding: 1rem;
+        }
+        
+        .client-info {
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .client-actions {
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        
+        .client-report-btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .expand-projects-btn {
+            width: 100%;
+            height: 40px;
+        }
+        
+        .projects-table {
+            margin: 0 -1rem;
+        }
+        
+        .table-header,
+        .project-row {
+            padding: 1rem;
+        }
+        
+        .project-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            text-align: center;
+        }
+        
+        .project-name {
+            justify-content: center;
+        }
+        
+        .project-status,
+        .project-dates {
+            justify-content: center;
+        }
+    }
+
+    /* Mobile (up to 599px) */
+    @media (max-width: 599px) {
+
+        
+        .bulk-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+
+        
+        .stat-item {
+            padding: 1rem;
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+        }
+        
+        .client-card {
+            margin-bottom: 0.5rem;
+        }
+        
+        .client-row {
+            padding: 0.75rem;
+        }
+        
+        .client-avatar {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .client-details h3 {
+            font-size: 1rem;
+        }
+        
+        .client-email {
+            font-size: 0.8rem;
+        }
+        
+        .client-report-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+        
+        .expand-projects-btn {
+            height: 36px;
+        }
+        
+        .table-header h4 {
+            font-size: 0.9rem;
+        }
+        
+        .project-count-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+        }
+        
+        .project-name span {
+            font-size: 0.9rem;
+        }
+        
+        .project-status .status-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+        }
+        
+        .project-dates {
+            font-size: 0.8rem;
+        }
+    }
+
+    /* Extra Small Mobile (up to 479px) */
+    @media (max-width: 479px) {
+        
+
+        
+
+        
+        .section-header h2 {
+            font-size: 1.1rem;
+        }
+        
+        .client-count {
+            font-size: 0.7rem;
+        }
+        
+        .refresh-btn {
+            font-size: 0.7rem;
+            padding: 0.4rem 0.8rem;
+        }
+        
+        .stat-item {
+            padding: 0.75rem;
+        }
+        
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+        }
+        
+        .stat-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+        }
+        
+        .client-row {
+            padding: 0.5rem;
+        }
+        
+        .client-avatar {
+            width: 36px;
+            height: 36px;
+        }
+        
+        .client-avatar svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .client-details h3 {
+            font-size: 0.9rem;
+        }
+        
+        .client-email {
+            font-size: 0.75rem;
+        }
+        
+        .client-report-btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+        }
+        
+        .expand-projects-btn {
+            height: 32px;
+        }
+        
+        .expand-projects-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+    }
+
+    /* Landscape orientation adjustments for mobile */
+    @media (max-width: 767px) and (orientation: landscape) {
+
+        
+
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .client-row {
+            grid-template-columns: auto 1fr auto;
+            padding: 0.75rem 1rem;
+        }
+        
+        .client-summary {
+            display: flex;
+            gap: 1rem;
+        }
+    }
+
+    /* High DPI displays */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        .client-avatar,
+        .stat-icon,
+        .expand-projects-btn,
+        .project-report-btn {
+            border-width: 0.5px;
+        }
+    }
+
+    /* Print styles */
+    @media print {
+        .controls-section,
+        .client-actions,
+        .bulk-actions,
+        .section-actions {
+            display: none !important;
+        }
+        
+        .client-card {
+            break-inside: avoid;
+            border: 1px solid #ccc;
+            margin-bottom: 1rem;
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    /* Accessibility improvements for small screens */
+    @media (max-width: 767px) {
+        .client-checkbox {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .client-checkbox:checked::before {
+            font-size: 14px;
+            top: -1px;
+            left: 2px;
+        }
+        
+        .client-report-btn:focus-visible,
+        .expand-projects-btn:focus-visible,
+        .bulk-btn:focus-visible {
+            outline-width: 3px;
+            outline-offset: 1px;
+        }
+    }
+    
+    /* Enhanced Report Info Styling */
+    .enhanced-report-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        cursor: help;
+        transition: all 0.3s ease;
+    }
+    
+    .enhanced-report-info:hover {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.2) 100%);
+        border-color: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+    }
+    
+    .enhanced-report-info svg {
+        width: 14px;
+        height: 14px;
+        color: var(--primary);
+    }
+
+    /* Professional Info Header */
+    .info-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .info-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+    }
+
+    .info-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .info-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a365d;
+        letter-spacing: -0.025em;
+    }
+
+    /* Professional Bulk Action Buttons */
+    .professional-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.5rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 400;
+        letter-spacing: 0.025em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border: 1px solid transparent;
+        min-width: 120px;
+        justify-content: center;
+    }
+
+    .professional-btn.btn-primary {
+        background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(26, 54, 93, 0.15);
+    }
+
+    .professional-btn.btn-primary:hover:not(:disabled) {
+        background: linear-gradient(135deg, #2d3748 0%, #1a365d 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(26, 54, 93, 0.25);
+    }
+
+    .professional-btn.btn-secondary {
+        background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+        color: #2d3748;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .professional-btn.btn-secondary:hover {
+        background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+        border-color: #cbd5e0;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .professional-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .professional-btn .btn-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+    }
+    
+    /* Enhanced Reports Info Section */
+    .enhanced-reports-info {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.05) 100%);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 2rem 0;
+        transition: all 0.3s ease;
+    }
+    
+    .enhanced-reports-info:hover {
+        border-color: rgba(59, 130, 246, 0.4);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    }
+    
+    .info-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .info-header svg {
+        width: 24px;
+        height: 24px;
+        color: var(--primary);
+    }
+    
+    .info-header h3 {
+        margin: 0;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .info-content p {
+        margin: 0 0 1rem 0;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(59, 130, 246, 0.1);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-item:hover {
+        background: rgba(255, 255, 255, 0.9);
+        border-color: rgba(59, 130, 246, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(59, 130, 246, 0.1);
+    }
+    
+    .feature-icon {
+        font-size: 1.2rem;
+        line-height: 1;
+    }
+    
+    .feature-item span:last-child {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    /* Dark mode adjustments */
+    [data-theme="dark"] .enhanced-reports-info {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+    
+    [data-theme="dark"] .feature-item {
+        background: rgba(31, 41, 55, 0.7);
+        border-color: rgba(59, 130, 246, 0.2);
+    }
+    
+    [data-theme="dark"] .feature-item:hover {
+        background: rgba(31, 41, 55, 0.9);
+        border-color: rgba(59, 130, 246, 0.4);
+    }
+</style>
+
+<script>
+    // Global state
+    let selectedClients = new Set();
+
+    // Client report functions
+    function sendClientReport(clientId, clientUsername, clientEmail) {
+        console.log('sendClientReport called with:', { clientId, clientUsername, clientEmail });
+        
+        showDebug();
+        updateDebug('Starting client report send process...', 'info');
+        
+        if (!clientEmail) {
+            updateDebug('❌ Client has no email address', 'error');
+            alert('This client does not have an email address. Please update the client information first.');
+            return;
+        }
+
+        // Find the button that was clicked
+        const button = event.target.closest('.client-report-btn');
+        if (button) {
+            button.classList.add('loading');
+            updateDebug('🔄 Button loading state activated', 'info');
+        }
+
+        if (confirm(`Send a comprehensive report for all projects to ${clientEmail} for client ${clientUsername}?`)) {
+            updateDebug('✅ User confirmed sending client report', 'success');
+            
+            const formData = new FormData();
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+            
+            if (!csrfToken) {
+                console.error('CSRF token not found!');
+                updateDebug('❌ CSRF token not found!', 'error');
+                alert('Security token not found. Please refresh the page and try again.');
+                if (button) button.classList.remove('loading');
+                return;
+            }
+            
+            updateDebug('🔑 CSRF token found and validated', 'success');
+            formData.append('csrfmiddlewaretoken', csrfToken.value);
+            formData.append('client_id', clientId);
+            formData.append('client_email', clientEmail);
+            formData.append('client_username', clientUsername);
+
+            updateDebug(`📤 Sending client report request...\nClient: ${clientUsername}\nEmail: ${clientEmail}`, 'info');
+
+            // Send POST request for client report
+            fetch('{% url "send_client_report_ajax" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status, response.statusText);
+                updateDebug(`📡 Server response: ${response.status} ${response.statusText}`, 'info');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                updateDebug(`📋 Response data: ${JSON.stringify(data, null, 2)}`, 'info');
+                
+                if (data.success) {
+                    updateDebug('✅ Enhanced client report sent successfully!', 'success');
+                    
+                    // Show enhanced success message
+                    let successMessage = `✅ Enhanced Client Report Sent Successfully!\n\n`;
+                    successMessage += `Client: ${clientUsername}\n`;
+                    successMessage += `Email: ${clientEmail}\n\n`;
+                    
+                    if (data.report_summary) {
+                        successMessage += `📊 Report Summary:\n`;
+                        successMessage += `• Tasks Completed: ${data.report_summary.tasks_completed}\n`;
+                        successMessage += `• Completion Rate: ${data.report_summary.completion_rate}\n`;
+                        successMessage += `• Timeline Progress: ${data.report_summary.timeline_progress}\n`;
+                        successMessage += `• Days Remaining: ${data.report_summary.days_remaining}\n\n`;
+                    }
+                    
+                    successMessage += `📧 A comprehensive PDF report has been sent to the client.\n`;
+                    successMessage += `📈 The report includes detailed analytics, charts, and strategic recommendations.`;
+                    
+                    alert(successMessage);
+                } else {
+                    updateDebug(`❌ Server returned error: ${data.error || 'Unknown error'}`, 'error');
+                    alert('❌ Error sending enhanced client report:\n\n' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                updateDebug(`❌ Fetch error: ${error.message}`, 'error');
+                alert('❌ Error sending client report:\n\n' + error.message);
+            })
+            .finally(() => {
+                if (button) {
+                    button.classList.remove('loading');
+                    updateDebug('🔄 Button loading state deactivated', 'info');
+                }
+            });
+        } else {
+            if (button) {
+                button.classList.remove('loading');
+                updateDebug('❌ User cancelled the operation', 'warning');
+            }
+        }
+    }
+
+    function sendProjectReport(projectId, projectName, clientUsername, clientEmail) {
+        console.log('sendProjectReport called with:', { projectId, projectName, clientUsername, clientEmail });
+        
+        showDebug();
+        updateDebug('Starting individual project report send process...', 'info');
+        
+        if (!clientEmail) {
+            updateDebug('❌ Client has no email address', 'error');
+            alert('This client does not have an email address. Please update the client information first.');
+            return;
+        }
+
+        const button = event.target.closest('.project-report-btn');
+        if (button) {
+            button.classList.add('loading');
+            updateDebug('🔄 Button loading state activated', 'info');
+        }
+
+        if (confirm(`Send a report for project "${projectName}" to ${clientEmail}?`)) {
+            updateDebug('✅ User confirmed sending project report', 'success');
+            
+            const formData = new FormData();
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+            
+            if (!csrfToken) {
+                console.error('CSRF token not found!');
+                updateDebug('❌ CSRF token not found!', 'error');
+                alert('Security token not found. Please refresh the page and try again.');
+                if (button) button.classList.remove('loading');
+                return;
+            }
+            
+            updateDebug('🔑 CSRF token found and validated', 'success');
+            formData.append('csrfmiddlewaretoken', csrfToken.value);
+            formData.append('project_id', projectId);
+            formData.append('client_email', clientEmail);
+            formData.append('client_username', clientUsername);
+
+            updateDebug(`📤 Sending project report request...\nProject: ${projectName}\nClient: ${clientUsername}\nEmail: ${clientEmail}`, 'info');
+
+            fetch('{% url "send_project_report_ajax" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status, response.statusText);
+                updateDebug(`📡 Server response: ${response.status} ${response.statusText}`, 'info');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                updateDebug(`📋 Response data: ${JSON.stringify(data, null, 2)}`, 'info');
+                
+                if (data.success) {
+                    updateDebug('✅ Enhanced project report sent successfully!', 'success');
+                    
+                    // Show enhanced success message with report summary
+                    let successMessage = `✅ Enhanced Project Report Sent Successfully!\n\n`;
+                    successMessage += `Project: ${projectName}\n`;
+                    successMessage += `Client: ${clientUsername}\n`;
+                    successMessage += `Email: ${clientEmail}\n\n`;
+                    
+                    if (data.report_summary) {
+                        successMessage += `📊 Report Summary:\n`;
+                        successMessage += `• Tasks Completed: ${data.report_summary.tasks_completed}\n`;
+                        successMessage += `• Completion Rate: ${data.report_summary.completion_rate}\n`;
+                        successMessage += `• Timeline Progress: ${data.report_summary.timeline_progress}\n`;
+                        successMessage += `• Days Remaining: ${data.report_summary.days_remaining}\n\n`;
+                    }
+                    
+                    successMessage += `📧 A comprehensive PDF report has been sent to the client.\n`;
+                    successMessage += `📈 The report includes detailed analytics, charts, and strategic recommendations.`;
+                    
+                    alert(successMessage);
+                } else {
+                    updateDebug(`❌ Server returned error: ${data.error || 'Unknown error'}`, 'error');
+                    alert('❌ Error sending enhanced project report:\n\n' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                updateDebug(`❌ Fetch error: ${error.message}`, 'error');
+                alert('❌ Error sending project report:\n\n' + error.message);
+            })
+            .finally(() => {
+                if (button) {
+                    button.classList.remove('loading');
+                    updateDebug('🔄 Button loading state deactivated', 'info');
+                }
+            });
+        } else {
+            if (button) {
+                button.classList.remove('loading');
+                updateDebug('❌ User cancelled the operation', 'warning');
+            }
+        }
+    }
+
+    // Bulk actions
+    function selectAllClients() {
+        const checkboxes = document.querySelectorAll('.client-checkbox');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const isSelectAll = selectAllBtn.textContent.includes('Select All');
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = isSelectAll;
+            if (isSelectAll) {
+                selectedClients.add(checkbox.closest('.client-card').dataset.clientId);
+            } else {
+                selectedClients.delete(checkbox.closest('.client-card').dataset.clientId);
+            }
+        });
+        
+        selectAllBtn.innerHTML = isSelectAll 
+            ? '<svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>Deselect All'
+            : '<svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>Select All';
+        
+        updateBulkActions();
+    }
+
+    function updateBulkActions() {
+        const checkboxes = document.querySelectorAll('.client-checkbox');
+        const selectedCount = document.querySelectorAll('.client-checkbox:checked').length;
+        const bulkSendBtn = document.getElementById('bulkSendBtn');
+        const selectedCountSpan = document.getElementById('selectedCount');
+        
+        selectedClients.clear();
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selectedClients.add(checkbox.closest('.client-card').dataset.clientId);
+            }
+        });
+        
+        selectedCountSpan.textContent = selectedCount;
+        bulkSendBtn.disabled = selectedCount === 0;
+        
+        if (selectedCount === 0) {
+            bulkSendBtn.style.opacity = '0.5';
+        } else {
+            bulkSendBtn.style.opacity = '1';
+        }
+    }
+
+    function sendBulkReports() {
+        if (selectedClients.size === 0) {
+            alert('Please select at least one client to send reports to.');
+            return;
+        }
+        
+        showDebug();
+        updateDebug(`Starting bulk report send for ${selectedClients.size} clients...`, 'info');
+        
+        if (confirm(`Send reports to ${selectedClients.size} selected client${selectedClients.size > 1 ? 's' : ''}?`)) {
+            updateDebug('✅ User confirmed bulk send operation', 'success');
+            
+            const bulkSendBtn = document.getElementById('bulkSendBtn');
+            bulkSendBtn.classList.add('loading');
+            
+            // Send reports sequentially
+            let completed = 0;
+            let errors = 0;
+            
+            selectedClients.forEach(clientId => {
+                const clientCard = document.querySelector(`[data-client-id="${clientId}"]`);
+                const clientUsername = clientCard.querySelector('.client-details h3').textContent;
+                const clientEmail = clientCard.querySelector('.client-email').textContent;
+                
+                updateDebug(`📤 Sending report to ${clientUsername} (${clientEmail})...`, 'info');
+                
+                const formData = new FormData();
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+                formData.append('csrfmiddlewaretoken', csrfToken.value);
+                formData.append('client_id', clientId);
+                formData.append('client_email', clientEmail);
+                formData.append('client_username', clientUsername);
+
+                fetch('{% url "send_client_report_ajax" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    completed++;
+                    if (data.success) {
+                        updateDebug(`✅ Report sent to ${clientUsername}`, 'success');
+                    } else {
+                        errors++;
+                        updateDebug(`❌ Failed to send report to ${clientUsername}: ${data.error}`, 'error');
+                    }
+                    
+                    if (completed === selectedClients.size) {
+                        bulkSendBtn.classList.remove('loading');
+                        updateDebug(`📊 Bulk send completed: ${completed - errors} successful, ${errors} failed`, 'info');
+                        alert(`Bulk send completed!\n\nSuccessful: ${completed - errors}\nFailed: ${errors}`);
+                    }
+                })
+                .catch(error => {
+                    completed++;
+                    errors++;
+                    updateDebug(`❌ Error sending to ${clientUsername}: ${error.message}`, 'error');
+                    
+                    if (completed === selectedClients.size) {
+                        bulkSendBtn.classList.remove('loading');
+                        updateDebug(`📊 Bulk send completed: ${completed - errors} successful, ${errors} failed`, 'info');
+                        alert(`Bulk send completed!\n\nSuccessful: ${completed - errors}\nFailed: ${errors}`);
+                    }
+                });
+            });
+        }
+    }
+
+    // UI functions
+    function toggleProjects(clientId, buttonElement) {
+        console.log('toggleProjects called with:', clientId, buttonElement);
+        
+        // Prevent any default button behavior
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        const projectsTable = document.getElementById(`projects-${clientId}`);
+        if (!projectsTable) {
+            console.error(`Projects table not found for client ${clientId}`);
+            return false;
+        }
+        
+        // Use the button element passed as parameter
+        const expandBtn = buttonElement;
+        if (!expandBtn) {
+            console.error('Expand button not found');
+            return false;
+        }
+        
+        if (projectsTable.style.display === 'none' || projectsTable.style.display === '') {
+            projectsTable.style.display = 'block';
+            expandBtn.classList.add('expanded');
+            console.log('Projects table expanded');
+        } else {
+            projectsTable.style.display = 'none';
+            expandBtn.classList.remove('expanded');
+            console.log('Projects table collapsed');
+        }
+        
+        return false; // Prevent form submission
+    }
+
+
+
+    function refreshStats() {
+        console.log('Refreshing statistics...');
+        location.reload();
+    }
+
+    // Debug functions (simplified since debug section was removed)
+    function showDebug() {
+        console.log('Debug function called - debug section was removed');
+    }
+
+    function updateDebug(message, type = 'info') {
+        // Since debug section was removed, just log to console
+        const timestamp = new Date().toLocaleTimeString();
+        const typeIcon = {
+            'info': 'ℹ️',
+            'success': '✅',
+            'error': '❌',
+            'warning': '⚠️'
+        }[type] || 'ℹ️';
+        
+        console.log(`[${timestamp}] ${typeIcon} [${type.toUpperCase()}] ${message}`);
+    }
+
+    function toggleDebug() {
+        console.log('Toggle debug function called - debug section was removed');
+    }
+
+
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize checkbox event listeners
+        const checkboxes = document.querySelectorAll('.client-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateBulkActions);
+        });
+        
+        // Initialize date filter
+        const dateFilter = document.getElementById('dateFilter');
+        if (dateFilter) {
+            dateFilter.addEventListener('change', function() {
+                console.log('Filter changed to:', this.value + ' days');
+            });
+        }
+        
+        updateDebug('Client reports interface initialized', 'info');
+    });
+</script>
+{% endblock %}

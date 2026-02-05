@@ -1,0 +1,737 @@
+{% extends 'home/dashboard_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="admin-controls">
+            <div class="dashboard-header">
+            <h1>Send Comprehensive Client Report</h1>
+            <p>Generate and send comprehensive reports covering all projects for this client</p>
+        </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="settings-container">
+        <!-- Client Overview Section -->
+        <section class="setting-section">
+            <div class="section-header">
+                <h2>Client Overview</h2>
+                <p>Key information about {{ project.client }} and their projects</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ project.get_status_display }}</div>
+                    <div class="stat-label">Status</div>
+                    <div class="stat-trend">
+                        {% if project.status == 'completed' %}✓ Completed{% elif project.status == 'in_progress' %}🔄 In Progress{% else %}📋 {{ project.get_status_display }}{% endif %}
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ project.client }}</div>
+                    <div class="stat-label">Client</div>
+                    <div class="stat-trend">📧 {{ project.client_email|default:"No email" }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">
+                        {% if project.start_date and project.end_date %}
+                            {{ project.start_date|date:"M d" }} - {{ project.end_date|date:"M d" }}
+                        {% else %}
+                            Not set
+                        {% endif %}
+                    </div>
+                    <div class="stat-label">Duration</div>
+                    <div class="stat-trend">
+                        {% if project.start_date and project.end_date %}
+                            📅 {{ project.start_date|date:"Y" }}
+                        {% else %}
+                            ⚠️ Dates needed
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ project.tasks.count|default:"0" }}</div>
+                    <div class="stat-label">Total Tasks</div>
+                    <div class="stat-trend">
+                        {% if project.tasks.count > 0 %}
+                            📋 {{ project.tasks.count }} tasks
+                        {% else %}
+                            ⚠️ No tasks
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Client Progress Chart -->
+        <section class="setting-section">
+            <div class="section-header">
+                <h2>Client Progress Overview</h2>
+                <p>Visual representation of all projects for {{ project.client }}</p>
+            </div>
+            
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Client Projects Overview</h3>
+                    <div class="chart-container">
+                        <canvas id="clientProgressChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item">
+                            <span class="legend-color completed"></span>
+                            <span>Completed Projects</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color in-progress"></span>
+                            <span>In Progress Projects</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color planned"></span>
+                            <span>Planned Projects</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Report Configuration Section -->
+        <section class="setting-section">
+            <div class="section-header">
+                <h2>Comprehensive Report Configuration</h2>
+                <p>Configure the comprehensive client report parameters and content</p>
+            </div>
+            
+            {% if not project.client_email %}
+            <div class="error-message">
+                <h4>No Client Email</h4>
+                <p>This project does not have a client email associated with it. Please edit the project to add a client email before sending a report.</p>
+                <a href="{% url 'edit_project' project.id %}" class="btn btn-primary">Edit Project</a>
+            </div>
+            {% else %}
+            
+            <form method="POST" class="settings-form">
+                {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date_range">Report Period</label>
+                        <select name="date_range" id="date_range" class="form-input" required>
+                            <option value="7">Last 7 days</option>
+                            <option value="14">Last 14 days</option>
+                            <option value="30" selected>Last 30 days</option>
+                            <option value="60">Last 60 days</option>
+                            <option value="90">Last 90 days</option>
+                        </select>
+                        <p class="help-text">Select the time period for the report data</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="report_title">Report Title</label>
+                        <input type="text" id="report_title" name="report_title" class="form-input" 
+                               placeholder="Enter report title" value="Project Report - {{ project.name }}" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="report_description">Report Description</label>
+                        <textarea id="report_description" name="report_description" class="form-input" rows="4" 
+                                  placeholder="Enter report description">Detailed progress report for {{ project.name }} including task completion, milestones, and project insights.</textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="custom_message">Custom Message (Optional)</label>
+                        <textarea name="custom_message" id="custom_message" class="form-input" rows="4" 
+                                  placeholder="Add a custom message to include in the email..."></textarea>
+                        <p class="help-text">This message will be included in the email body</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="format">Report Format</label>
+                    <select id="format" name="format" class="form-input" required>
+                        <option value="pdf" selected>PDF</option>
+                        <option value="excel">Excel</option>
+                        <option value="word">Word Document</option>
+                        <option value="html">HTML</option>
+                    </select>
+                </div>
+
+                <!-- Report Preview -->
+                <div class="preview-section">
+                    <h4>Comprehensive Report Preview</h4>
+                    <div class="preview-content">
+                        <p>• Complete client portfolio overview with all projects</p>
+                        <p>• Cross-project task completion rates and progress summary</p>
+                        <p>• Client-wide performance metrics and analytics</p>
+                        <p>• Comprehensive insights and strategic recommendations</p>
+                        <p>• Timeline analysis across all projects</p>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'projects_page' %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        Send comprehensive client report to {{ project.client_email }}
+                    </button>
+                </div>
+            </form>
+            
+            {% endif %}
+        </section>
+
+        <!-- Help Section -->
+        <section class="setting-section">
+            <div class="section-header">
+                <h2>About Comprehensive Client Reports</h2>
+                <p>Understanding comprehensive client report generation</p>
+            </div>
+            
+            <div class="help-content">
+                <p>Comprehensive client reports are automatically generated PDFs that include detailed analytics, progress tracking, and insights across ALL projects for a specific client. The report provides a complete portfolio overview and will be sent to the client email associated with this project.</p>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <h4>📊 Portfolio Analytics</h4>
+                        <p>Cross-project completion rates, progress tracking, and performance metrics</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>📈 Multi-Project Visualization</h4>
+                        <p>Charts and graphs showing all projects and their completion status</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>📋 Comprehensive Breakdown</h4>
+                        <p>Complete project analysis and timeline overview across all projects</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>🎯 Strategic Insights</h4>
+                        <p>Portfolio-level recommendations and next steps for client success</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<style>
+.admin-controls {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.dashboard-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.dashboard-header p {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.setting-section {
+    background: var(--background-secondary);
+    border-radius: var(--radius-large);
+    padding: 2rem;
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s ease;
+}
+
+.setting-section:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.section-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.section-header h2 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.section-header p {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--background-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-medium);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+}
+
+.stat-trend {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 2rem;
+}
+
+.chart-card {
+    background: var(--background-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-medium);
+    padding: 2rem;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+}
+
+.chart-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-large);
+    border-color: var(--primary);
+}
+
+.chart-card h3 {
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+    font-size: 1.25rem;
+    text-align: center;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.chart-container {
+    position: relative;
+    height: 350px;
+    margin-bottom: 1.5rem;
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    padding: 1rem;
+    background: var(--background-tertiary);
+    border-radius: var(--radius-small);
+    border: 1px solid var(--border-light);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    background: var(--background-primary);
+    border-radius: var(--radius-small);
+    border: 1px solid var(--border-light);
+    transition: all 0.2s ease;
+}
+
+.legend-item:hover {
+    background: var(--background-secondary);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.legend-color {
+    width: 16px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.legend-color.completed { background: var(--success); }
+.legend-color.in-progress { background: var(--warning); }
+.legend-color.not-started { background: var(--info); }
+.legend-color.on-hold { background: var(--danger); }
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.form-input {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-small);
+    font-size: 1rem;
+    background: var(--background-primary);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.help-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.preview-section {
+    background: var(--background-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-medium);
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.preview-section h4 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.preview-content {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.preview-content p {
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-small);
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #ffffff;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: #ffffff;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+}
+
+.btn-outline:hover {
+    background: var(--primary);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.btn-icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+.help-content {
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.info-item {
+    background: var(--background-primary);
+    border-radius: var(--radius-medium);
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.info-item h4 {
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.info-item p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.error-message {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-medium);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.error-message h4 {
+    color: #dc2626;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.error-message p {
+    color: #7f1d1d;
+    margin-bottom: 1rem;
+}
+
+.messages {
+    margin-bottom: 2rem;
+}
+
+.message {
+    padding: 1rem;
+    border-radius: var(--radius-small);
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.message.success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.message.error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.message.warning {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+.message.info {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+}
+
+@media (max-width: 768px) {
+    .admin-controls {
+        padding: 1rem;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Send Project Report page loaded');
+    
+    // Initialize client progress chart
+    const clientProgressCtx = document.getElementById('clientProgressChart').getContext('2d');
+    
+    // Get client project counts from the template context
+    const completedProjects = {{ completed_projects|default:"0" }};
+    const inProgressProjects = {{ in_progress_projects|default:"0" }};
+    const plannedProjects = {{ planned_projects|default:"0" }};
+    
+    new Chart(clientProgressCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Completed', 'In Progress', 'Planned'],
+            datasets: [{
+                data: [completedProjects, inProgressProjects, plannedProjects],
+                backgroundColor: [
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(6, 182, 212, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(16, 185, 129, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(6, 182, 212, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    display: false 
+                }
+            },
+            cutout: '60%'
+        }
+    });
+});
+
+function resetForm() {
+    document.querySelector('.settings-form').reset();
+}
+</script>
+{% endblock %} 

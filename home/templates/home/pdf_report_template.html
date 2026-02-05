@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Click Project Management Report</title>
+    <style>
+        /* E-Click Branding Colors */
+        :root {
+            --eclick-red: #dc2626;
+            --eclick-black: #000000;
+            --eclick-gray: #6b7280;
+            --eclick-light-gray: #f9fafb;
+            --eclick-border: #e5e7eb;
+        }
+
+        @page {
+            size: A4;
+            margin: 2cm 1.5cm;
+            @top-center {
+                content: element(header);
+            }
+            @bottom-center {
+                content: element(footer);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 10pt;
+            line-height: 1.6;
+            color: var(--eclick-black);
+        }
+
+        /* Header */
+        .header {
+            position: running(header);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--eclick-red);
+            margin-bottom: 20px;
+        }
+
+        .header-left img {
+            height: 40px;
+        }
+
+        .header-right {
+            text-align: right;
+            font-size: 9pt;
+            color: var(--eclick-gray);
+        }
+
+        .header-right strong {
+            color: var(--eclick-red);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Footer */
+        .footer {
+            position: running(footer);
+            text-align: center;
+            padding-top: 10px;
+            border-top: 1px solid var(--eclick-border);
+            margin-top: 20px;
+            font-size: 9pt;
+        }
+
+        .footer strong {
+            color: var(--eclick-red);
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .footer span {
+            color: var(--eclick-gray);
+        }
+
+        /* Title Section */
+        .title-section {
+            text-align: center;
+            margin: 40px 0 30px 0;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #fff 0%, var(--eclick-light-gray) 100%);
+            border-left: 5px solid var(--eclick-red);
+        }
+
+        .title-section h1 {
+            color: var(--eclick-red);
+            font-size: 24pt;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .title-section h2 {
+            color: var(--eclick-black);
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .title-section p {
+            color: var(--eclick-gray);
+            font-size: 10pt;
+            margin: 3px 0;
+        }
+
+        /* Section Headers */
+        h3 {
+            color: var(--eclick-red);
+            font-size: 14pt;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--eclick-red);
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid var(--eclick-border);
+            border-left: 4px solid var(--eclick-red);
+            padding: 15px;
+            text-align: center;
+        }
+
+        .summary-card .value {
+            font-size: 24pt;
+            font-weight: bold;
+            color: var(--eclick-red);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .summary-card .label {
+            font-size: 9pt;
+            color: var(--eclick-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 9pt;
+        }
+
+        table thead {
+            background: var(--eclick-red);
+            color: white;
+        }
+
+        table th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 9pt;
+        }
+
+        table td {
+            padding: 10px 8px;
+            border-bottom: none;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: white;
+        }
+
+        table tbody tr:hover {
+            background: white;
+        }
+
+        /* Gantt Chart */
+        .gantt-chart {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border: 1px solid var(--eclick-border);
+        }
+
+        .gantt-timeline {
+            display: flex;
+            border-bottom: 2px solid var(--eclick-gray);
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            font-size: 8pt;
+            color: var(--eclick-gray);
+        }
+
+        .gantt-row {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            min-height: 30px;
+        }
+
+        .gantt-label {
+            width: 200px;
+            padding-right: 10px;
+            font-size: 9pt;
+            font-weight: bold;
+            color: var(--eclick-black);
+        }
+
+        .gantt-bar-container {
+            flex: 1;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gantt-bar {
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8pt;
+            font-weight: bold;
+            color: white;
+            position: absolute;
+        }
+
+        .gantt-bar.in-progress {
+            background: var(--eclick-red);
+        }
+
+        .gantt-bar.completed {
+            background: #10b981;
+        }
+
+        .gantt-bar.planned {
+            background: var(--eclick-gray);
+        }
+
+        .gantt-legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 8pt;
+        }
+
+        .gantt-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .gantt-legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        /* Insights */
+        .insights {
+            background: var(--eclick-light-gray);
+            border-left: 4px solid var(--eclick-red);
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .insights ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .insights li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .insights li:before {
+            content: "▸";
+            color: var(--eclick-red);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 8pt;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-planned {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .status-in-progress {
+            background: #fee2e2;
+            color: var(--eclick-red);
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--eclick-red);
+            border-radius: 4px;
+        }
+
+        /* Page Break */
+        .page-break {
+            page-break-after: always;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric-box {
+            border: 1px solid var(--eclick-border);
+            padding: 15px;
+            background: white;
+        }
+
+        .metric-box h4 {
+            color: var(--eclick-red);
+            font-size: 11pt;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 32pt;
+            font-weight: bold;
+            color: var(--eclick-black);
+        }
+
+        .metric-label {
+            font-size: 9pt;
+            color: var(--eclick-gray);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <h2 style="color: var(--eclick-red); font-size: 18pt;">E-CLICK</h2>
+        </div>
+        <div class="header-right">
+            <strong>E-Click Support</strong>
+            <div>Phone: (+27)</div>
+            <div>support@eclick.co.za</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <strong>WE CARE, WE CAN, WE DELIVER</strong>
+        <span>E-Click Project Management | Page <span class="page-number"></span></span>
+    </div>
+
+    <!-- Title Section -->
+    <div class="title-section">
+        <h1>E-Click Project Management Report</h1>
+        <h2>Comprehensive Project Overview & Analytics</h2>
+        <p><strong>Report Period:</strong> {{ start_date }} - {{ end_date }}</p>
+        <p><strong>Generated:</strong> {{ generated_date }}</p>
+    </div>
+
+    <!-- Executive Summary -->
+    <h3>Executive Summary</h3>
+    <div class="summary-grid">
+        <div class="summary-card">
+            <span class="value">{{ total_projects }}</span>
+            <span class="label">Total Projects</span>
+        </div>
+        <div class="summary-card">
+            <span class="value">{{ total_tasks }}</span>
+            <span class="label">Total Tasks</span>
+        </div>
+        <div class="summary-card">
+            <span class="value">{{ project_completion_rate }}%</span>
+            <span class="label">Completion Rate</span>
+        </div>
+        <div class="summary-card">
+            <span class="value">{{ active_users }}</span>
+            <span class="label">Active Users</span>
+        </div>
+    </div>
+
+    <div class="insights">
+        <ul>
+            <li>Project Performance: {{ project_completion_rate }}% completion rate with {{ projects_in_progress }} active projects</li>
+            <li>Task Efficiency: {{ task_completion_rate }}% task completion with {{ completed_tasks }} tasks delivered</li>
+            <li>User Engagement: {{ user_engagement_rate }}% active users with {{ active_users }} engaged team members</li>
+        </ul>
+    </div>
+
+    <!-- Page Break -->
+    <div class="page-break"></div>
+
+    <!-- Project Timeline - Gantt Chart -->
+    <h3>Project Timeline - Gantt Chart</h3>
+    <div class="gantt-chart">
+        {% if projects_for_gantt %}
+            {% for project in projects_for_gantt %}
+            <div class="gantt-row">
+                <div class="gantt-label">{{ project.name|truncatechars:25 }}</div>
+                <div class="gantt-bar-container">
+                    <div class="gantt-bar {{ project.status_class }}"
+                         style="left: {{ project.start_percent }}%; width: {{ project.duration_percent }}%;">
+                        {{ project.progress }}%
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="gantt-legend">
+                <div class="gantt-legend-item">
+                    <div class="gantt-legend-color in-progress"></div>
+                    <span>In Progress</span>
+                </div>
+                <div class="gantt-legend-item">
+                    <div class="gantt-legend-color completed"></div>
+                    <span>Completed</span>
+                </div>
+                <div class="gantt-legend-item">
+                    <div class="gantt-legend-color planned"></div>
+                    <span>Planned</span>
+                </div>
+            </div>
+        {% else %}
+            <p style="text-align: center; color: var(--eclick-gray); padding: 20px;">No projects with defined timelines available</p>
+        {% endif %}
+    </div>
+
+    <!-- All Projects Overview -->
+    <h3>All Projects Overview</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Project Name</th>
+                <th>Client</th>
+                <th>Status</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Progress</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in all_projects %}
+            <tr>
+                <td>{{ project.name }}</td>
+                <td>{{ project.client }}</td>
+                <td><span class="status-badge status-{{ project.status }}">{{ project.status_display }}</span></td>
+                <td>{{ project.start_date_str }}</td>
+                <td>{{ project.end_date_str }}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="progress-bar" style="flex: 1;">
+                            <div class="progress-fill" style="width: {{ project.progress_pct }}%;"></div>
+                        </div>
+                        <span style="font-size: 8pt; color: var(--eclick-gray);">{{ project.progress_pct }}%</span>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; color: var(--eclick-gray);">No projects available</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Page Break -->
+    <div class="page-break"></div>
+
+    <!-- Performance Metrics -->
+    <h3>Performance Analysis</h3>
+    <div class="metrics-grid">
+        <div class="metric-box">
+            <h4>Project Completion</h4>
+            <div class="metric-value">{{ project_completion_rate }}%</div>
+            <div class="metric-label">{{ projects_completed }} of {{ total_projects }} projects completed</div>
+        </div>
+        <div class="metric-box">
+            <h4>Task Completion</h4>
+            <div class="metric-value">{{ task_completion_rate }}%</div>
+            <div class="metric-label">{{ completed_tasks }} of {{ total_tasks }} tasks completed</div>
+        </div>
+        <div class="metric-box">
+            <h4>Active Projects</h4>
+            <div class="metric-value">{{ projects_in_progress }}</div>
+            <div class="metric-label">Currently in progress</div>
+        </div>
+        <div class="metric-box">
+            <h4>User Engagement</h4>
+            <div class="metric-value">{{ user_engagement_rate }}%</div>
+            <div class="metric-label">{{ active_users }} of {{ total_users }} users active</div>
+        </div>
+    </div>
+
+    <!-- Strategic Recommendations -->
+    <h3>Strategic Recommendations</h3>
+    <div class="insights">
+        <ul>
+            {% for recommendation in recommendations %}
+            <li>{{ recommendation }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Top Performing Projects -->
+    {% if top_projects %}
+    <h3>Top Performing Projects</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Project</th>
+                <th>Client</th>
+                <th>Completion</th>
+                <th>Tasks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in top_projects %}
+            <tr>
+                <td style="text-align: center; font-weight: bold;">#{{ forloop.counter }}</td>
+                <td>{{ project.name|truncatechars:30 }}</td>
+                <td>{{ project.client|truncatechars:20 }}</td>
+                <td><strong style="color: var(--eclick-red);">{{ project.completion_rate }}%</strong></td>
+                <td>{{ project.completed_tasks }}/{{ project.total_tasks }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</body>
+</html>

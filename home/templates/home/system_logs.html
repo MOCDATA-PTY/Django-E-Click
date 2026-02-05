@@ -1,0 +1,2101 @@
+{% extends 'home/dashboard_base.html' %}
+{% load static %}
+
+{% block title %}System Logs - E-Click{% endblock %}
+
+{% block content %}
+<div class="admin-controls">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <h1>System Logs</h1>
+        <p>Monitor system activity, user actions, and security events across the platform.</p>
+    </div>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}message-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="settings-container">
+        <!-- System Overview Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2>System Overview</h2>
+            </div>
+            <div class="section-content">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ page_obj.paginator.count }}</div>
+                        <div class="stat-label">Total Log Entries</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ page_obj.paginator.num_pages }}</div>
+                        <div class="stat-label">Total Pages</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ page_obj.number }}</div>
+                        <div class="stat-label">Current Page</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">50</div>
+                        <div class="stat-label">Logs Per Page</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Filter Logs</h2>
+            </div>
+            <div class="section-content">
+                <form id="filters-form" class="filters-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-search">Search by Username</label>
+                            <input type="text" id="user-search" name="user" value="{{ user_filter }}" placeholder="Enter username..." class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="action-filter">Action Type</label>
+                            <select id="action-filter" name="action" class="form-input">
+                                <option value="">All Actions</option>
+                                {% for action_code, action_name in action_choices %}
+                                <option value="{{ action_code }}" {% if action_filter == action_code %}selected{% endif %}>
+                                    {{ action_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="date-from">From Date</label>
+                            <input type="date" id="date-from" name="date_from" value="{{ date_from }}" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date-to">To Date</label>
+                            <input type="date" id="date-to" name="date_to" value="{{ date_to }}" class="form-input">
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="apply-filters" class="btn btn-primary">
+                            <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            Apply Filters
+                        </button>
+                        <button type="button" id="clear-filters" class="btn btn-secondary">Clear Filters</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Logs Table Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2>System Activity Logs</h2>
+            </div>
+            <div class="section-content">
+                {% if page_obj %}
+                <div class="users-table">
+                    <div class="table-header">
+                        <div class="table-cell">User</div>
+                        <div class="table-cell">Action</div>
+                        <div class="table-cell">Details</div>
+                        <div class="table-cell">Timestamp</div>
+                        <div class="table-cell">IP Address</div>
+                        <div class="table-cell">System Info</div>
+                    </div>
+                    
+                    {% for log in page_obj %}
+                    <div class="table-row">
+                        <div class="table-cell user-cell" data-label="User">
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    {% if log.user %}
+                                        <div class="avatar">{{ log.user.username|first|upper }}</div>
+                                    {% else %}
+                                        <div class="avatar failed">?</div>
+                                    {% endif %}
+                                </div>
+                                <div class="user-details">
+                                    <span class="username">
+                                        {% if log.user %}
+                                            {{ log.user.username }}
+                                        {% else %}
+                                            <span class="failed-attempt">{{ log.additional_info.attempted_username|default:"Unknown" }}</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-cell action-cell" data-label="Action">
+                            <span class="action-badge action-{{ log.action }}">
+                                {% if log.action == 'navigation' %}
+                                    Navigate
+                                {% else %}
+                                    {{ log.get_action_display }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="table-cell details-cell" data-label="Details">
+                            <div class="action-details">
+                                {% if log.action == 'task_status_change' %}
+                                    <div class="detail-item">
+                                        <strong>Task:</strong> {{ log.additional_info.task_title }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Status:</strong> 
+                                        <span class="status-change">
+                                            Changed from {{ log.additional_info.old_status|title }} to {{ log.additional_info.new_status|title }}
+                                        </span>
+                                    </div>
+                                {% elif log.action == 'task_priority_change' %}
+                                    <div class="detail-item">
+                                        <strong>Task:</strong> {{ log.additional_info.task_title }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Priority:</strong> 
+                                        <span class="priority-change">
+                                            Changed from {{ log.additional_info.old_priority|title }} to {{ log.additional_info.new_priority|title }}
+                                        </span>
+                                    </div>
+                                {% elif log.action == 'task_created' %}
+                                    <div class="detail-item">
+                                        <strong>Task:</strong> {{ log.additional_info.task_title }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Priority:</strong> {{ log.additional_info.priority|title }}
+                                    </div>
+                                {% elif log.action == 'task_edited' %}
+                                    <div class="detail-item">
+                                        <strong>Task:</strong> {{ log.additional_info.task_title }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Changes:</strong>
+                                        <div class="changes-list">
+                                            {% for field, change in log.additional_info.changes.items %}
+                                            <div class="change-item {% if field == 'assigned_users' %}assigned-users-change compact-change{% endif %}">
+                                                <span class="field-name">{{ field|title }}:</span>
+                                                <span class="change-value">
+                                                    {% if field == 'assigned_users' %}
+                                                        {% if change.old %}
+                                                            Changed from [{{ change.old|join:", " }}] to [{{ change.new|join:", " }}]
+                                                        {% else %}
+                                                            Set to [{{ change.new|join:", " }}]
+                                                        {% endif %}
+                                                    {% else %}
+                                                        Changed from {{ change.old }} to {{ change.new }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% elif log.action == 'project_created' %}
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Client:</strong> {{ log.additional_info.client }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Status:</strong> {{ log.additional_info.status|title }}
+                                    </div>
+                                {% elif log.action == 'project_status_change' %}
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Status:</strong> 
+                                        <span class="status-change">
+                                            Changed from {{ log.additional_info.old_status|title }} to {{ log.additional_info.new_status|title }}
+                                        </span>
+                                    </div>
+                                {% elif log.action == 'user_created' %}
+                                    <div class="detail-item">
+                                        <strong>New User:</strong> {{ log.additional_info.new_username }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Email:</strong> {{ log.additional_info.new_email }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Name:</strong> {{ log.additional_info.new_user_full_name }}
+                                    </div>
+                                {% elif log.action == 'user_permissions_changed' %}
+                                    <div class="detail-item">
+                                        <strong>User:</strong> {{ log.additional_info.target_username }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Permissions Updated</strong>
+                                    </div>
+                                {% elif log.action == 'user_suspended' %}
+                                    <div class="detail-item">
+                                        <strong>User:</strong> {{ log.additional_info.target_username }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Reason:</strong> {{ log.additional_info.suspension_reason }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Until:</strong> {{ log.additional_info.suspended_until }}
+                                    </div>
+                                {% elif log.action == 'client_created' %}
+                                    <div class="detail-item">
+                                        <strong>Client:</strong> {{ log.additional_info.client_username }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Email:</strong> {{ log.additional_info.client_email }}
+                                    </div>
+                                {% elif log.action == 'login_attempt_failed' %}
+                                    <div class="detail-item">
+                                        <strong>Username:</strong> {{ log.additional_info.attempted_username }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Reason:</strong> {{ log.additional_info.failure_reason }}
+                                    </div>
+                                {% elif log.action == 'report_generated' %}
+                                    <div class="detail-item">
+                                        <strong>Report:</strong> {{ log.additional_info.report_type|title }}
+                                    </div>
+                                    {% if log.additional_info.project_name %}
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name }}
+                                    </div>
+                                    {% endif %}
+                                {% elif log.action == 'backup_created' %}
+                                    <div class="detail-item">
+                                        <strong>Backup:</strong> {{ log.additional_info.backup_name }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Size:</strong> {{ log.additional_info.backup_size }}
+                                    </div>
+                                {% elif log.action == 'backup_restored' %}
+                                    <div class="detail-item">
+                                        <strong>Backup:</strong> {{ log.additional_info.backup_name|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Restored by:</strong> {{ log.user.username }}
+                                    </div>
+                                {% elif log.action == 'project_edited' %}
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Changes:</strong>
+                                        <div class="changes-list">
+                                            {% for field, change in log.additional_info.changes.items %}
+                                            <div class="change-item {% if field == 'assigned_users' %}assigned-users-change compact-change{% endif %}">
+                                                <span class="field-name">{{ field|title }}:</span>
+                                                <span class="change-value">
+                                                    {% if field == 'assigned_users' %}
+                                                        {% if change.old %}
+                                                            Changed from [{{ change.old|join:", " }}] to [{{ change.new|join:", " }}]
+                                                        {% else %}
+                                                            Set to [{{ change.new|join:", " }}]
+                                                        {% endif %}
+                                                    {% else %}
+                                                        Changed from {{ change.old }} to {{ change.new }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% elif log.action == 'project_deleted' %}
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Client:</strong> {{ log.additional_info.client_name }}
+                                    </div>
+                                {% elif log.action == 'project_assigned' %}
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Assigned Users:</strong> 
+                                        <span class="assigned-users-list">{{ log.additional_info.assigned_users|join:", " }}</span>
+                                    </div>
+                                {% elif log.action == 'user_edited' %}
+                                    <div class="detail-item">
+                                        <strong>User:</strong> {{ log.additional_info.target_username|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Changes:</strong>
+                                        <div class="changes-list">
+                                            {% for field, change in log.additional_info.changes.items %}
+                                            <div class="change-item {% if field == 'assigned_users' %}assigned-users-change compact-change{% endif %}">
+                                                <span class="field-name">{{ field|title }}:</span>
+                                                <span class="change-value">
+                                                    {% if field == 'assigned_users' %}
+                                                        {% if change.old %}
+                                                            Changed from [{{ change.old|join:", " }}] to [{{ change.new|join:", " }}]
+                                                        {% else %}
+                                                            Set to [{{ change.new|join:", " }}]
+                                                        {% endif %}
+                                                    {% else %}
+                                                        Changed from {{ change.old }} to {{ change.new }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% elif log.action == 'user_deleted' %}
+                                    <div class="detail-item">
+                                        <strong>User:</strong> {{ log.additional_info.target_username|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Deleted by:</strong> {{ log.user.username }}
+                                    </div>
+                                {% elif log.action == 'user_activated' %}
+                                    <div class="detail-item">
+                                        <strong>User:</strong> {{ log.additional_info.target_username|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Activated by:</strong> {{ log.user.username }}
+                                    </div>
+                                {% elif log.action == 'client_edited' %}
+                                    <div class="detail-item">
+                                        <strong>Client:</strong> {{ log.additional_info.client_username|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Changes:</strong>
+                                        <div class="changes-list">
+                                            {% for field, change in log.additional_info.changes.items %}
+                                            <div class="change-item {% if field == 'assigned_users' %}assigned-users-change compact-change{% endif %}">
+                                                <span class="field-name">{{ field|title }}:</span>
+                                                <span class="change-value">
+                                                    {% if field == 'assigned_users' %}
+                                                        {% if change.old %}
+                                                            Changed from [{{ change.old|join:", " }}] to [{{ change.new|join:", " }}]
+                                                        {% else %}
+                                                            Set to [{{ change.new|join:", " }}]
+                                                        {% endif %}
+                                                    {% else %}
+                                                        Changed from {{ change.old }} to {{ change.new }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% elif log.action == 'client_deleted' %}
+                                    <div class="detail-item">
+                                        <strong>Client:</strong> {{ log.additional_info.client_username|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Deleted by:</strong> {{ log.user.username }}
+                                    </div>
+                                {% elif log.action == 'client_activated' %}
+                                    <div class="detail-item">
+                                        <strong>Client:</strong> {{ log.additional_info.client_username|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Activated by:</strong> {{ log.user.username }}
+                                    </div>
+                                {% elif log.action == 'client_deactivated' %}
+                                    <div class="detail-item">
+                                        <strong>Client:</strong> {{ log.additional_info.client_username|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Deactivated by:</strong> {{ log.user.username }}
+                                    </div>
+                                {% elif log.action == 'subtask_created' %}
+                                    <div class="detail-item">
+                                        <strong>Subtask:</strong> {{ log.additional_info.subtask_title|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Task:</strong> {{ log.additional_info.task_title|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name|default:"N/A" }}
+                                    </div>
+                                {% elif log.action == 'subtask_edited' %}
+                                    <div class="detail-item">
+                                        <strong>Subtask:</strong> {{ log.additional_info.subtask_title|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Changes:</strong>
+                                        <div class="changes-list">
+                                            {% for field, change in log.additional_info.changes.items %}
+                                            <div class="change-item {% if field == 'assigned_users' %}assigned-users-change compact-change{% endif %}">
+                                                <span class="field-name">{{ field|title }}:</span>
+                                                <span class="change-value">
+                                                    {% if field == 'assigned_users' %}
+                                                        {% if change.old %}
+                                                            Changed from [{{ change.old|join:", " }}] to [{{ change.new|join:", " }}]
+                                                        {% else %}
+                                                            Set to [{{ change.new|join:", " }}]
+                                                        {% endif %}
+                                                    {% else %}
+                                                        Changed from {{ change.old }} to {{ change.new }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% elif log.action == 'subtask_deleted' %}
+                                    <div class="detail-item">
+                                        <strong>Subtask:</strong> {{ log.additional_info.subtask_title|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Task:</strong> {{ log.additional_info.task_title|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name|default:"N/A" }}
+                                    </div>
+                                {% elif log.action == 'subtask_status_change' %}
+                                    <div class="detail-item">
+                                        <strong>Subtask:</strong> {{ log.additional_info.subtask_title|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Status:</strong> 
+                                        <span class="status-change">
+                                            Changed from {{ log.additional_info.old_status|title }} to {{ log.additional_info.new_status|title }}
+                                        </span>
+                                    </div>
+                                {% elif log.action == 'task_assigned' %}
+                                    <div class="detail-item">
+                                        <strong>Task:</strong> {{ log.additional_info.task_title|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Assigned Users:</strong> {{ log.additional_info.assigned_users|join:", "|default:"N/A" }}
+                                    </div>
+                                {% elif log.action == 'task_comment_added' %}
+                                    <div class="detail-item">
+                                        <strong>Task:</strong> {{ log.additional_info.task_title|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Project:</strong> {{ log.additional_info.project_name|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Comment:</strong> {{ log.additional_info.comment|truncatechars:100|default:"N/A" }}
+                                    </div>
+                                {% elif log.action == 'report_sent' %}
+                                    <div class="detail-item">
+                                        <strong>Report Type:</strong> {{ log.additional_info.report_type|title|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Recipient:</strong> {{ log.additional_info.recipient_email|default:"N/A" }}
+                                    </div>
+                                {% elif log.action == 'system_settings_changed' %}
+                                    <div class="detail-item">
+                                        <strong>Setting:</strong> {{ log.additional_info.setting_name|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>Changes:</strong>
+                                        <div class="changes-list">
+                                            {% for field, change in log.additional_info.changes.items %}
+                                            <div class="change-item {% if field == 'assigned_users' %}assigned-users-change compact-change{% endif %}">
+                                                <span class="field-name">{{ field|title }}:</span>
+                                                <span class="change-value">
+                                                    {% if field == 'assigned_users' %}
+                                                        {% if change.old %}
+                                                            Changed from [{{ change.old|join:", " }}] to [{{ change.new|join:", " }}]
+                                                        {% else %}
+                                                            Set to [{{ change.new|join:", " }}]
+                                                        {% endif %}
+                                                    {% else %}
+                                                        Changed from {{ change.old }} to {{ change.new }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% elif log.action == 'navigation' %}
+                                    <div class="detail-item">
+                                        <strong>Navigation to:</strong> {{ log.additional_info.page_name|default:"N/A" }}
+                                    </div>
+                                    <div class="detail-item">
+                                        <strong>URL:</strong> {{ log.additional_info.page_url|default:"N/A" }}
+                                    </div>
+                                {% else %}
+                                    <div class="detail-item">
+                                        <strong>Details:</strong> Available in system
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="table-cell timestamp-cell" data-label="Timestamp">
+                            <div class="timestamp">
+                                <div class="date">{{ log.timestamp|date:"M d, Y" }}</div>
+                                <div class="time">{{ log.timestamp|time:"H:i:s" }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-cell ip-cell" data-label="IP Address">
+                            {% if log.ip_address %}
+                                <span class="ip-address">{{ log.ip_address }}</span>
+                            {% else %}
+                                <span class="empty-field">—</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="table-cell system-cell" data-label="System Info">
+                            <div class="system-info">
+                                {% if log.os_info or log.browser_info %}
+                                    <div class="info-item">
+                                        <span class="info-label">OS:</span>
+                                        <span class="info-value">{{ log.os_info|default:"Unknown" }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Browser:</span>
+                                        <span class="info-value">{{ log.browser_info|default:"Unknown" }}</span>
+                                    </div>
+                                {% else %}
+                                    <span class="empty-field">—</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-data">
+                    <div class="no-data-icon">📋</div>
+                    <div class="no-data-text">No system logs found</div>
+                    <div class="no-data-subtext">Try adjusting your filters or check back later</div>
+                </div>
+                {% endif %}
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if action_filter %}&action={{ action_filter }}{% endif %}{% if user_filter %}&user={{ user_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="pagination-btn">First</a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if user_filter %}&user={{ user_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="pagination-btn">Previous</a>
+                    {% endif %}
+                    
+                    <span class="pagination-info">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if user_filter %}&user={{ user_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="pagination-btn">Next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if action_filter %}&action={{ action_filter }}{% endif %}{% if user_filter %}&user={{ user_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="pagination-btn">Last</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* CSS Variables for consistent theming - EXACTLY matching admin controls */
+    :root {
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --text-primary: #1f2937;
+        --text-secondary: #6b7280;
+        --text-muted: #9ca3af;
+        --text-white: #ffffff;
+        --background-primary: #ffffff;
+        --background-secondary: #f9fafb;
+        --background-tertiary: #f1f5f9;
+        --info: #3b82f6;
+        --border-light: #e5e7eb;
+        --border-medium: #d1d5db;
+        --border-dark: #94a3b8;
+        --radius-small: 0.375rem;
+        --radius-medium: 0.5rem;
+        --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Dark mode variables */
+    [data-theme="dark"] {
+        --text-primary: #f9fafb;
+        --text-secondary: #d1d5db;
+        --text-muted: #9ca3af;
+        --background-primary: #111827;
+        --background-secondary: #1f2937;
+        --background-tertiary: #374151;
+        --border-light: #374151;
+        --border-medium: #4b5563;
+        --border-dark: #6b7280;
+    }
+
+    /* EXACTLY matching admin control panel styles */
+    .admin-controls {
+        width: 100%;
+        padding: 2rem;
+        margin: 0;
+        background: var(--background-primary);
+        min-height: 100vh;
+        box-sizing: border-box;
+    }
+
+    /* Settings Container - Main box styling */
+    .settings-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: var(--background-primary);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-medium);
+        box-shadow: var(--shadow-medium);
+        overflow: hidden;
+        background: var(--background-primary);
+    }
+
+    /* Dashboard Header - EXACTLY matching admin control style */
+    .dashboard-header {
+        background: var(--background-primary);
+        border: none;
+        border-radius: 0;
+        padding: 2rem 0;
+        margin-bottom: 3rem;
+        text-align: center;
+        position: relative;
+        width: 100%;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .dashboard-header h1 {
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .dashboard-header p {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        font-weight: 300;
+    }
+
+    /* Section Styling - EXACTLY matching admin control style */
+    .section {
+        background: var(--background-primary);
+        border: none;
+        border-radius: 0;
+        margin-bottom: 0;
+        overflow: visible;
+        padding: 0;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .section-header {
+        background: var(--background-secondary);
+        padding: 1.5rem 2rem 1rem 2rem;
+        border-bottom: 1px solid var(--border-light);
+        margin-bottom: 0;
+    }
+
+    .section-header h2 {
+        color: var(--text-secondary);
+        margin: 0;
+        font-size: 0.8rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+
+    .section-content {
+        padding: 2rem;
+        background: var(--background-primary);
+    }
+
+    /* Form Actions - EXACTLY matching admin control style */
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin: 0;
+        padding: 2rem;
+        border-top: 1px solid var(--border-light);
+        flex-wrap: wrap;
+        width: 100%;
+        background: var(--background-primary);
+        box-sizing: border-box;
+    }
+
+    /* Button Styles - EXACTLY matching admin control style */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        border: 1px solid transparent;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 400;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        text-align: center;
+        letter-spacing: 0.025em;
+        min-width: 120px;
+        justify-content: center;
+        background: transparent;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: var(--text-white);
+        border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--text-secondary);
+        border-color: var(--border-medium);
+    }
+
+    .btn-secondary:hover {
+        background: var(--background-secondary);
+        color: var(--text-primary);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .btn-icon {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    /* Form Styles - EXACTLY matching admin control style */
+    .form-group {
+        margin-bottom: 2rem;
+        position: relative;
+        display: block;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        letter-spacing: 0.025em;
+        text-transform: uppercase;
+        line-height: 1.4;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 1rem 0;
+        border: none;
+        border-bottom: 1px solid var(--border-light);
+        border-radius: 0;
+        font-size: 1rem;
+        background: transparent;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        color: var(--text-primary);
+        box-sizing: border-box;
+        display: block;
+        line-height: 1.4;
+    }
+    
+    /* Special styling for select elements */
+    .form-group select {
+        padding: 1rem 0 1rem 0;
+        min-height: 3rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        outline: none;
+        border-bottom: 2px solid var(--primary);
+        background: transparent;
+        box-shadow: none;
+        transform: translateY(-1px);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: var(--text-muted);
+        font-weight: 300;
+    }
+
+    .form-group small {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 300;
+        font-style: italic;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        width: 100%;
+    }
+
+    .form-row .form-group {
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+    /* Disabled input styling */
+    .form-group input:disabled {
+        background: transparent;
+        color: var(--text-muted);
+        border-bottom-color: var(--border-light);
+        cursor: not-allowed;
+    }
+
+    .form-group input:disabled:focus {
+        border-bottom-color: var(--border-light);
+        transform: none;
+    }
+
+    /* Remove any validation styling that might be causing green borders */
+    .form-group input:valid,
+    .form-group textarea:valid,
+    .form-group select:valid {
+        border-bottom-color: var(--border-light);
+    }
+
+    .form-group input:invalid:not(:focus):not(:placeholder-shown),
+    .form-group textarea:invalid:not(:focus):not(:placeholder-shown),
+    .form-group select:invalid:not(:focus):not(:placeholder-shown) {
+        border-bottom-color: var(--border-light);
+    }
+
+    /* Select dropdown styling */
+    select.form-input {
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1.25em 1.25em;
+        padding-right: 2.5rem;
+        appearance: none;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    /* Dark mode select dropdown - override arrow color */
+    [data-theme="dark"] select.form-input {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23d1d5db' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    }
+    
+    /* Select dropdown hover and focus states */
+    select.form-input:hover {
+        border-bottom-color: var(--border-medium);
+        transform: translateY(-1px);
+    }
+    
+    select.form-input:focus {
+        border-bottom-color: var(--primary);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+    
+    /* Select dropdown options styling */
+    select.form-input option {
+        background: var(--background-primary);
+        color: var(--text-primary);
+        padding: 0.75rem;
+        border: none;
+        font-size: 0.875rem;
+    }
+    
+    /* Select dropdown options hover */
+    select.form-input option:hover {
+        background: var(--background-secondary);
+        color: var(--text-primary);
+    }
+    
+    /* Select dropdown options selected state */
+    select.form-input option:checked {
+        background: var(--primary);
+        color: white;
+    }
+    
+    /* Select dropdown options focus state */
+    select.form-input option:focus {
+        background: var(--background-secondary);
+        color: var(--text-primary);
+    }
+    
+    /* Ensure proper contrast for dropdown arrow in all themes */
+    select.form-input::-ms-expand {
+        display: none;
+    }
+    
+
+    
+    /* Select dropdown focus state with better visibility */
+    select.form-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        background-color: var(--background-primary);
+    }
+    
+    /* Select dropdown hover state */
+    select.form-input:hover {
+        border-color: var(--border-medium);
+        background-color: var(--background-secondary);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin-top: 1rem;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 2rem;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        border-color: var(--border-medium);
+        transform: translateY(-2px);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 300;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 300;
+    }
+
+    /* Messages - EXACTLY matching admin control style */
+    .messages {
+        margin-bottom: 3rem;
+    }
+
+    .message {
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+        border-radius: 0;
+        border: none;
+        border-bottom: 1px solid;
+        background: transparent;
+    }
+
+    .message-success {
+        border-bottom-color: var(--success);
+        color: var(--success);
+    }
+
+    .message-error {
+        border-bottom-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .message-warning {
+        border-bottom-color: var(--warning);
+        color: var(--warning);
+    }
+
+    .message-info {
+        border-bottom-color: var(--info);
+        color: var(--info);
+    }
+
+    /* Table Styles */
+    .users-table {
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .table-header {
+        display: grid;
+        grid-template-columns: 1.5fr 1.5fr 4fr 1.5fr 1.5fr 2fr;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        background: var(--background-secondary);
+        border-bottom: 1px solid var(--border-light);
+        font-weight: 500;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .table-row {
+        display: grid;
+        grid-template-columns: 1.5fr 1.5fr 4fr 1.5fr 1.5fr 2fr;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+        align-items: flex-start;
+    }
+
+    .table-row:hover {
+        background: var(--background-secondary);
+    }
+
+    .table-row:last-child {
+        border-bottom: none;
+    }
+
+    .table-cell {
+        display: flex;
+        align-items: center;
+    }
+
+    /* User Info */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .user-avatar {
+        flex-shrink: 0;
+    }
+
+    .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--primary);
+        color: var(--text-white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .avatar.failed {
+        background: var(--danger);
+    }
+
+    .username {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .failed-attempt {
+        color: var(--danger);
+        font-weight: 500;
+    }
+
+    /* Action Badge */
+    .action-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        background: transparent;
+        border: 1px solid;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+        cursor: default;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .action-badge:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Add subtle background for better visibility */
+    .action-badge::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: currentColor;
+        opacity: 0.05;
+        z-index: -1;
+        transition: opacity 0.3s ease;
+    }
+    
+    .action-badge:hover::before {
+        opacity: 0.1;
+    }
+
+    .action-login { border-color: var(--success); color: var(--success); }
+    .action-logout { border-color: var(--warning); color: var(--warning); }
+    .action-task_status_change { border-color: var(--info); color: var(--info); }
+    .action-task_priority_change { border-color: var(--info); color: var(--info); }
+    .action-task_created { border-color: var(--success); color: var(--success); }
+    .action-task_edited { border-color: var(--warning); color: var(--warning); }
+    .action-task_deleted { border-color: var(--danger); color: var(--danger); }
+    .action-task_assigned { border-color: var(--info); color: var(--info); }
+    .action-task_comment_added { border-color: var(--info); color: var(--info); }
+    .action-project_created { border-color: var(--success); color: var(--success); }
+    .action-project_edited { border-color: var(--warning); color: var(--warning); }
+    .action-project_deleted { border-color: var(--danger); color: var(--danger); }
+    .action-project_status_change { border-color: var(--info); color: var(--info); }
+    .action-project_assigned { border-color: var(--info); color: var(--info); }
+    .action-user_created { border-color: var(--success); color: var(--success); }
+    .action-user_edited { border-color: var(--warning); color: var(--warning); }
+    .action-user_deleted { border-color: var(--danger); color: var(--danger); }
+    .action-user_permissions_changed { border-color: var(--info); color: var(--info); }
+    .action-user_suspended { border-color: var(--danger); color: var(--danger); }
+    .action-user_activated { border-color: var(--success); color: var(--success); }
+    .action-client_created { border-color: var(--success); color: var(--success); }
+    .action-client_edited { border-color: var(--warning); color: var(--warning); }
+    .action-client_deleted { border-color: var(--danger); color: var(--danger); }
+    .action-client_activated { border-color: var(--success); color: var(--success); }
+    .action-client_deactivated { border-color: var(--warning); color: var(--warning); }
+    .action-subtask_created { border-color: var(--success); color: var(--success); }
+    .action-subtask_edited { border-color: var(--warning); color: var(--warning); }
+    .action-subtask_deleted { border-color: var(--danger); color: var(--danger); }
+    .action-subtask_status_change { border-color: var(--info); color: var(--info); }
+    .action-report_generated { border-color: var(--info); color: var(--info); }
+    .action-report_sent { border-color: var(--success); color: var(--success); }
+    .action-backup_created { border-color: var(--success); color: var(--success); }
+    .action-backup_restored { border-color: var(--warning); color: var(--warning); }
+    .action-system_settings_changed { border-color: var(--info); color: var(--info); }
+    .action-login_attempt_failed { border-color: var(--danger); color: var(--danger); }
+    .action-account_locked { border-color: var(--danger); color: var(--danger); }
+    .action-account_unlocked { border-color: var(--success); color: var(--success); }
+    .action-navigation { border-color: var(--info); color: var(--info); }
+    
+    /* Dark mode specific improvements for action badges */
+    [data-theme="dark"] .action-badge {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+    }
+    
+    [data-theme="dark"] .action-badge:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Ensure all action types have proper contrast in dark mode */
+    [data-theme="dark"] .action-login,
+    [data-theme="dark"] .action-logout,
+    [data-theme="dark"] .action-task_status_change,
+    [data-theme="dark"] .action-task_priority_change,
+    [data-theme="dark"] .action-task_created,
+    [data-theme="dark"] .action-task_edited,
+    [data-theme="dark"] .action-task_deleted,
+    [data-theme="dark"] .action-task_assigned,
+    [data-theme="dark"] .action-task_comment_added,
+    [data-theme="dark"] .action-project_created,
+    [data-theme="dark"] .action-project_edited,
+    [data-theme="dark"] .action-project_deleted,
+    [data-theme="dark"] .action-project_status_change,
+    [data-theme="dark"] .action-project_assigned,
+    [data-theme="dark"] .action-user_created,
+    [data-theme="dark"] .action-user_edited,
+    [data-theme="dark"] .action-user_deleted,
+    [data-theme="dark"] .action-user_permissions_changed,
+    [data-theme="dark"] .action-user_suspended,
+    [data-theme="dark"] .action-user_activated,
+    [data-theme="dark"] .action-client_created,
+    [data-theme="dark"] .action-client_edited,
+    [data-theme="dark"] .action-client_deleted,
+    [data-theme="dark"] .action-client_activated,
+    [data-theme="dark"] .action-client_deactivated,
+    [data-theme="dark"] .action-subtask_created,
+    [data-theme="dark"] .action-subtask_edited,
+    [data-theme="dark"] .action-subtask_deleted,
+    [data-theme="dark"] .action-subtask_status_change,
+    [data-theme="dark"] .action-report_generated,
+    [data-theme="dark"] .action-report_sent,
+    [data-theme="dark"] .action-backup_created,
+    [data-theme="dark"] .action-backup_restored,
+    [data-theme="dark"] .action-system_settings_changed,
+    [data-theme="dark"] .action-login_attempt_failed,
+    [data-theme="dark"] .action-account_locked,
+    [data-theme="dark"] .action-account_unlocked,
+    [data-theme="dark"] .action-navigation {
+        border-width: 2px;
+        font-weight: 600;
+    }
+
+    /* Action Details */
+    .action-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+        max-width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        line-height: 1.3;
+        flex-wrap: wrap;
+    }
+
+    .detail-item strong {
+        color: var(--text-secondary);
+        font-weight: 600;
+        min-width: 80px;
+        flex-shrink: 0;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .status-change, .priority-change {
+        font-weight: 500;
+        color: var(--text-primary);
+        padding: 0.125rem 0.5rem;
+        border-radius: 4px;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+    
+    /* Dark mode improvements for status and priority changes */
+    [data-theme="dark"] .status-change,
+    [data-theme="dark"] .priority-change {
+        background: rgba(59, 130, 246, 0.15);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .changes-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-top: 0.25rem;
+    }
+
+    .change-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        background: var(--background-secondary);
+        border: 1px solid var(--border-light);
+        transition: all 0.3s ease;
+        flex-wrap: wrap;
+        line-height: 1.2;
+    }
+    
+    .change-item:hover {
+        background: var(--background-tertiary);
+        border-color: var(--border-medium);
+        transform: translateX(2px);
+    }
+
+    .field-name {
+        color: var(--text-secondary);
+        font-weight: 500;
+        min-width: 90px;
+        flex-shrink: 0;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .change-value {
+        color: var(--text-primary);
+        font-weight: 400;
+        padding: 0.125rem 0.5rem;
+        background: rgba(59, 130, 246, 0.1);
+        border-radius: 3px;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        font-size: 0.7rem;
+        word-break: break-word;
+        max-width: 100%;
+    }
+    
+    /* Dark mode improvements for change items */
+    [data-theme="dark"] .change-item {
+        background: var(--background-tertiary);
+        border-color: var(--border-medium);
+    }
+    
+    [data-theme="dark"] .change-item:hover {
+        background: var(--background-secondary);
+        border-color: var(--border-dark);
+    }
+    
+    [data-theme="dark"] .change-value {
+        background: rgba(59, 130, 246, 0.15);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    /* Special styling for assigned users and complex changes */
+    .change-item.assigned-users-change .change-value {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: rgba(16, 185, 129, 0.2);
+        font-family: 'Courier New', monospace;
+        font-size: 0.65rem;
+        padding: 0.25rem 0.5rem;
+        white-space: pre-wrap;
+        max-width: 100%;
+        overflow-wrap: break-word;
+    }
+
+    [data-theme="dark"] .change-item.assigned-users-change .change-value {
+        background: rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    /* Compact display for long lists */
+    .change-item.compact-change {
+        padding: 0.125rem 0.375rem;
+        margin-bottom: 0.125rem;
+    }
+
+    .change-item.compact-change .field-name {
+        min-width: 70px;
+        font-size: 0.65rem;
+    }
+
+    .change-item.compact-change .change-value {
+        font-size: 0.65rem;
+        padding: 0.125rem 0.375rem;
+    }
+
+    /* Assigned users list styling */
+    .assigned-users-list {
+        font-family: 'Courier New', monospace;
+        font-size: 0.7rem;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-radius: 3px;
+        padding: 0.25rem 0.5rem;
+        color: var(--text-primary);
+        word-break: break-word;
+        max-width: 100%;
+        display: inline-block;
+    }
+
+    [data-theme="dark"] .assigned-users-list {
+        background: rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    /* Timestamp */
+    .timestamp {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .date {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+    }
+
+    .time {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 400;
+    }
+
+    /* IP Address */
+    .ip-address {
+        font-family: 'Courier New', monospace;
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        background: var(--background-tertiary);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 400;
+    }
+
+    /* System Info */
+    .system-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .info-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+        min-width: 50px;
+    }
+
+    .info-value {
+        color: var(--text-primary);
+        font-weight: 400;
+    }
+
+    .empty-field {
+        color: var(--text-muted);
+        font-style: italic;
+        font-size: 0.875rem;
+    }
+
+    /* No Data State */
+    .no-data {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: var(--text-muted);
+    }
+
+    .no-data-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .no-data-text {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .no-data-subtext {
+        font-size: 0.875rem;
+        font-weight: 400;
+    }
+
+    /* Pagination */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        padding: 2rem;
+        border-top: 1px solid var(--border-light);
+        flex-wrap: wrap;
+    }
+
+    .pagination-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-small);
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        background: var(--background-primary);
+    }
+
+    .pagination-btn:hover {
+        background: var(--background-secondary);
+        border-color: var(--border-dark);
+        color: var(--text-primary);
+    }
+
+    .pagination-info {
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        font-weight: 500;
+        padding: 0 1rem;
+    }
+
+    /* Smooth animations */
+    .section {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .section:nth-child(1) { animation-delay: 0.1s; }
+    .section:nth-child(2) { animation-delay: 0.2s; }
+    .section:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Accessibility improvements */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+
+    /* Focus improvements */
+    .form-group input:focus-visible,
+    .form-group textarea:focus-visible,
+    .form-group select:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    .btn:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .admin-controls {
+            padding: 1rem;
+        }
+
+        .settings-container {
+            margin: 0 1rem;
+        }
+
+        .section-content {
+            padding: 1.5rem;
+        }
+
+        .section-header {
+            padding: 1rem 1.5rem 0.75rem 1.5rem;
+        }
+
+        .form-actions {
+            padding: 1.5rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        /* Mobile select dropdown improvements */
+        select.form-input {
+            font-size: 16px; /* Prevents zoom on iOS */
+            padding: 0.75rem 0;
+            min-height: 2.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            justify-content: center;
+            width: 100%;
+        }
+
+        .table-header,
+        .table-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .table-header {
+            display: none;
+        }
+
+        .table-row {
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-small);
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--background-primary);
+            position: relative;
+        }
+
+        .table-cell {
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .table-cell:last-child {
+            border-bottom: none;
+        }
+
+        .table-cell::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            display: block;
+            background: var(--background-secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            align-self: flex-start;
+        }
+
+        .user-info {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .action-details {
+            max-width: 100%;
+        }
+
+        .changes-list {
+            max-width: 100%;
+        }
+
+        .change-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.25rem;
+        }
+
+        .change-item .field-name {
+            min-width: auto;
+            font-size: 0.65rem;
+        }
+
+        .change-item .change-value {
+            font-size: 0.65rem;
+            padding: 0.125rem 0.375rem;
+            width: 100%;
+        }
+
+        .assigned-users-list {
+            font-size: 0.65rem;
+            padding: 0.125rem 0.375rem;
+        }
+
+        .action-badge {
+            align-self: flex-start;
+        }
+
+        .pagination {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .pagination-btn {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .admin-controls {
+            padding: 0.5rem;
+        }
+
+        .settings-container {
+            margin: 0 0.5rem;
+        }
+
+        .dashboard-header {
+            padding: 1.5rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.25rem;
+        }
+
+        .dashboard-header p {
+            font-size: 0.8rem;
+        }
+
+        .section-content {
+            padding: 1rem;
+        }
+
+        .section-header {
+            padding: 1rem 1rem 0.75rem 1rem;
+        }
+
+        .form-actions {
+            padding: 1rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .stat-item {
+            padding: 0.75rem;
+        }
+
+        .stat-number {
+            font-size: 1.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            font-size: 0.8rem;
+        }
+
+        .table-row {
+            padding: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .table-cell {
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .action-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+        }
+
+        .avatar {
+            width: 28px;
+            height: 28px;
+            font-size: 0.75rem;
+        }
+
+        .detail-item {
+            font-size: 0.8rem;
+        }
+
+        .timestamp .date {
+            font-size: 0.8rem;
+        }
+
+        .timestamp .time {
+            font-size: 0.7rem;
+        }
+        
+        .filter-message {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-medium);
+            font-weight: 500;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .filter-message.message-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border-left-color: var(--success);
+        }
+        
+        .filter-message.message-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border-left-color: var(--error);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .no-logs {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-secondary);
+        }
+        
+        .no-logs-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+        
+        .no-logs h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+        
+        .no-logs p {
+            font-size: 1rem;
+            line-height: 1.6;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+    }
+</style>
+
+<script>
+    // System Logs functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableRows = document.querySelectorAll('.table-row');
+        
+        tableRows.forEach((row, rowIndex) => {
+            const cells = row.querySelectorAll('.table-cell');
+            
+            cells.forEach((cell, cellIndex) => {
+                // Add data-label attribute for mobile responsive design
+                const labels = ['User', 'Action', 'Details', 'Timestamp', 'IP Address', 'System Info'];
+                if (cellIndex < labels.length) {
+                    cell.setAttribute('data-label', labels[cellIndex]);
+                }
+            });
+        });
+        
+        // Add smooth scrolling for pagination
+        const paginationLinks = document.querySelectorAll('.pagination-btn');
+        paginationLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Smooth scroll to top when navigating pages
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // AJAX Filtering - Prevent page refresh
+        const applyFiltersBtn = document.getElementById('apply-filters');
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        const filterForm = document.getElementById('filters-form');
+        
+        if (applyFiltersBtn) {
+            applyFiltersBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                applyFilters();
+            });
+        }
+        
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                clearFilters();
+            });
+        }
+        
+        // Auto-apply filters on input change (with debouncing)
+        const filterInputs = filterForm.querySelectorAll('input, select');
+        filterInputs.forEach(input => {
+            if (input.type !== 'submit') {
+                input.addEventListener('change', function() {
+                    // Add a small delay to avoid too many requests
+                    clearTimeout(this.submitTimeout);
+                    this.submitTimeout = setTimeout(() => {
+                        applyFilters();
+                    }, 500);
+                });
+            }
+        });
+        
+        function applyFilters() {
+            const formData = new FormData(filterForm);
+            const params = new URLSearchParams();
+            
+            // Build query parameters
+            for (let [key, value] of formData.entries()) {
+                if (value) {
+                    params.append(key, value);
+                }
+            }
+            
+            // Update URL without page refresh
+            const currentUrl = window.location.pathname;
+            const newUrl = params.toString() ? `${currentUrl}?${params.toString()}` : currentUrl;
+            
+            // Update browser URL
+            window.history.pushState({}, '', newUrl);
+            
+            // Fetch filtered results
+            fetch(`${currentUrl}?${params.toString()}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                // Parse the HTML and extract the logs table
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newLogsTable = doc.querySelector('.users-table');
+                const currentLogsTable = document.querySelector('.users-table');
+                
+                if (newLogsTable && currentLogsTable) {
+                    currentLogsTable.innerHTML = newLogsTable.innerHTML;
+                }
+                
+                // Update pagination if it exists
+                const newPagination = doc.querySelector('.pagination');
+                const currentPagination = document.querySelector('.pagination');
+                
+                if (newPagination && currentPagination) {
+                    currentPagination.innerHTML = newPagination.innerHTML;
+                }
+                
+                // Update stats if they exist
+                const newStats = doc.querySelector('.stats-grid');
+                const currentStats = document.querySelector('.stats-grid');
+                
+                if (newStats && currentStats) {
+                    currentStats.innerHTML = newStats.innerHTML;
+                }
+                
+                // Show success message
+                showMessage('Filters applied successfully!', 'success');
+            })
+            .catch(error => {
+                console.error('Error applying filters:', error);
+                showMessage('Error applying filters. Please try again.', 'error');
+            });
+        }
+        
+        function clearFilters() {
+            // Reset form
+            filterForm.reset();
+            
+            // Clear URL parameters
+            window.history.pushState({}, '', window.location.pathname);
+            
+            // Reload the page to show all logs
+            window.location.reload();
+        }
+        
+        function showMessage(message, type) {
+            // Remove existing messages
+            const existingMessages = document.querySelectorAll('.filter-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            // Create new message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `filter-message message message-${type}`;
+            messageDiv.textContent = message;
+            
+            // Insert after the filters section
+            const filtersSection = document.querySelector('.filters-form').closest('.section');
+            filtersSection.appendChild(messageDiv);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+
+        // Add mobile-friendly table interactions
+        if (window.innerWidth <= 1200) {
+            const tableRows = document.querySelectorAll('.table-row');
+            tableRows.forEach(row => {
+                row.addEventListener('click', function() {
+                    // Toggle expanded view on mobile
+                    this.classList.toggle('expanded');
+                });
+            });
+        }
+
+        // Enhanced form interactions matching settings page
+        const inputs = document.querySelectorAll('.form-group input, .form-group textarea, .form-group select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+
+            input.addEventListener('input', function() {
+                // Add subtle animation feedback
+                this.style.transform = 'scale(1.01)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+            });
+        });
+
+        // Enhanced button interactions
+        const buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+    });
+</script>
+{% endblock %} 
